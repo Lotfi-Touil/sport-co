@@ -30,7 +30,7 @@ RUN apk add --no-cache \
 		gettext \
 		git \
         linux-headers \
-		npm \
+        npm \
 	;
 
 RUN set -eux; \
