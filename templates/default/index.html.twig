@@ -4,4 +4,9 @@
 
 {% block body %}
     Page d'accueil
+    {% if app.user %}
+        <div class="mb-3">
+            Tu est connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Déconnexion</a>
+        </div>
+    {% endif %}
 {% endblock %}
