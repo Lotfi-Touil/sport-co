@@ -32,7 +32,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(mappedBy: 'creatorUser', targetEntity: QuoteUser::class)]
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: QuoteUser::class)]
     private Collection $quoteUsers;
 
     public function __construct()
@@ -122,7 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->quoteUsers->contains($quoteUser)) {
             $this->quoteUsers->add($quoteUser);
-            $quoteUser->setCreatorUser($this);
+            $quoteUser->setCreator($this);
         }
 
         return $this;
@@ -132,8 +132,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->quoteUsers->removeElement($quoteUser)) {
             // set the owning side to null (unless already changed)
-            if ($quoteUser->getCreatorUser() === $this) {
-                $quoteUser->setCreatorUser(null);
+            if ($quoteUser->getCreator() === $this) {
+                $quoteUser->setCreator(null);
             }
         }
 

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\QuoteUserRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: QuoteUserRepository::class)]
@@ -18,12 +19,17 @@ class QuoteUser
     private ?Quote $quote = null;
 
     #[ORM\ManyToOne(inversedBy: 'quoteUsers')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $creatorUser = null;
+    private ?Customer $customer = null;
 
     #[ORM\ManyToOne(inversedBy: 'quoteUsers')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $customerUser = null;
+    private ?User $creator = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ["default" => "CURRENT_TIMESTAMP"])]
+    private ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ["default" => "CURRENT_TIMESTAMP"])]
+    private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -42,26 +48,50 @@ class QuoteUser
         return $this;
     }
 
-    public function getCreatorUser(): ?User
+    public function getCustomer(): ?Customer
     {
-        return $this->creatorUser;
+        return $this->customer;
     }
 
-    public function setCreatorUser(?User $creatorUser): static
+    public function setCustomer(?Customer $customer): static
     {
-        $this->creatorUser = $creatorUser;
+        $this->customer = $customer;
 
         return $this;
     }
 
-    public function getCustomerUser(): ?User
+    public function getCreator(): ?User
     {
-        return $this->customerUser;
+        return $this->creator;
     }
 
-    public function setCustomerUser(?User $customerUser): static
+    public function setCreator(?User $creator): static
     {
-        $this->customerUser = $customerUser;
+        $this->creator = $creator;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
