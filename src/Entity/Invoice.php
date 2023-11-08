@@ -2,23 +2,23 @@
 
 namespace App\Entity;
 
-use App\Repository\QuoteRepository;
+use App\Repository\InvoiceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: QuoteRepository::class)]
-class Quote
+#[ORM\Entity(repositoryClass: InvoiceRepository::class)]
+class Invoice
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'quotes')]
+    #[ORM\ManyToOne(inversedBy: 'invoices')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?QuoteStatus $quoteStatus = null;
+    private ?InvoiceStatus $invoiceStatus = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
     private ?string $totalAmount = null;
@@ -29,46 +29,39 @@ class Quote
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
     private ?string $taxes = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $notes = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ["default" => "CURRENT_TIMESTAMP"])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $SubmittedAt = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $submittedAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $expiryDate = null;
+
+    #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: Payment::class)]
+    private Collection $payments;
+
+    public function __construct()
+    {
+        $this->payments = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getQuote(): ?Quote
+    public function getInvoiceStatus(): ?InvoiceStatus
     {
-        return $this->quote;
+        return $this->invoiceStatus;
     }
 
-    public function setQuote(?Quote $quote): static
+    public function setInvoiceStatus(?InvoiceStatus $invoiceStatus): static
     {
-        $this->quote = $quote;
-
-        return $this;
-    }
-
-    public function getQuoteStatus(): ?QuoteStatus
-    {
-        return $this->quoteStatus;
-    }
-
-    public function setQuoteStatus(?QuoteStatus $quoteStatus): static
-    {
-        $this->quoteStatus = $quoteStatus;
+        $this->invoiceStatus = $invoiceStatus;
 
         return $this;
     }
@@ -109,18 +102,6 @@ class Quote
         return $this;
     }
 
-    public function getNotes(): ?string
-    {
-        return $this->notes;
-    }
-
-    public function setNotes(string $notes): static
-    {
-        $this->notes = $notes;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -147,12 +128,12 @@ class Quote
 
     public function getSubmittedAt(): ?\DateTimeInterface
     {
-        return $this->SubmittedAt;
+        return $this->submittedAt;
     }
 
-    public function setSubmittedAt(?\DateTimeInterface $SubmittedAt): static
+    public function setSubmittedAt(\DateTimeInterface $submittedAt): static
     {
-        $this->SubmittedAt = $SubmittedAt;
+        $this->submittedAt = $submittedAt;
 
         return $this;
     }
@@ -162,9 +143,39 @@ class Quote
         return $this->expiryDate;
     }
 
-    public function setExpiryDate(?\DateTimeInterface $expiryDate): static
+    public function setExpiryDate(\DateTimeInterface $expiryDate): static
     {
         $this->expiryDate = $expiryDate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Payment>
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+
+    public function addPayment(Payment $payment): static
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments->add($payment);
+            $payment->setInvoice($this);
+        }
+
+        return $this;
+    }
+
+    public function removePayment(Payment $payment): static
+    {
+        if ($this->payments->removeElement($payment)) {
+            // set the owning side to null (unless already changed)
+            if ($payment->getInvoice() === $this) {
+                $payment->setInvoice(null);
+            }
+        }
 
         return $this;
     }
