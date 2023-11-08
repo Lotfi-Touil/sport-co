@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -29,6 +31,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\OneToMany(mappedBy: 'creatorUser', targetEntity: QuoteUser::class)]
+    private Collection $quoteUsers;
+
+    public function __construct()
+    {
+        $this->quoteUsers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -98,5 +108,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, QuoteUser>
+     */
+    public function getQuoteUsers(): Collection
+    {
+        return $this->quoteUsers;
+    }
+
+    public function addQuoteUser(QuoteUser $quoteUser): static
+    {
+        if (!$this->quoteUsers->contains($quoteUser)) {
+            $this->quoteUsers->add($quoteUser);
+            $quoteUser->setCreatorUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuoteUser(QuoteUser $quoteUser): static
+    {
+        if ($this->quoteUsers->removeElement($quoteUser)) {
+            // set the owning side to null (unless already changed)
+            if ($quoteUser->getCreatorUser() === $this) {
+                $quoteUser->setCreatorUser(null);
+            }
+        }
+
+        return $this;
     }
 }
