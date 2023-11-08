@@ -44,17 +44,21 @@ class Quote
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $expiryDate = null;
 
-    #[ORM\OneToMany(mappedBy: 'quote', targetEntity: QuoteUser::class)]
-    private Collection $quoteUsers;
-
-    public function __construct()
-    {
-        $this->quoteUsers = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getQuote(): ?Quote
+    {
+        return $this->quote;
+    }
+
+    public function setQuote(?Quote $quote): static
+    {
+        $this->quote = $quote;
+
+        return $this;
     }
 
     public function getQuoteStatus(): ?QuoteStatus
@@ -161,36 +165,6 @@ class Quote
     public function setExpiryDate(?\DateTimeInterface $expiryDate): static
     {
         $this->expiryDate = $expiryDate;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, QuoteUser>
-     */
-    public function getQuoteUsers(): Collection
-    {
-        return $this->quoteUsers;
-    }
-
-    public function addQuoteUser(QuoteUser $quoteUser): static
-    {
-        if (!$this->quoteUsers->contains($quoteUser)) {
-            $this->quoteUsers->add($quoteUser);
-            $quoteUser->setQuote($this);
-        }
-
-        return $this;
-    }
-
-    public function removeQuoteUser(QuoteUser $quoteUser): static
-    {
-        if ($this->quoteUsers->removeElement($quoteUser)) {
-            // set the owning side to null (unless already changed)
-            if ($quoteUser->getQuote() === $this) {
-                $quoteUser->setQuote(null);
-            }
-        }
 
         return $this;
     }

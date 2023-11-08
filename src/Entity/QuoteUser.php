@@ -14,7 +14,7 @@ class QuoteUser
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'quoteUsers')]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Quote $quote = null;
 
@@ -34,18 +34,6 @@ class QuoteUser
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getQuote(): ?Quote
-    {
-        return $this->quote;
-    }
-
-    public function setQuote(?Quote $quote): static
-    {
-        $this->quote = $quote;
-
-        return $this;
     }
 
     public function getCustomer(): ?Customer
@@ -92,6 +80,18 @@ class QuoteUser
     public function setUpdatedAt(\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getQuote(): ?Quote
+    {
+        return $this->quote;
+    }
+
+    public function setQuote(Quote $quote): static
+    {
+        $this->quote = $quote;
 
         return $this;
     }
