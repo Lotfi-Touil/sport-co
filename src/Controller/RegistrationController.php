@@ -17,7 +17,7 @@ class RegistrationController extends AbstractController
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
         if ($this->getUser()) {
-            return $this->redirectToRoute('default_index');
+            return $this->redirectToRoute('home_index');
         }
 
         $user = new User();
@@ -37,7 +37,7 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
             // do anything else you need here, like send an email
 
-            return $this->redirectToRoute('default_index');
+            return $this->redirectToRoute('home_index');
         }
 
         return $this->render('registration/register.html.twig', [
