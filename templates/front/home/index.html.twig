@@ -3,10 +3,12 @@
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
-    Page d'accueil
-    {% if app.user %}
-        <div class="mb-3">
-            Tu est connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Déconnexion</a>
-        </div>
-    {% endif %}
+    {% include '_partials/front/_navbar.html.twig' %}
+
+    <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+        <h5 class="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Lorem Ipsum</h5>
+        <p class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">Lorem Ipsum Lorem Ipsum Lorem IpsumLorem IpsumLorem Ipsum Lorem Ipsum Lorem Ipsum</p>
+    </div>
+
+    {% include '_partials/front/_footer.html.twig' %}
 {% endblock %}
