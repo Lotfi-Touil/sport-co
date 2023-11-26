@@ -6,9 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/platform')]
 class MainController extends AbstractController
 {
-    #[Route('/platform', name: 'platform_index')]
+    #[Route('/', name: 'platform_index')]
     public function index(): Response
     {
         return $this->render('back/main/index.html.twig', []);

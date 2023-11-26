@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+    <section class="p-4 sm:ml-64 mt-14">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold mb-5">Produit #{{ product.id }}</h1>
+
+            <div class="actions flex">
+                <a href="{{ path('platform_product_index') }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                    Revenir à la liste
+                </a>
+                <a href="{{ path('platform_product_edit', {'id': product.id}) }}" class="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
+                    Modifier
+                </a>
+                {{ include('back/product/_delete_form.html.twig') }}
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg p-6">
+            <table class="w-full table-auto">
+                <tbody class="text-gray-700">
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left font-semibold">Id</th>
+                        <td class="py-2 px-4">{{ product.id }}</td>
+                    </tr>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left font-semibold">Name</th>
+                        <td class="py-2 px-4">{{ product.name }}</td>
+                    </tr>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left font-semibold">Description</th>
+                        <td class="py-2 px-4">{{ product.description }}</td>
+                    </tr>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left font-semibold">Price</th>
+                        <td class="py-2 px-4">{{ product.price }}</td>
+                    </tr>
+                    <tr>
+                        <th class="py-2 px-4 text-left font-semibold">Tax Rate</th>
+                        <td class="py-2 px-4">{{ product.taxRate }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+{% endblock %}
