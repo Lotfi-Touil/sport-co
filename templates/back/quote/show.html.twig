@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Quote{% endblock %}
+
+{% block body %}
+    <h1>Quote</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ quote.id }}</td>
+            </tr>
+            <tr>
+                <th>TotalAmount</th>
+                <td>{{ quote.totalAmount }}</td>
+            </tr>
+            <tr>
+                <th>Subtotal</th>
+                <td>{{ quote.subtotal }}</td>
+            </tr>
+            <tr>
+                <th>Taxes</th>
+                <td>{{ quote.taxes }}</td>
+            </tr>
+            <tr>
+                <th>Notes</th>
+                <td>{{ quote.notes }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ quote.createdAt ? quote.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ quote.updatedAt ? quote.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>SubmittedAt</th>
+                <td>{{ quote.SubmittedAt ? quote.SubmittedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>ExpiryDate</th>
+                <td>{{ quote.expiryDate ? quote.expiryDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('platform_quote_index') }}">back to list</a>
+
+    <a href="{{ path('platform_quote_edit', {'id': quote.id}) }}">edit</a>
+
+    {{ include('back/quote/_delete_form.html.twig') }}
+{% endblock %}
