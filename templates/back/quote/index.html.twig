@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des devis{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+
+    <section class="p-4 sm:ml-64 mt-14">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-lg font-bold">Liste des devis</h1>
+            <a href="{{ path('platform_quote_new') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Créer un devis
+            </a>
+        </div>
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            #
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Nom
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Description
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Prix
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Taxes
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quote in quotes %}
+                        <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                            <td class="px-6 py-4">{{ quote.id }}</td>
+                            <td class="px-6 py-4">{{ quote.name }}</td>
+                            <td class="px-6 py-4">{{ quote.description }}</td>
+                            <td class="px-6 py-4">{{ quote.price }}</td>
+                            <td class="px-6 py-4">{{ quote.taxRate }}</td>
+                            <td class="px-6 py-4 flex">
+                                <a href="{{ path('platform_quote_show', {'id': quote.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                    Voir
+                                </a>
+                                <a href="{{ path('platform_quote_edit', {'id': quote.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                    Modifier
+                                </a>
+                                <form method="post" action="{{ path('platform_quote_delete', {'id': quote.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce devis ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quote.id) }}">
+                                    <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr class="bg-gray-100 border-b dark:bg-gray-800">
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-600 dark:text-gray-400 text-lg">
+                                Aucun devis pour le moment.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+{% endblock %}
