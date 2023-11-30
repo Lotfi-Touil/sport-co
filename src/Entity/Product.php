@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -25,6 +27,14 @@ class Product
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
     private ?string $tax_rate = null;
+
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: QuoteProduct::class)]
+    private Collection $quoteProducts;
+
+    public function __construct()
+    {
+        $this->quoteProducts = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -75,6 +85,36 @@ class Product
     public function setTaxRate(string $tax_rate): static
     {
         $this->tax_rate = $tax_rate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QuoteProduct>
+     */
+    public function getQuoteProducts(): Collection
+    {
+        return $this->quoteProducts;
+    }
+
+    public function addQuoteProduct(QuoteProduct $quoteProduct): static
+    {
+        if (!$this->quoteProducts->contains($quoteProduct)) {
+            $this->quoteProducts->add($quoteProduct);
+            $quoteProduct->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuoteProduct(QuoteProduct $quoteProduct): static
+    {
+        if ($this->quoteProducts->removeElement($quoteProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($quoteProduct->getProduct() === $this) {
+                $quoteProduct->setProduct(null);
+            }
+        }
 
         return $this;
     }
