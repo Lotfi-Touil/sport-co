@@ -32,6 +32,9 @@ RUN apk add --no-cache \
         linux-headers \
         npm \
 	;
+	
+# Ajout de stripe via composer
+RUN composer require stripe/stripe-php
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \

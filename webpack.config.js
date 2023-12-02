@@ -57,7 +57,11 @@ Encore
 
     // enables Sass/SCSS support
     .enableSassLoader()
-    .enablePostCssLoader()
+    .enablePostCssLoader((options) => {
+        options.postcssOptions = {
+            path: './postcss.config.js'
+        };
+    })    
     .addPlugin(new WatchExternalFilesPlugin({
         files: [
             './templates/**/*.html.twig',

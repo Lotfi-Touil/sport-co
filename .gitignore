@@ -3,6 +3,7 @@
 /.env.local
 /.env.local.php
 /.env.*.local
+.env.test
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -53,3 +54,5 @@ ehthumbs_vista.db
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+/.env
+.env
