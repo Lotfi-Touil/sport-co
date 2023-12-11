@@ -16,6 +16,7 @@ use App\Entity\PaymentStatus;
 use App\Entity\PaymentMethod;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 #[Route('/platform')]
 class PaymentController extends AbstractController
@@ -173,7 +174,7 @@ class PaymentController extends AbstractController
     }
 
 
-    #[Route('/payment/failed', name: 'back/payment_failed')]
+    #[Route('/payment/failed', name: 'payment_failed')]
     public function failed(): Response
     {
 

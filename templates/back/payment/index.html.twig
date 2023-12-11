@@ -30,6 +30,9 @@
 								<th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
 									Statut
 								</th>
+                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+									Payer
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -44,6 +47,9 @@
 										</td>
 										<td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
 											{{ payment.paymentStatus.name }}
+										</td>
+										<td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+											<a href="{{ path('payment_checkout', {'paymentId': payment.id}) }}" class="text-blue-600 hover:text-blue-900">Payer</a>
 										</td>
 									</tr>
 								{% endfor %}
@@ -77,29 +83,30 @@
 								</button>
 							</div>
 							<!-- Modal body and rest of your modal content... -->
-							<div class="p-4 md:p-5">
-                        <!-- Corps du Modal -->
-                        <form id="paymentForm">
-                            <ul class="space-y-4 mb-4">
-                                {% for invoice in invoices %}
-                                    <li>
-                                        <input type="radio" id="invoice-{{ invoice.id }}" name="invoice" value="{{ invoice.id }}" class="hidden peer" @change="selectedInvoiceId = {{ invoice.id }}">
-                                        <label for="invoice-{{ invoice.id }}" class="inline-flex items-center justify-between w-full p-5 text-gray-900 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:bg-blue-100">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">{{ invoice.id }}</div>
-                                                <div class="w-full text-gray-500 dark:text-gray-400">{{ invoice.totalAmount }}</div>
-                                            </div>
-                                        </label>
-                                    </li>
-                                {% else %}
-                                    <li>Aucune facture disponible.</li>
-                                {% endfor %}
-                            </ul>
-                            <button type="button" onclick="submitPaymentForm()" class="text-white inline-flex w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                Créer le Paiement
-                            </button>
-                        </form>
-                    </div>
+							<div
+								class="p-4 md:p-5">
+								<!-- Corps du Modal -->
+								<form id="paymentForm">
+									<ul class="space-y-4 mb-4">
+										{% for invoice in invoices %}
+											<li>
+												<input type="radio" id="invoice-{{ invoice.id }}" name="invoice" value="{{ invoice.id }}" class="hidden peer" @change="selectedInvoiceId = {{ invoice.id }}">
+												<label for="invoice-{{ invoice.id }}" class="inline-flex items-center justify-between w-full p-5 text-gray-900 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:bg-blue-100">
+													<div class="block">
+														<div class="w-full text-lg font-semibold">{{ invoice.id }}</div>
+														<div class="w-full text-gray-500 dark:text-gray-400">{{ invoice.totalAmount }}</div>
+													</div>
+												</label>
+											</li>
+										{% else %}
+											<li>Aucune facture disponible.</li>
+										{% endfor %}
+									</ul>
+									<button type="button" onclick="submitPaymentForm()" class="text-white inline-flex w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+										Créer le Paiement
+									</button>
+								</form>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -113,7 +120,15 @@
 		function submitPaymentForm() {
 var selectedInvoiceId = document.querySelector('input[name="invoice"]:checked').value;
 if (selectedInvoiceId) {
-window.location.href = '/platform/payment/create/' + selectedInvoiceId;
+fetch('/platform/payment/create/' + selectedInvoiceId, {method: 'POST'}).then(response => {
+if (response.ok) {
+location.reload();
+} else {
+console.error('Erreur lors de la création du paiement');
+}
+}).catch(error => {
+console.error('Erreur AJAX : ', error);
+});
 }
 }
 	</script>
