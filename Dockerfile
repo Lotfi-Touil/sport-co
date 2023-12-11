@@ -33,8 +33,8 @@ RUN apk add --no-cache \
         npm \
 	;
 	
-# Ajout de stripe via composer
-RUN composer require stripe/stripe-php
+# Ajout de stripe et faker via composer
+RUN composer require stripe/stripe-php fakerphp/faker  doctrine/doctrine-fixtures-bundle
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \

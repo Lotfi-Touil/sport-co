@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
+
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,7 +12,10 @@ use Stripe\StripeClient;
 use Stripe\Exception\ApiErrorException;
 use App\Entity\Payment;
 use App\Entity\Invoice;
+use App\Entity\PaymentStatus;
+use App\Entity\PaymentMethod;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/platform')]
 class PaymentController extends AbstractController
@@ -19,46 +24,63 @@ class PaymentController extends AbstractController
     private $entityManager;
     private $stripeSecretKey;
     private $stripeWebhookSecret;
+    private $authorizationChecker;
 
-    public function __construct(string $stripeSecretKey, string $stripeWebhookSecret,  EntityManagerInterface $entityManager)
+    public function __construct(string $stripeSecretKey, string $stripeWebhookSecret,  EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker)
     {
         $this->stripeSecretKey = $stripeSecretKey;
         $this->stripeWebhookSecret = $stripeWebhookSecret;
         $this->stripeClient = new StripeClient($stripeSecretKey);
         $this->entityManager = $entityManager;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     #[Route('/payment/create/{invoiceId}', name: 'payment_create')]
     public function create(Request $request, int $invoiceId): Response
     {
-        // Vérifie que l'utilisateur est bien une entreprise
-        $this->denyAccessUnlessGranted('ROLE_COMPANY'); 
-    
+        // Vérifie que l'utilisateur est bien une entreprise ou un admin
+        if (
+            !$this->authorizationChecker->isGranted('ROLE_COMPANY') &&
+            !$this->authorizationChecker->isGranted('ROLE_ADMIN')
+        ) {
+            throw new AccessDeniedException('Accès refusé.');
+        }
+
         try {
             $invoice = $this->entityManager->getRepository(Invoice::class)->find($invoiceId);
             if (!$invoice) {
                 throw new \Exception("Facture non trouvée");
             }
-    
+
             // Vérifie si un paiement n'a pas déjà été initié pour cette facture
             $existingPayment = $this->entityManager->getRepository(Payment::class)->findOneBy(['invoice' => $invoice]);
             if ($existingPayment) {
                 throw new \Exception("Un paiement a déjà été initié pour cette facture.");
             }
-    
+
             $amount = $invoice->getTotalAmount();
-    
+
             $paymentIntent = $this->stripeClient->paymentIntents->create([
                 'amount' => $amount * 100, // Convertit le montant en centimes
                 'currency' => 'eur',
                 'payment_method_types' => ['card'],
             ]);
-    
+
             $payment = new Payment();
             $payment->setAmount($amount);
             $payment->setInvoice($invoice);
             $payment->setStripePaymentIntentId($paymentIntent->id); // Stocke l'ID du PaymentIntent
-    
+            $defaultPaymentStatus = $this->entityManager->getRepository(PaymentStatus::class)->findOneBy(['name' => 'En attente']);
+            if (!$defaultPaymentStatus) {
+                throw new \Exception("Statut de paiement par défaut introuvable.");
+            }
+
+            $payment->setPaymentStatus($defaultPaymentStatus);
+            $defaultPaymentMethod = $this->entityManager->getRepository(PaymentMethod::class)->findOneBy(['name' => 'Carte de crédit']);
+            if (!$defaultPaymentMethod) {
+                throw new \Exception("Méthode de paiement par défaut introuvable.");
+            }
+            $payment->setPaymentMethod($defaultPaymentMethod);
             $this->entityManager->persist($payment);
             $this->entityManager->flush();
 
@@ -111,7 +133,9 @@ class PaymentController extends AbstractController
 
         try {
             $event = \Stripe\Webhook::constructEvent(
-                $payload, $sig_header, $endpoint_secret
+                $payload,
+                $sig_header,
+                $endpoint_secret
             );
 
             if ($event->type === 'checkout.session.completed') {
@@ -152,7 +176,7 @@ class PaymentController extends AbstractController
     #[Route('/payment/failed', name: 'back/payment_failed')]
     public function failed(): Response
     {
-        
+
         return $this->render('back/payment/failed.html.twig');
     }
 
@@ -160,9 +184,16 @@ class PaymentController extends AbstractController
     public function index(): Response
     {
         $payments = $this->entityManager->getRepository(Payment::class)->findAll();
+        // Récupération de toutes les factures
+        $allInvoices = $this->entityManager->getRepository(Invoice::class)->findAll();
+
+        // Filtrer pour obtenir seulement les factures sans paiements
+        $invoicesWithoutPayments = array_filter($allInvoices, function ($invoice) {
+            return $invoice->getPayments()->isEmpty();
+        });
         return $this->render('back/payment/index.html.twig', [
             'payments' => $payments,
+            'invoices' => $invoicesWithoutPayments,
         ]);
     }
-    
 }

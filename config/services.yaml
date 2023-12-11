@@ -21,8 +21,10 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+            - '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
-    App\Controller\PaymentController:
+    App\Controller\Back\PaymentController:
+        autowire: true
         arguments:
             $stripeSecretKey: '%stripe.secret_key%'
             $stripeWebhookSecret: '%stripe.webhook_secret%'
