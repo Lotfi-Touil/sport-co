@@ -22,7 +22,7 @@ class Product
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 13, scale: 4)]
     private ?string $price = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
@@ -87,6 +87,11 @@ class Product
         $this->tax_rate = $tax_rate;
 
         return $this;
+    }
+
+    public function getPriceHT()
+    {
+        return $this->getPrice() * (1 - $this->getTaxRate() / 100);
     }
 
     /**

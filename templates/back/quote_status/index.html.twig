@@ -39,7 +39,7 @@
                                 <a href="{{ path('platform_quote_status_edit', {'id': quote_status.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
                                     Modifier
                                 </a>
-                                <form method="post" action="{{ path('platform_quote_status_delete', {'id': quote_status.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');">
+                                <form method="post" action="{{ path('platform_quote_status_delete', {'id': quote_status.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce status ?');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quote_status.id) }}">
                                     <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
                                 </form>

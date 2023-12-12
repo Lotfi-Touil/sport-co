@@ -20,16 +20,25 @@
                             #
                         </th>
                         <th scope="col" class="px-6 py-3 text-left">
-                            Nom
+                            Total
                         </th>
                         <th scope="col" class="px-6 py-3 text-left">
-                            Description
+                            Total HT
                         </th>
                         <th scope="col" class="px-6 py-3 text-left">
-                            Prix
+                            Notes / Observations
                         </th>
                         <th scope="col" class="px-6 py-3 text-left">
-                            Taxes
+                            Date de création
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Date de dernière modification
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Date de soumission
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Date d'expiration
                         </th>
                         <th scope="col" class="px-6 py-3 text-left">
                             Actions
@@ -39,11 +48,14 @@
                 <tbody>
                     {% for quote in quotes %}
                         <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                            <td class="px-6 py-4">{{ quote.id }}</td>
-                            <td class="px-6 py-4">{{ quote.name }}</td>
-                            <td class="px-6 py-4">{{ quote.description }}</td>
-                            <td class="px-6 py-4">{{ quote.price }}</td>
-                            <td class="px-6 py-4">{{ quote.taxRate }}</td>
+                            <td class="px-6 py-4">{{ quote.getId() }}</td>
+                            <td class="px-6 py-4">{{ quote.totalAmount|default('-')|number_format(2, ',', ' ') }} €</td>
+                            <td class="px-6 py-4">{{ quote.subtotal|default('-')|number_format(2, ',', ' ') }} €</td>
+                            <td class="px-6 py-4">{{ quote.notes|default('-') }}</td>
+                            <td class="px-6 py-4">{{ quote.createdAt ? quote.createdAt|date('d/m/Y H:i') : '-' }}</td>
+                            <td class="px-6 py-4">{{ quote.updatedAt ? quote.updatedAt|date('d/m/Y H:i') : '-' }}</td>
+                            <td class="px-6 py-4">{{ quote.submittedAt ? quote.submittedAt|date('d/m/Y H:i') : '-' }}</td>
+                            <td class="px-6 py-4">{{ quote.expiryDate ? quote.expiryDate|date('d/m/Y H:i') : '-' }}</td>
                             <td class="px-6 py-4 flex">
                                 <a href="{{ path('platform_quote_show', {'id': quote.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
                                     Voir
@@ -69,5 +81,4 @@
         </div>
 
     </section>
-
 {% endblock %}
