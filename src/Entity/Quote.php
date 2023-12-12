@@ -20,22 +20,19 @@ class Quote
     #[ORM\JoinColumn(nullable: false)]
     private ?QuoteStatus $quoteStatus = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 13, scale: 4)]
     private ?string $totalAmount = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 13, scale: 4)]
     private ?string $subtotal = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
-    private ?string $taxes = null;
-
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ["default" => "CURRENT_TIMESTAMP"])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ["default" => "CURRENT_TIMESTAMP"])]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
@@ -44,7 +41,7 @@ class Quote
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $expiryDate = null;
 
-    #[ORM\OneToMany(mappedBy: 'quote', targetEntity: QuoteProduct::class)]
+    #[ORM\OneToMany(mappedBy: 'quote', targetEntity: QuoteProduct::class, cascade: ['persist'])]
     private Collection $quoteProducts;
 
     public function __construct()
@@ -55,18 +52,6 @@ class Quote
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getQuote(): ?Quote
-    {
-        return $this->quote;
-    }
-
-    public function setQuote(?Quote $quote): static
-    {
-        $this->quote = $quote;
-
-        return $this;
     }
 
     public function getQuoteStatus(): ?QuoteStatus
@@ -101,18 +86,6 @@ class Quote
     public function setSubtotal(string $subtotal): static
     {
         $this->subtotal = $subtotal;
-
-        return $this;
-    }
-
-    public function getTaxes(): ?string
-    {
-        return $this->taxes;
-    }
-
-    public function setTaxes(string $taxes): static
-    {
-        $this->taxes = $taxes;
 
         return $this;
     }
@@ -173,6 +146,20 @@ class Quote
     public function setExpiryDate(?\DateTimeInterface $expiryDate): static
     {
         $this->expiryDate = $expiryDate;
+
+        return $this;
+    }
+
+    public function incrementSubtotal(float $value): static
+    {
+        $this->setSubtotal($this->getSubtotal() + $value);
+
+        return $this;
+    }
+
+    public function incrementTotalAmount(float $value): static
+    {
+        $this->setTotalAmount($this->getTotalAmount() + $value);
 
         return $this;
     }

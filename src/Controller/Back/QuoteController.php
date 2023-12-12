@@ -2,11 +2,15 @@
 
 namespace App\Controller\Back;
 
+use App\Entity\Product;
 use App\Entity\Quote;
+use App\Entity\QuoteProduct;
+use App\Entity\QuoteStatus;
 use App\Form\QuoteType;
 use App\Repository\QuoteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,6 +21,7 @@ class QuoteController extends AbstractController
     #[Route('/', name: 'platform_quote_index', methods: ['GET'])]
     public function index(QuoteRepository $quoteRepository): Response
     {
+        // dd($quoteRepository->findAll());
         return $this->render('back/quote/index.html.twig', [
             'quotes' => $quoteRepository->findAll(),
         ]);
@@ -25,11 +30,51 @@ class QuoteController extends AbstractController
     #[Route('/new', name: 'platform_quote_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $statusList = $entityManager->getRepository(QuoteStatus::class)->findAll();
+
         $quote = new Quote();
-        $form = $this->createForm(QuoteType::class, $quote);
+        $form = $this->createForm(QuoteType::class, $quote, ['status_choices' => $statusList, 'entityManager' => $entityManager]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $params = $request->request->all();
+
+            $quoteProductsJson = $params['form']['products_json'];
+            $quoteProductsData = json_decode($quoteProductsJson, true);
+
+            if ($quoteProductsData)
+            {
+                $repository = $entityManager->getRepository(Product::class);
+
+                foreach ($quoteProductsData as $productData) {
+                    $product = $repository->find($productData['id']);
+                    if ($product) {
+                        if ($product->getPrice() != $productData['price'] || $product->getTaxRate() != $productData['tax_rate']) {
+                            $form->addError(new FormError("Une erreur est survenue lors de l'ajout du produit n°{$productData['id']} ({$product->getName()})."));
+                            return $this->render('back/quote/new.html.twig', [
+                                'quote' => $quote,
+                                'form' => $form->createView(),
+                            ]);
+                        }
+
+                        $quantity = $productData['quantity'];
+
+                        // Créer une nouvelle instance de QuoteProduct ou utiliser une entité de jointure appropriée
+                        $quoteProduct = new QuoteProduct();
+                        $quoteProduct->setQuote($quote);
+                        $quoteProduct->setProduct($product);
+                        $quoteProduct->setQuantity($quantity);
+                        $quoteProduct->setPrice($product->getPrice());
+                        $quoteProduct->setTaxRate($product->getTaxRate());
+
+                        // Ajouter cette entité de jointure à votre entité Quote
+                        $quote->addQuoteProduct($quoteProduct);
+                        $quote->incrementSubtotal($product->getPriceHT() * $quantity);
+                        $quote->incrementTotalAmount($product->getPrice() * $quantity);
+                    }
+                }
+            }
+
             $entityManager->persist($quote);
             $entityManager->flush();
 
@@ -38,7 +83,7 @@ class QuoteController extends AbstractController
 
         return $this->render('back/quote/new.html.twig', [
             'quote' => $quote,
-            'form' => $form,
+            'form' => $form
         ]);
     }
 

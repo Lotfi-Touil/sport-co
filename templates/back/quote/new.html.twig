@@ -17,23 +17,281 @@
         </div>
 
         <div class="bg-white shadow rounded-lg p-6">
-            {{ form_start(form, {'attr': {'class': 'w-full'}}) }}
 
-            {% for field in form %}
-                {% if field.vars.name != '_token' %}
-                    <div class="mb-4">
-                        {{ form_label(field, null, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}}) }}
-                        {{ form_widget(field, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(field) }}
+            <div class="w-full p-4 bg-white shadow rounded-lg">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Ajouter un produit</label>
+                <form>
+                    <label for="product-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Rechercher un produit</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"></div>
+                        <input type="search" id="product-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Rechercher un produit" required>
+                        <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Rechercher</button>
                     </div>
-                {% endif %}
-            {% endfor %}
+                </form>
 
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                <div id="product-results" class="mt-4 bg-gray-50 p-4 rounded shadow-inner hidden">
+                    <!-- résultats -->
+                </div>
+            </div>
+
+            <hr class="my-10">
+
+            <div class="mt-6">
+                <h2 class="text-xl font-bold mb-4">Produits ajoutés au devis</h2>
+                <div id="no-products" class="text-gray-600">Le devis ne contient aucun article.</div>
+                <div id="added-products" class="space-y-4">
+                    <!-- Les produits ajoutés apparaîtront ici -->
+                </div>
+            </div>
+
+            <hr class="my-10">
+
+            <div class="mt-4">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-lg">Total HT:</span>
+                    <span id="subtotal" class="text-lg"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-lg">Total TTC:</span>
+                    <span id="total-amount" class="text-lg"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-lg">Montant des taxes:</span>
+                    <span id="total-taxes" class="text-lg"></span>
+                </div>
+            </div>
+
+            <hr class="my-10">
+
+            {{ form_start(form, {'attr': {'id': 'form-new-quote', 'class': 'w-full'}}) }}
+
+            {% if form.vars.errors|length > 0 %}
+                <div class="alert alert-danger">
+                    {% for error in form.vars.errors %}
+                        <p>{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
+                {{ form_widget(form.quoteStatus, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.quoteStatus) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Notes et observations</label>
+                {{ form_widget(form.notes, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.notes) }}
+            </div>
+
+            <input type="hidden" id="form_quote_products_json" name="form[products_json]" value="">
+
+            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                 {{ button_label|default('Enregistrer') }}
             </button>
 
             {{ form_end(form) }}
         </div>
     </section>
+
+    <script>
+        $(document).ready(function() {
+
+            $('#product-search').on('input', function() {
+                var searchTerm = $(this).val();
+
+                if (searchTerm.length < 2) {
+                    $('#product-results').hide();
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ path('product_search') }}',
+                    data: { term: searchTerm },
+                    success: function(data) {
+                        var productsHtml = '';
+                        if (data.length === 0) {
+                            productsHtml = '<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Aucun produit trouvé.</h2>';
+                        } else {
+                            productsHtml = `<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Résultats de votre recherche :</h2>
+                                            <ul class="max-w-md space-y-1 text-gray-500 list-none list-inside dark:text-gray-400">`;
+
+                            productsHtml += data.map(function(product) {
+                                return `<li>
+                                            <span class="text-lg">
+                                                ${product.name} 
+                                            </span>
+                                            <button class="add-product btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded ml-5"
+                                                    data-product-id="${product.id}"
+                                                    data-product-price="${product.price}"
+                                                    data-product-tax-rate="${product.taxRate}">
+                                                Ajouter
+                                            </button>
+                                        </li>`;
+                            }).join('');
+
+                            productsHtml += '</ul>';
+                        }
+                        $('#product-results').html(productsHtml).show();
+                    }
+                });
+            });
+
+            $(this).on('click', function(event) {
+                if (!$(event.target).closest('#product-search, #product-results').length) {
+                    $('#product-results').hide();
+                }
+            });
+
+            $(this).on('click', '.add-product', function() {
+                let productId = $(this).data('product-id');
+                let productName = $(this).siblings('span').text();
+                let priceTTC = parseFloat($(this).data('product-price'));
+                let taxRate = parseFloat($(this).data('product-tax-rate'));
+
+                // Calcul du prix HT à partir du prix TTC et du taux de taxe
+                let priceHT = getPriceHT(priceTTC, taxRate)
+
+                // Vérifier si le produit est déjà ajouté
+                let existingProduct = $('#added-products').find(`input[data-product-id=${productId}]`);
+                if (existingProduct.length > 0) {
+                    let quantity = parseInt(existingProduct.val());
+                    existingProduct.val(quantity + 1);
+                    updateTotalPricePerProduct(existingProduct);
+                } else {
+                    // Ajouter un nouveau produit
+                    let productHtml = `
+                        <div class="product-info flex items-center justify-between bg-white p-4 rounded shadow" data-product-id="${productId}">
+                            <span class="text-lg">${productName}</span>
+                            <span class="text-lg">Prix Unit HT: ${priceHT.toFixed(2)} €</span>
+                            <span class="text-lg">Prix Unit. TTC: ${priceTTC.toFixed(2)} €</span>
+                            <span class="text-lg">Taxe (${taxRate}%): ${(getTaxAmountByProduct(priceTTC, taxRate)).toFixed(2)} €</span>
+                            <input type="hidden" class="product-item form-input mt-1 block w-16 text-center" value="1" min="1"
+                                data-product-id="${productId}"
+                                data-product-price="${priceTTC}"
+                                data-product-tax-rate="${taxRate}">
+                            <div>
+                                <button class="increment-quantity bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">+</button>
+                                <button class="decrement-quantity bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">-</button>
+                            </div>
+                            <span class="ml-4 total-product-price">Prix : ${priceTTC} €</span>
+                            <button class="remove-product bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4">Retirer</button>
+                        </div>
+                    `;
+                    $('#no-products').hide();
+                    $('#added-products').append(productHtml);
+                }
+                $('#no-products').hide();
+                updateTotals();
+            });
+
+            $(this).on('click', '.remove-product', function() {
+                $(this).parent().remove();
+                if ($('#added-products').children().length === 0) {
+                    $('#no-products').show();
+                }
+                updateTotals();
+            });
+
+            $(this).on('submit', '#form-new-quote', function(e) {
+                e.preventDefault();
+
+                let productsData = [];
+
+                $('#added-products .product-info').each(function() {
+                    let productId = $(this).data('product-id');
+                    let quantity = $(this).find('.product-item').val();
+                    let price = $(this).find('.product-item').data('product-price');
+                    let taxRate = $(this).find('.product-item').data('product-tax-rate');
+
+                    productsData.push({
+                        id: productId,
+                        quantity: quantity,
+                        price: price,
+                        tax_rate: taxRate,
+                    });
+                });
+
+                let jsonData = JSON.stringify(productsData);
+                $('#form_quote_products_json').val(jsonData);
+
+                this.submit(); // Soumettre le formulaire
+            });
+
+            $(this).on('click', '.increment-quantity', function() {
+                let inputElement = $(this).closest('div').siblings('.product-item');
+                let currentQuantity = parseInt(inputElement.val());
+                inputElement.val(currentQuantity + 1);
+                updateTotalPricePerProduct(inputElement);
+            });
+
+            $(this).on('click', '.decrement-quantity', function() {
+                let inputElement = $(this).closest('div').siblings('.product-item');
+                let currentQuantity = parseInt(inputElement.val());
+                if (currentQuantity > 1) {
+                    inputElement.val(currentQuantity - 1);
+                    updateTotalPricePerProduct(inputElement);
+                }
+            });
+
+            function getPriceTTC(price_ht, tax) {
+                return price_ht * (1 + tax / 100);
+            }
+
+            function getPriceHT(price_ttc, tax) {
+                return price_ttc * (1 - tax / 100);
+            }
+
+            function getTotalPrice(price, quantity) {
+                return price * quantity;
+            }
+
+            function getTaxAmountByProduct(price_ttc, tax, quantity=1) {
+                let priceHT = getPriceHT(price_ttc, tax);
+                let taxAmount = price_ttc - priceHT;
+                return taxAmount * quantity;
+            }
+
+            function updateTotals() {
+                var subtotalHT = 0; // Sous-total HT
+                var totalTaxes = 0; // Total des taxes
+
+                $('#added-products div').each(function () {
+                    var priceTTC = parseFloat($(this).find('.product-item').data('product-price')); // Prix TTC
+                    var taxRate = parseFloat($(this).find('.product-item').data('product-tax-rate')); // Taux de taxe
+                    var quantity = parseInt($(this).find('.product-item').val()); // Quantité
+
+                    if (!isNaN(priceTTC) && !isNaN(taxRate) && !isNaN(quantity)) {
+                        var priceHT = getPriceHT(priceTTC, taxRate);
+                        var totalPriceHT = getTotalPrice(priceHT, quantity);
+                        var taxAmount = getTaxAmountByProduct(priceTTC, taxRate, quantity)
+
+                        subtotalHT += totalPriceHT;
+                        totalTaxes += taxAmount;
+                    }
+                });
+
+                // Mise à jour des totaux sur la page
+                $('#subtotal').text(subtotalHT.toFixed(2) + ' €'); // Afficher le sous-total HT
+                $('#total-taxes').text(totalTaxes.toFixed(2) + ' €'); // Afficher le total des taxes
+                $('#total-amount').text((subtotalHT + totalTaxes).toFixed(2) + ' €'); // Afficher le total TTC
+            }
+
+            function updateTotalPricePerProduct(inputElement) {
+                let productId = parseFloat(inputElement.data('product-id'));
+                let quantity = parseInt(inputElement.val());
+                let price = parseFloat(inputElement.data('product-price'));
+                let totalPriceElement = $(`.product-info[data-product-id=${productId}]`).find('.total-product-price');
+
+                console.log(quantity, price, totalPriceElement);
+
+                totalPriceElement.text(`Prix: ${(price * quantity).toFixed(2)} €`);
+                updateTotals();
+            }
+
+            updateTotals(); // Appelez la fonction initialement pour calculer les totaux à l'ouverture de la page
+
+        });
+    </script>
 {% endblock %}

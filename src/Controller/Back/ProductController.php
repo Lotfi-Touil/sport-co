@@ -7,6 +7,7 @@ use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -91,4 +92,23 @@ class ProductController extends AbstractController
 
         return $this->redirectToRoute('platform_product_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/search/products', name: 'product_search', methods: ['GET'])]
+    public function searchProducts(Request $request, ProductRepository $productRepository): JsonResponse
+    {
+        $searchTerm = $request->query->get('term');
+        $products = $productRepository->findBySearchTerm($searchTerm);
+
+        $productData = array_map(function ($product) {
+            return [
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'price' => $product->getPrice(),
+                'taxRate' => $product->getTaxRate(),
+            ];
+        }, $products);
+
+        return $this->json($productData);
+    }
+
 }

@@ -14,7 +14,7 @@ class Payment
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 13, scale: 4)]
     private ?string $amount = null;
 
     #[ORM\ManyToOne(inversedBy: 'payments')]

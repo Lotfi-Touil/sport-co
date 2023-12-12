@@ -25,16 +25,16 @@ class QuoteProduct
     #[ORM\Column]
     private ?int $quantity = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 13, scale: 4)]
     private ?string $price = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
     private ?string $tax_rate = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ["default" => "CURRENT_TIMESTAMP"])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true , options: ["default" => "CURRENT_TIMESTAMP"])]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true )]
     private ?\DateTimeInterface $updated_at = null;
 
     public function getId(): ?int

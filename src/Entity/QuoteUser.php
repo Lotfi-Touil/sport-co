@@ -25,10 +25,10 @@ class QuoteUser
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ["default" => "CURRENT_TIMESTAMP"])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true , options: ["default" => "CURRENT_TIMESTAMP"])]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true )]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
