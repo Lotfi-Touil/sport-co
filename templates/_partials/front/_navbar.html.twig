@@ -1,10 +1,10 @@
-<div class="navbar ">
+<div class="navbar custom-screen ">
   <div class="navbar-start">
     <div class="dropdown">
       <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
       </div>
-      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52  color">
         <li><a>Accueil</a></li>
         <li>
           <a>Fonctionnalité</a>
@@ -41,6 +41,8 @@
     <button id="test" class="btn" onclick="my_modal_5.showModal()">open modal</button>
 <dialog id="my_modal_5" class="modal modal-bottom sm:modal-middle">
   <div class="modal-box">
+  <div id="loginError" class="hidden text-red-500 text-sm mb-2"></div>
+
 <div class="min-h-screen flex items-center justify-center bg-gray-100">
         <form id="loginbtn" action ="/api/login" method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-96">
 

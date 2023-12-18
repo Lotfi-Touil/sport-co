@@ -14,19 +14,23 @@ class ApiLoginController extends AbstractController
 
      public function index(#[CurrentUser] ?User $user): Response
       {
-        dump($user);
-         if (null === $user) {
-             return $this->json([
-                 'message' => 'missing credentials',
-             ], Response::HTTP_UNAUTHORIZED);
-         }
+        if(!$user){
+            return $this->json([
+                'error' => "Vous n'étes pas co"
+            ]);
+        };
+        //  if (null === $user) {
+        //      return $this->json([
+        //          'message' =>$user,
+        //      ], Response::HTTP_UNAUTHORIZED);
+        //  }
 
          $token ="salut"; // somehow create an API token for $user
 
           return $this->json([
              
              'user'  => $user->getUserIdentifier(),
-             'token' => $token,
+             'token' => $user,
           ]);
       }
   }
