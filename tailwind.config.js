@@ -16,5 +16,32 @@ module.exports = {
       // Ajoutez d'autres variantes si nécessaire
     },
   },
-  plugins: [],
+  daisyui: {
+    themes: [
+      {
+        mytheme: {
+        
+            "primary": "#023618",
+                    
+            "secondary": "#f3f4f6",
+                    
+            "accent": "#ff0000",
+                    
+            "neutral": "#111827",
+                    
+            "base-100": "#ffffff",
+                    
+            "info": "#008dac",
+                    
+            "success": "#00e079",
+                    
+            "warning": "#db7000",
+                    
+            "error": "#ff0057",
+        },
+      },
+    ],
+  },
+  plugins: [require("daisyui")],
+  
 }
