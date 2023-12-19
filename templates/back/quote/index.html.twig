@@ -5,7 +5,7 @@
 {% block body %}
     {% include '_partials/back/_platform_nav.html.twig' %}
 
-    <section class="p-4 sm:ml-64 mt-14">
+    <section class="p-4 mt-14 w-full">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-lg font-bold">Liste des devis</h1>
             <a href="{{ path('platform_quote_new') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -19,9 +19,9 @@
                         <th scope="col" class="px-6 py-3 text-left">
                             #
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left">
+                        {# <th scope="col" class="px-6 py-3 text-left">
                             Statut
-                        </th>
+                        </th> #}
                         <th scope="col" class="px-6 py-3 text-left">
                             Total
                         </th>
@@ -52,7 +52,7 @@
                     {% for quote in quotes %}
                         <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                             <td class="px-6 py-4">{{ quote.id }}</td>
-                            <td class="px-6 py-4">{{ quote_status[quote.getQuoteStatus().getId()].getTitle() }}</td>
+                            {# <td class="px-6 py-4">{{ quote_status[quote.getQuoteStatus().getId()].getTitle() }}</td> #}
                             <td class="px-6 py-4">{{ quote.totalAmount|default('-')|number_format(2, ',', ' ') }} €</td>
                             <td class="px-6 py-4">{{ quote.subtotal|default('-')|number_format(2, ',', ' ') }} €</td>
                             <td class="px-6 py-4">{{ quote.notes|default('-') }}</td>
@@ -75,7 +75,7 @@
                         </tr>
                     {% else %}
                         <tr class="bg-gray-100 border-b dark:bg-gray-800">
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-600 dark:text-gray-400 text-lg">
+                            <td colspan="10" class="w-full px-6 py-4 text-center text-gray-600 dark:text-gray-400 text-lg">
                                 Aucun devis pour le moment.
                             </td>
                         </tr>
