@@ -8,6 +8,7 @@ use App\Entity\QuoteProduct;
 use App\Entity\QuoteStatus;
 use App\Form\QuoteType;
 use App\Repository\QuoteRepository;
+use App\Repository\QuoteStatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -19,11 +20,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class QuoteController extends AbstractController
 {
     #[Route('/', name: 'platform_quote_index', methods: ['GET'])]
-    public function index(QuoteRepository $quoteRepository): Response
+    public function index(QuoteRepository $quoteRepository, QuoteStatusRepository $quoteStatusRepository): Response
     {
-        // dd($quoteRepository->findAll());
         return $this->render('back/quote/index.html.twig', [
             'quotes' => $quoteRepository->findAll(),
+            'quote_status' => $quoteStatusRepository->findAll(),
         ]);
     }
 

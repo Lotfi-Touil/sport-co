@@ -37,9 +37,13 @@ class Product
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: QuoteProduct::class)]
     private Collection $quoteProducts;
 
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: InvoiceProduct::class)]
+    private Collection $invoiceProducts;
+
     public function __construct()
     {
         $this->quoteProducts = new ArrayCollection();
+        $this->invoiceProducts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -149,6 +153,36 @@ class Product
     public function setStripePriceId(?string $stripePriceId): self
     {
         $this->stripePriceId = $stripePriceId;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InvoiceProduct>
+     */
+    public function getInvoiceProducts(): Collection
+    {
+        return $this->invoiceProducts;
+    }
+
+    public function addInvoiceProduct(InvoiceProduct $invoiceProduct): static
+    {
+        if (!$this->invoiceProducts->contains($invoiceProduct)) {
+            $this->invoiceProducts->add($invoiceProduct);
+            $invoiceProduct->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvoiceProduct(InvoiceProduct $invoiceProduct): static
+    {
+        if ($this->invoiceProducts->removeElement($invoiceProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($invoiceProduct->getProduct() === $this) {
+                $invoiceProduct->setProduct(null);
+            }
+        }
+
         return $this;
     }
 }
