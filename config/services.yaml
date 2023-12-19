@@ -29,5 +29,11 @@ services:
             $stripeSecretKey: '%stripe.secret_key%'
             $stripeWebhookSecret: '%stripe.webhook_secret%'
 
+    App\Service\StripeService:
+        autowire: true
+        arguments:
+            $stripeApiKey: '%stripe.secret_key%'
+
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

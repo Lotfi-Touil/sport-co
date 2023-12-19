@@ -36,61 +36,142 @@ class PaymentController extends AbstractController
         $this->authorizationChecker = $authorizationChecker;
     }
 
+    // #[Route('/payment/create/{invoiceId}', name: 'payment_create')]
+    // public function create(Request $request, int $invoiceId): Response
+    // {
+    //     // Vérifie que l'utilisateur est bien une entreprise ou un admin
+    //     if (
+    //         !$this->authorizationChecker->isGranted('ROLE_COMPANY') &&
+    //         !$this->authorizationChecker->isGranted('ROLE_ADMIN')
+    //     ) {
+    //         throw new AccessDeniedException('Accès refusé.');
+    //     }
+
+    //     try {
+    //         $invoice = $this->entityManager->getRepository(Invoice::class)->find($invoiceId);
+    //         if (!$invoice) {
+    //             throw new \Exception("Facture non trouvée");
+    //         }
+
+    //         // Vérifie si un paiement n'a pas déjà été initié pour cette facture
+    //         $existingPayment = $this->entityManager->getRepository(Payment::class)->findOneBy(['invoice' => $invoice]);
+    //         if ($existingPayment) {
+    //             throw new \Exception("Un paiement a déjà été initié pour cette facture.");
+    //         }
+
+    //         $amount = $invoice->getTotalAmount();
+
+    //         $paymentIntent = $this->stripeClient->paymentIntents->create([
+    //             'amount' => $amount * 100, // Convertit le montant en centimes
+    //             'currency' => 'eur',
+    //             'payment_method_types' => ['card'],
+    //         ]);
+
+    //         $payment = new Payment();
+    //         $payment->setAmount($amount);
+    //         $payment->setInvoice($invoice);
+    //         $payment->setStripePaymentIntentId($paymentIntent->id); // Stocke l'ID du PaymentIntent
+    //         $defaultPaymentStatus = $this->entityManager->getRepository(PaymentStatus::class)->findOneBy(['name' => 'En attente']);
+    //         if (!$defaultPaymentStatus) {
+    //             throw new \Exception("Statut de paiement par défaut introuvable.");
+    //         }
+
+    //         $payment->setPaymentStatus($defaultPaymentStatus);
+    //         $defaultPaymentMethod = $this->entityManager->getRepository(PaymentMethod::class)->findOneBy(['name' => 'Carte de crédit']);
+    //         if (!$defaultPaymentMethod) {
+    //             throw new \Exception("Méthode de paiement par défaut introuvable.");
+    //         }
+    //         $payment->setPaymentMethod($defaultPaymentMethod);
+    //         $this->entityManager->persist($payment);
+    //         $this->entityManager->flush();
+
+    //         // TODO : Rediriger vers la page de paiement ou le tableau de bord des paiements
+    //         return $this->json(['clientSecret' => $paymentIntent->client_secret]);
+    //     } catch (\Exception $e) {
+    //         return new Response('Erreur: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+    //     }
+    // }
+
     #[Route('/payment/create/{invoiceId}', name: 'payment_create')]
     public function create(Request $request, int $invoiceId): Response
     {
-        // Vérifie que l'utilisateur est bien une entreprise ou un admin
-        if (
-            !$this->authorizationChecker->isGranted('ROLE_COMPANY') &&
-            !$this->authorizationChecker->isGranted('ROLE_ADMIN')
-        ) {
+        if (!$this->authorizationChecker->isGranted('ROLE_COMPANY') &&
+            !$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
             throw new AccessDeniedException('Accès refusé.');
         }
-
+    
         try {
             $invoice = $this->entityManager->getRepository(Invoice::class)->find($invoiceId);
             if (!$invoice) {
                 throw new \Exception("Facture non trouvée");
             }
 
-            // Vérifie si un paiement n'a pas déjà été initié pour cette facture
+            // Récupérer le client lié à la facture
+            $customer = $invoice->getCustomer();
+            if (!$customer) {
+                throw new \Exception("Client non trouvé pour cette facture.");
+            }
+    
             $existingPayment = $this->entityManager->getRepository(Payment::class)->findOneBy(['invoice' => $invoice]);
             if ($existingPayment) {
                 throw new \Exception("Un paiement a déjà été initié pour cette facture.");
             }
-
+    
             $amount = $invoice->getTotalAmount();
-
-            $paymentIntent = $this->stripeClient->paymentIntents->create([
-                'amount' => $amount * 100, // Convertit le montant en centimes
-                'currency' => 'eur',
-                'payment_method_types' => ['card'],
-            ]);
-
+            $paymentType = $request->request->get('payment_type', 'unique');
+            $isRecurring = $paymentType === 'recurring';
+    
             $payment = new Payment();
             $payment->setAmount($amount);
             $payment->setInvoice($invoice);
-            $payment->setStripePaymentIntentId($paymentIntent->id); // Stocke l'ID du PaymentIntent
+            $payment->setIsRecurring($isRecurring);
+    
+            if (!$isRecurring) {
+                $paymentIntent = $this->stripeClient->paymentIntents->create([
+                    'amount' => $amount * 100,
+                    'currency' => 'eur',
+                    'payment_method_types' => ['card'],
+                ]);
+                $payment->setStripePaymentIntentId($paymentIntent->id);
+            } else {
+                $stripeCustomer = $this->stripeClient->customers->create([
+                    'email' => $customer->getEmail(),
+                    'name' => $customer->getFirstName() . ' ' . $customer->getLastName(),
+                ]);
+
+                $subscription = $this->stripeClient->subscriptions->create([
+                    'customer' => $stripeCustomer->id,
+                    // Todo corriger pour implementer la logique de création de produit et de plan
+                    'items' => [['price' => 'price_id']],
+                ]);
+                $payment->setStripeSubscriptionId($subscription->id);
+            }
+    
             $defaultPaymentStatus = $this->entityManager->getRepository(PaymentStatus::class)->findOneBy(['name' => 'En attente']);
             if (!$defaultPaymentStatus) {
                 throw new \Exception("Statut de paiement par défaut introuvable.");
             }
-
             $payment->setPaymentStatus($defaultPaymentStatus);
+    
             $defaultPaymentMethod = $this->entityManager->getRepository(PaymentMethod::class)->findOneBy(['name' => 'Carte de crédit']);
             if (!$defaultPaymentMethod) {
                 throw new \Exception("Méthode de paiement par défaut introuvable.");
             }
             $payment->setPaymentMethod($defaultPaymentMethod);
+    
             $this->entityManager->persist($payment);
             $this->entityManager->flush();
-
-            // TODO : Rediriger vers la page de paiement ou le tableau de bord des paiements
-            return $this->json(['clientSecret' => $paymentIntent->client_secret]);
+    
+            $responseContent = $isRecurring ? ['subscriptionId' => $subscription->id] : ['clientSecret' => $paymentIntent->client_secret];
+            return $this->json($responseContent);
+    
         } catch (\Exception $e) {
             return new Response('Erreur: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
     }
+    
+
+
 
     #[Route('/payment/checkout/{paymentId}', name: 'payment_checkout')]
     public function checkout(int $paymentId): Response

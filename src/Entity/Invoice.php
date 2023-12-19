@@ -44,6 +44,12 @@ class Invoice
     #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: Payment::class)]
     private Collection $payments;
 
+
+    #[ORM\ManyToOne(targetEntity: Customer::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Customer $customer = null;
+
+    
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -176,6 +182,18 @@ class Invoice
                 $payment->setInvoice(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCustomer(): ?Customer
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?Customer $customer): self
+    {
+        $this->customer = $customer;
 
         return $this;
     }

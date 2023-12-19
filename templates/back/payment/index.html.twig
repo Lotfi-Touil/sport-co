@@ -102,6 +102,14 @@
 											<li>Aucune facture disponible.</li>
 										{% endfor %}
 									</ul>
+									<div class="mb-4">
+										<label for="payment-type" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Type de Paiement :</label>
+										<select id="payment-type" name="payment_type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+											<option value="unique">Paiement Unique</option>
+											<option value="recurring">Paiement Récurrent</option>
+										</select>
+									</div>
+									<div id="error-message" class="hidden text-red-500 text-sm mt-2"></div>
 									<button type="button" onclick="submitPaymentForm()" class="text-white inline-flex w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
 										Créer le Paiement
 									</button>
@@ -116,20 +124,38 @@
 {% endblock %}
 
 {% block javascripts %}
-	<script>
-		function submitPaymentForm() {
-var selectedInvoiceId = document.querySelector('input[name="invoice"]:checked').value;
-if (selectedInvoiceId) {
-fetch('/platform/payment/create/' + selectedInvoiceId, {method: 'POST'}).then(response => {
-if (response.ok) {
-location.reload();
-} else {
-console.error('Erreur lors de la création du paiement');
-}
-}).catch(error => {
-console.error('Erreur AJAX : ', error);
-});
-}
-}
-	</script>
+<script>
+    function submitPaymentForm() {
+        var selectedInvoiceId = document.querySelector('input[name="invoice"]:checked');
+        var paymentType = document.getElementById('payment-type').value;
+        var errorMessage = document.getElementById('error-message');
+
+        // Réinitialiser le message d'erreur
+        errorMessage.classList.add('hidden');
+        errorMessage.textContent = '';
+
+        // Validation
+        if (!selectedInvoiceId || !paymentType) {
+            errorMessage.textContent = 'Veuillez sélectionner une facture et un type de paiement.';
+            errorMessage.classList.remove('hidden');
+            return;
+        }
+
+        fetch('/platform/payment/create/' + selectedInvoiceId.value, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ payment_type: paymentType })
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                console.error('Erreur lors de la création du paiement');
+            }
+        }).catch(error => {
+            console.error('Erreur AJAX : ', error);
+        });
+    }
+</script>
 {% endblock %}

@@ -32,6 +32,13 @@ class Payment
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $stripePaymentIntentId = null;
 
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private $isRecurring;
+    
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $stripeSubscriptionId = null;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -96,4 +103,27 @@ class Payment
 
         return $this;
     }
+
+    public function getIsRecurring(): ?bool
+    {
+        return $this->isRecurring;
+    }
+
+    public function setIsRecurring(bool $isRecurring): self
+    {
+        $this->isRecurring = $isRecurring;
+        return $this;
+    }
+
+    public function getStripeSubscriptionId(): ?string
+    {
+        return $this->stripeSubscriptionId;
+    }
+
+    public function setStripeSubscriptionId(?string $stripeSubscriptionId): self
+    {
+        $this->stripeSubscriptionId = $stripeSubscriptionId;
+        return $this;
+    }
+
 }

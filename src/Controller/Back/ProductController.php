@@ -10,10 +10,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\StripeService;
 
 #[Route('/platform/product')]
 class ProductController extends AbstractController
 {
+    private $stripeService;
+
+    public function __construct(StripeService $stripeService)
+    {
+        $this->stripeService = $stripeService;
+    }
+
     #[Route('/', name: 'platform_product_index', methods: ['GET'])]
     public function index(ProductRepository $productRepository): Response
     {
@@ -33,6 +41,11 @@ class ProductController extends AbstractController
             $entityManager->persist($product);
             $entityManager->flush();
 
+            $stripeData = $this->stripeService->createStripeProduct($product);
+            $product->setStripeProductId($stripeData['stripeProductId']);
+            $product->setStripePriceId($stripeData['stripePriceId']);
+        
+            $entityManager->flush();
             return $this->redirectToRoute('platform_product_index', [], Response::HTTP_SEE_OTHER);
         }
 

@@ -34,7 +34,9 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
             $invoice->setSubmittedAt($faker->dateTimeBetween('-6 months'));
             $invoice->setExpiryDate($faker->dateTimeBetween('-6 months'));
             $invoice->setInvoiceStatus($status);
-            // Remplir les autres propriétés de l'invoice si nécessaire
+            $customerReference = 'customer_' . $i % 10;
+            $customer = $this->getReference($customerReference);
+            $invoice->setCustomer($customer);
 
             $manager->persist($invoice);
         }
@@ -46,6 +48,7 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
     {
         return [
             InvoiceStatusFixtures::class,
+            CustomerFixtures::class,
         ];
     }
 }

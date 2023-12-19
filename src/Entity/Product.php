@@ -25,6 +25,12 @@ class Product
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
     private ?string $tax_rate = null;
+    
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $stripeProductId = null;
+
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $stripePriceId = null;
 
     public function getId(): ?int
     {
@@ -76,6 +82,27 @@ class Product
     {
         $this->tax_rate = $tax_rate;
 
+        return $this;
+    }
+    public function getStripeProductId(): ?string
+    {
+        return $this->stripeProductId;
+    }
+
+    public function setStripeProductId(?string $stripeProductId): self
+    {
+        $this->stripeProductId = $stripeProductId;
+        return $this;
+    }
+
+    public function getStripePriceId(): ?string
+    {
+        return $this->stripePriceId;
+    }
+
+    public function setStripePriceId(?string $stripePriceId): self
+    {
+        $this->stripePriceId = $stripePriceId;
         return $this;
     }
 }
