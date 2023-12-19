@@ -44,9 +44,13 @@ class Invoice
     #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: Payment::class)]
     private Collection $payments;
 
+    #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: InvoiceProduct::class)]
+    private Collection $invoiceProducts;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
+        $this->invoiceProducts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -174,6 +178,36 @@ class Invoice
             // set the owning side to null (unless already changed)
             if ($payment->getInvoice() === $this) {
                 $payment->setInvoice(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InvoiceProduct>
+     */
+    public function getInvoiceProducts(): Collection
+    {
+        return $this->invoiceProducts;
+    }
+
+    public function addInvoiceProduct(InvoiceProduct $invoiceProduct): static
+    {
+        if (!$this->invoiceProducts->contains($invoiceProduct)) {
+            $this->invoiceProducts->add($invoiceProduct);
+            $invoiceProduct->setInvoice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvoiceProduct(InvoiceProduct $invoiceProduct): static
+    {
+        if ($this->invoiceProducts->removeElement($invoiceProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($invoiceProduct->getInvoice() === $this) {
+                $invoiceProduct->setInvoice(null);
             }
         }
 

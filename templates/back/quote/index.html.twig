@@ -20,6 +20,9 @@
                             #
                         </th>
                         <th scope="col" class="px-6 py-3 text-left">
+                            Statut
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
                             Total
                         </th>
                         <th scope="col" class="px-6 py-3 text-left">
@@ -48,7 +51,8 @@
                 <tbody>
                     {% for quote in quotes %}
                         <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                            <td class="px-6 py-4">{{ quote.getId() }}</td>
+                            <td class="px-6 py-4">{{ quote.id }}</td>
+                            <td class="px-6 py-4">{{ quote_status[quote.getQuoteStatus().getId()].getTitle() }}</td>
                             <td class="px-6 py-4">{{ quote.totalAmount|default('-')|number_format(2, ',', ' ') }} €</td>
                             <td class="px-6 py-4">{{ quote.subtotal|default('-')|number_format(2, ',', ' ') }} €</td>
                             <td class="px-6 py-4">{{ quote.notes|default('-') }}</td>
