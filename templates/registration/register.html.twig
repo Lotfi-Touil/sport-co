@@ -3,66 +3,21 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
-    <div class="w-full flex items-center justify-center h-screen">
-        <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <h1 class="text-xl mb-4 font-semibold">Inscrivez-vous en 30 secondes !</h1>
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+    {% endfor %}
 
-            {% if form_errors(registrationForm) %}
-                <div class="alert alert-danger">{{ form_errors(registrationForm)|trans({}, 'security') }}</div>
-            {% endif %}
+    <h1>Register</h1>
 
-            {{ form_start(registrationForm) }}
+    {{ form_errors(registrationForm) }}
 
-            <div class="mb-4">
-                {{ form_row(registrationForm.email, {
-                    'attr': {
-                        'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',
-                        'id': 'registration_form_email',
-                        'autocomplete': 'email',
-                        'required': 'required',
-                    }
-                }) }}
-            </div>
+    {{ form_start(registrationForm) }}
+        {{ form_row(registrationForm.email) }}
+        {{ form_row(registrationForm.plainPassword, {
+            label: 'Password'
+        }) }}
+        {{ form_row(registrationForm.agreeTerms) }}
 
-            <div class="mb-4">
-                {{ form_row(registrationForm.plainPassword.first, {
-                    'attr': {
-                        'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',
-                        'id': 'registration_form_plainPassword_first',
-                        'required': 'required',
-                    }
-                }) }}
-            </div>
-
-            <div class="mb-4">
-                {{ form_row(registrationForm.plainPassword.second, {
-                    'attr': {
-                        'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',
-                        'id': 'registration_form_plainPassword_second',
-                        'required': 'required',
-                    }
-                }) }}
-            </div>
-
-            <div class="mb-6">
-                {{ form_widget(registrationForm.agreeTerms, {
-                    'attr': {
-                        'class': 'mr-2 leading-tight',
-                        'id': 'registration_form_agreeTerms',
-                        'required': 'required',
-                    }
-                }) }}
-                <span class="text-gray-700 font-bold">J'accepte les conditions générales d’utilisation (CGU).</span>
-            </div>
-
-            <div class="flex items-center justify-center">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Inscription
-                </button>
-            </div>
-
-            <input type="hidden" name="{{ csrf_token('authenticate') }}" />
-            {{ form_end(registrationForm) }}
-        </form>
-    </div>
+        <button type="submit" class="btn">Register</button>
+    {{ form_end(registrationForm) }}
 {% endblock %}
