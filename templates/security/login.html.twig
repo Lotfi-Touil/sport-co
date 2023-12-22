@@ -22,6 +22,7 @@
             </div>
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Connexion</button>
+            <a href="{{ path('app_forgot_password_request') }}">mdp oublié ?</a>
         </form>
     </div>
 {% endblock %}
