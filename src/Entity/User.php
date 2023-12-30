@@ -35,9 +35,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: QuoteUser::class)]
     private Collection $quoteUsers;
 
+    #[ORM\OneToMany(mappedBy: 'updated_by', targetEntity: Product::class)]
+    private Collection $modified_product;
+
+    #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Product::class)]
+    private Collection $created_product;
+
+    #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Category::class)]
+    private Collection $created_categories;
+
+    #[ORM\OneToMany(mappedBy: 'updated_by', targetEntity: Category::class)]
+    private Collection $modified_categories;
+
     public function __construct()
     {
         $this->quoteUsers = new ArrayCollection();
+        $this->modified_product = new ArrayCollection();
+        $this->created_product = new ArrayCollection();
+        $this->created_categories = new ArrayCollection();
+        $this->modified_categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -134,6 +150,126 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($quoteUser->getCreator() === $this) {
                 $quoteUser->setCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getModifiedProduct(): Collection
+    {
+        return $this->modified_product;
+    }
+
+    public function addModifiedProduct(Product $modifiedProduct): static
+    {
+        if (!$this->modified_product->contains($modifiedProduct)) {
+            $this->modified_product->add($modifiedProduct);
+            $modifiedProduct->setUpdatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModifiedProduct(Product $modifiedProduct): static
+    {
+        if ($this->modified_product->removeElement($modifiedProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($modifiedProduct->getUpdatedBy() === $this) {
+                $modifiedProduct->setUpdatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getCreatedProduct(): Collection
+    {
+        return $this->created_product;
+    }
+
+    public function addCreatedProduct(Product $createdProduct): static
+    {
+        if (!$this->created_product->contains($createdProduct)) {
+            $this->created_product->add($createdProduct);
+            $createdProduct->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedProduct(Product $createdProduct): static
+    {
+        if ($this->created_product->removeElement($createdProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($createdProduct->getCreatedBy() === $this) {
+                $createdProduct->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getCreatedCategories(): Collection
+    {
+        return $this->created_categories;
+    }
+
+    public function addCreatedCategory(Category $createdCategory): static
+    {
+        if (!$this->created_categories->contains($createdCategory)) {
+            $this->created_categories->add($createdCategory);
+            $createdCategory->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedCategory(Category $createdCategory): static
+    {
+        if ($this->created_categories->removeElement($createdCategory)) {
+            // set the owning side to null (unless already changed)
+            if ($createdCategory->getCreatedBy() === $this) {
+                $createdCategory->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getModifiedCategories(): Collection
+    {
+        return $this->modified_categories;
+    }
+
+    public function addModifiedCategory(Category $modifiedCategory): static
+    {
+        if (!$this->modified_categories->contains($modifiedCategory)) {
+            $this->modified_categories->add($modifiedCategory);
+            $modifiedCategory->setUpdatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModifiedCategory(Category $modifiedCategory): static
+    {
+        if ($this->modified_categories->removeElement($modifiedCategory)) {
+            // set the owning side to null (unless already changed)
+            if ($modifiedCategory->getUpdatedBy() === $this) {
+                $modifiedCategory->setUpdatedBy(null);
             }
         }
 

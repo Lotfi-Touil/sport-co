@@ -35,6 +35,8 @@ class ProductController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $product = new Product();
+        $product->setUpdatedBy($this->getUser());
+        $product->setCreatedBy($this->getUser());
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
