@@ -21,6 +21,18 @@ class QuoteProductRepository extends ServiceEntityRepository
         parent::__construct($registry, QuoteProduct::class);
     }
 
+    public function findByProductIdAndQuoteId(int $productId, int $quoteId): mixed
+    {
+        return $this->createQueryBuilder('qp')
+            ->andWhere('qp.product = :productId')
+            ->setParameter('productId', $productId)
+            ->andWhere('qp.quote = :quoteId')
+            ->setParameter('quoteId', $quoteId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
 //    /**
 //     * @return QuoteProduct[] Returns an array of QuoteProduct objects
 //     */

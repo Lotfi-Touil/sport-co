@@ -3,11 +3,11 @@
 {% block title %}Modifier un devis{% endblock %}
 
 {% block body %}
-    {% include '_partials/back/_platform_nav.html.twig' %}
+   {% include '_partials/back/_platform_nav.html.twig' %}
 
     <section class="p-4 mt-14 w-full">
         <div class="flex justify-between items-center mb-4">
-            <h1 class="text-2xl font-bold mb-5">Produit #{{ quote.id }}</h1>
+            <h1 class="text-2xl font-bold mb-5">Devis #{{ quote.id }}</h1>
 
             <div class="actions flex">
                 <a href="{{ path('platform_quote_index') }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
@@ -18,23 +18,105 @@
         </div>
 
         <div class="bg-white shadow rounded-lg p-6">
-            {{ form_start(form, {'attr': {'class': 'w-full'}}) }}
 
-            {% for field in form %}
-                {% if field.vars.name != '_token' %}
-                    <div class="mb-4">
-                        {{ form_label(field, null, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}}) }}
-                        {{ form_widget(field, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(field) }}
+            <div class="w-full p-4 bg-white shadow rounded-lg">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Ajouter un produit</label>
+                <form>
+                    <label for="product-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Rechercher un produit</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"></div>
+                        <input type="search" id="product-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Rechercher un produit" required>
+                        <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Rechercher</button>
                     </div>
-                {% endif %}
-            {% endfor %}
+                </form>
 
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                <div id="product-results" class="mt-4 bg-gray-50 p-4 rounded shadow-inner hidden">
+                    <!-- résultats -->
+                </div>
+            </div>
+
+            <hr class="my-10">
+
+            <div class="mt-6">
+                <h2 class="text-xl font-bold mb-4">Produits ajoutés au devis</h2>
+                <div id="added-products" class="space-y-4">
+                    {% for quoteProduct in quote.quoteProducts %}
+                        {% set tax_amount = (quoteProduct.price * quoteProduct.taxRate / 100) | round(2) %}
+                        <div class="product-info flex items-center justify-between bg-white p-4 rounded shadow" data-product-id="{{ quoteProduct.product.id }}">
+                            <span class="text-lg">{{ quoteProduct.product.name }}</span>
+                            <span class="text-lg">Prix Unit HT: {{ quoteProduct.price - tax_amount | number_format(2, '.', '') }} €</span>
+                            <span class="text-lg">Prix Unit. TTC: {{ (quoteProduct.price) | number_format(2, '.', '') }} €</span>
+                            <span class="text-lg">Taxe ({{ quoteProduct.taxRate }}%): {{ tax_amount }} €</span>
+                            <input type="hidden" class="product-item form-input mt-1 block w-16 text-center" value="{{ quoteProduct.quantity }}" min="1"
+                                data-product-id="{{ quoteProduct.product.id }}"
+                                data-product-price="{{ quoteProduct.price }}"
+                                data-product-tax-rate="{{ quoteProduct.taxRate }}">
+                            <div>
+                                <button class="decrement-quantity bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">-</button>
+                                <span id="quantity-{{ quoteProduct.id }}" class="quantity-display mx-2">{{ quoteProduct.quantity }}</span>
+                                <button class="increment-quantity bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">+</button>
+                            </div>
+                            {% set total_item_price = (quoteProduct.price * quoteProduct.quantity) | round(2) %}
+                            <span class="ml-4 total-product-price">Total : {{ total_item_price | number_format(2, '.', '') }} €</span>
+                            <button class="remove-product bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4">Retirer</button>
+                        </div>
+                    {% else %}
+                        <div id="no-products" class="text-gray-600">Le devis ne contient aucun article.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <hr class="my-10">
+
+            <div class="mt-4">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-lg">Total HT:</span>
+                    <span id="subtotal" class="text-lg"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-lg">Total TTC:</span>
+                    <span id="total-amount" class="text-lg"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-lg">Montant des taxes:</span>
+                    <span id="total-taxes" class="text-lg"></span>
+                </div>
+            </div>
+
+            <hr class="my-10">
+
+            {{ form_start(form, {'attr': {'id': 'form-new-quote', 'class': 'w-full'}}) }}
+
+            {% if form.vars.errors|length > 0 %}
+                <div class="alert alert-danger">
+                    {% for error in form.vars.errors %}
+                        <p>{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
+                {{ form_widget(form.quoteStatus, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.quoteStatus) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Notes et observations</label>
+                {{ form_widget(form.notes, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.notes) }}
+            </div>
+
+            <input type="hidden" id="form_products_json" name="form[products_json]" value="">
+
+            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                 {{ button_label|default('Enregistrer') }}
             </button>
 
             {{ form_end(form) }}
         </div>
     </section>
+
+   {% include '_components/back/js/quote-and-invoice-script.html.twig' %}
+
 {% endblock %}

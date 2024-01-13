@@ -14,11 +14,11 @@ class QuoteProduct
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'quoteProducts')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'quoteProducts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Quote $quote = null;
 
-    #[ORM\ManyToOne(inversedBy: 'quoteProducts')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'quoteProducts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Product $product = null;
 
