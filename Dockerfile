@@ -40,12 +40,17 @@ RUN set -eux; \
 		icu-dev \
 		libzip-dev \
 		zlib-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        libwebp-dev \
+        freetype-dev \
 	; \
 	\
 	docker-php-ext-configure zip; \
 	docker-php-ext-install -j$(nproc) \
 		intl \
 		zip \
+        gd \
 	; \
 	pecl install \
 		apcu \
@@ -55,7 +60,10 @@ RUN set -eux; \
 		apcu \
 		opcache \
 	; \
-	\
+    # Configuration spécifique à GD
+    	docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
+    	docker-php-ext-install gd; \
+    	\
 	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
 			| tr ',' '\n' \

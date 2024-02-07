@@ -10,7 +10,8 @@
             <h1 class="text-2xl font-bold mb-5">Produit #{{ product.id }}</h1>
 
             <div class="actions flex">
-                <a href="{{ path('platform_product_index') }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                <a href="{{ path('platform_product_index') }}"
+                   class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
                     Revenir à la liste
                 </a>
                 {{ include('back/product/_delete_form.html.twig') }}
@@ -20,21 +21,68 @@
         <div class="bg-white shadow rounded-lg p-6">
             {{ form_start(form, {'attr': {'class': 'w-full'}}) }}
 
-            {% for field in form %}
-                {% if field.vars.name != '_token' %}
-                    <div class="mb-4">
-                        {{ form_label(field, null, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}}) }}
-                        {{ form_widget(field, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(field) }}
-                    </div>
-                {% endif %}
-            {% endfor %}
+            {% if form.vars.errors|length > 0 %}
+                <div class="alert alert-danger">
+                    {% for error in form.vars.errors %}
+                        <p>{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
+                {{ form_widget(form.name, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.name) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                {{ form_widget(form.description, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.description) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Prix TTC</label>
+                {{ form_widget(form.price, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.price) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Taxe</label>
+                {{ form_widget(form.tax_rate, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.tax_rate) }}
+            </div>
+
+            <div class="mb-4">
+                <h2>Images</h2>
+                <div class="flex gap-4">
+                    {% for image in product.images %}
+
+                        <div>
+                            <img src="{{ asset('assets/uploads/products/mini/150x150-' ~ image.name ) }}" alt="Image"
+                                 width="150">
+                            <a href="{{ path('platform_image_delete',{id:image.id}) }}" data-delete
+                               data-token="{{ csrf_token('delete' ~ image.id) }}">Supprimer</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Ajouter une image</label>
+                {{ form_widget(form.images, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.images) }}
+            </div>
+
+
+            <button type="submit"
+                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                 {{ button_label|default('Enregistrer') }}
             </button>
-
-            {{ form_end(form) }}
         </div>
     </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('image') }}
 {% endblock %}

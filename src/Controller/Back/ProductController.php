@@ -2,16 +2,19 @@
 
 namespace App\Controller\Back;
 
+use App\Entity\Image;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use App\Service\PageAccessService;
+use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\StripeService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/platform/product')]
 class ProductController extends AbstractController
@@ -38,7 +41,7 @@ class ProductController extends AbstractController
     }
 
     #[Route('/new', name: 'platform_product_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager,ImageService $imageService): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
@@ -47,6 +50,15 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $images = $form->get('images')->getData();
+
+            foreach ($images as $image){
+                $folder = 'products';
+                $file = $imageService->add($image,$folder,150,150);
+                $img = new Image();
+                $img->setName($file);
+                $product->addImage($img);
+            }
 
             $entityManager->persist($product);
             $entityManager->flush();
@@ -76,7 +88,7 @@ class ProductController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'platform_product_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Product $product, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Product $product, EntityManagerInterface $entityManager,ImageService $imageService): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
@@ -84,6 +96,15 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $images = $form->get('images')->getData();
+
+            foreach ($images as $image){
+                $folder = 'products';
+                $file = $imageService->add($image,$folder,150,150);
+                $img = new Image();
+                $img->setName($file);
+                $product->addImage($img);
+            }
             $entityManager->flush();
 
             return $this->redirectToRoute('platform_product_index', [], Response::HTTP_SEE_OTHER);
@@ -133,4 +154,23 @@ class ProductController extends AbstractController
             'product' => $product,
         ]);
     }
+
+    #[Route('/delete/image/{id}', name: 'platform_image_delete', methods: ['DELETE'])]
+    public function deleteImage(Request $request, Image $image, EntityManagerInterface $entityManager,ImageService $imageService): JsonResponse
+    {
+        $data = json_decode($request->getContent(),true);
+
+        if($this->isCsrfTokenValid('delete'.$image->getId(),$data['_token'])){
+            $name = $image->getName();
+
+            if($imageService->delete($name,'products',150,150)){
+                $entityManager->remove($image);
+                $entityManager->flush();
+                return new JsonResponse(['success'=>true],200);
+            }
+            return new JsonResponse(['error'=>"error delete"],400);
+        }
+        return new JsonResponse(['error'=>"token invalid"],400);
+    }
+
 }

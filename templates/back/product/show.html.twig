@@ -42,6 +42,19 @@
                         <th class="py-2 px-4 text-left font-semibold">Tax Rate</th>
                         <td class="py-2 px-4">{{ product.taxRate }}</td>
                     </tr>
+
+                    <tr>
+                        <th class="py-2 px-4 text-left font-semibold">Image</th>
+                        <td class="py-2 px-4">
+                            <div class="flex gap-4">
+                            {%for image in product.images %}
+                                <div>
+                                    <img src="{{ asset('assets/uploads/products/mini/150x150-' ~ image.name ) }}" alt="Image" width="150">
+                                </div>
+                            {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>

@@ -7,8 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[Vich\Uploadable]
 class Product
 {
     #[ORM\Id]
@@ -43,11 +46,15 @@ class Product
     #[ORM\ManyToMany(targetEntity: ProductCategory::class, inversedBy: 'products')]
     private Collection $category;
 
+    #[ORM\OneToMany(mappedBy: 'products', targetEntity: Image::class, cascade: ['persist'], orphanRemoval: true)]
+    private Collection $images;
+
     public function __construct()
     {
         $this->quoteProducts = new ArrayCollection();
         $this->invoiceProducts = new ArrayCollection();
         $this->category = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -207,10 +214,40 @@ class Product
 
         return $this;
     }
+    
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setProducts($this);
+        }
+
+        return $this;
+    }
 
     public function removeCategory(ProductCategory $category): static
     {
         $this->category->removeElement($category);
+
+        return $this;
+    }
+
+    public function removeImage(Image $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getProducts() === $this) {
+                $image->setProducts(null);
+            }
+        }
 
         return $this;
     }
