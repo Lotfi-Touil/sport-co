@@ -6,8 +6,9 @@ use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use App\Entity\Invoice;
 use App\Entity\InvoiceStatus;
+use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 
-class InvoiceFixtures extends Fixture implements DependentFixtureInterface
+class InvoiceFixtures extends Fixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager)
     {
@@ -39,9 +40,16 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
             $invoice->setCustomer($customer);
 
             $manager->persist($invoice);
+            $this->addReference('invoice-' . $i, $invoice);
         }
         
         $manager->flush();
+    }
+
+    public function getOrder()
+    {
+        // Assurez-vous que cette fixture est chargée après les dépendances nécessaires
+        return 2;
     }
 
     public function getDependencies()

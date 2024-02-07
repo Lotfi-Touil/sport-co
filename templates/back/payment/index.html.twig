@@ -121,7 +121,6 @@
 		</div>
 	</div>
 {% endblock %}
-
 {% block javascripts %}
 <script>
     function submitPaymentForm() {
@@ -144,16 +143,23 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest', // Ajout pour indiquer que c'est une requête AJAX
             },
             body: JSON.stringify({ payment_type: paymentType })
         }).then(response => {
             if (response.ok) {
-                location.reload();
+                response.json().then(data => {
+                    console.log('Paiement créé', data);
+                    //location.reload();
+                });
             } else {
-                console.error('Erreur lors de la création du paiement');
+                errorMessage.textContent = 'Erreur lors de la création du paiement.';
+                errorMessage.classList.remove('hidden');
             }
         }).catch(error => {
             console.error('Erreur AJAX : ', error);
+            errorMessage.textContent = 'Erreur technique lors de la création du paiement.';
+            errorMessage.classList.remove('hidden');
         });
     }
 </script>
