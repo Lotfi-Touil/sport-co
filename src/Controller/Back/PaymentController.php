@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Stripe\StripeClient;
-use Stripe\Exception\ApiErrorException;
 use App\Entity\Payment;
 use App\Entity\Invoice;
 use App\Entity\PaymentStatus;
@@ -118,9 +117,11 @@ class PaymentController extends AbstractController
             }
     
             $amount = $invoice->getTotalAmount();
-            $paymentType = $request->request->get('payment_type', 'unique');
+        
+            $content = json_decode($request->getContent(), true);
+            $paymentType = $content['payment_type'] ?? 'unique'; // Remplacer ici
             $isRecurring = $paymentType === 'recurring';
-    
+
             $payment = new Payment();
             $payment->setAmount($amount);
             $payment->setInvoice($invoice);
@@ -134,15 +135,34 @@ class PaymentController extends AbstractController
                 ]);
                 $payment->setStripePaymentIntentId($paymentIntent->id);
             } else {
+                // Récupération ou création du client Stripe
                 $stripeCustomer = $this->stripeClient->customers->create([
                     'email' => $customer->getEmail(),
                     'name' => $customer->getFirstName() . ' ' . $customer->getLastName(),
                 ]);
-
+            
+                // Récupération des produits de la facture
+                $invoiceProducts = $invoice->getInvoiceProducts();
+                $stripeItems = [];
+            
+                foreach ($invoiceProducts as $invoiceProduct) {
+                    $product = $invoiceProduct->getProduct(); // Obtient l'entité produit
+                    $stripePriceId = $product->getStripePriceId(); // Obtient l'ID de prix Stripe du produit
+            
+                    if ($stripePriceId) {
+                        $stripeItems[] = ['price' => $stripePriceId];
+                    }
+                }
+            
+                if (empty($stripeItems)) {
+                    // Aucun produit Stripe n'est disponible
+                    return new Response('Erreur: Aucun produit Stripe disponible pour la facture.', Response::HTTP_BAD_REQUEST);
+                }
+            
+                // Création de la souscription Stripe avec les produits
                 $subscription = $this->stripeClient->subscriptions->create([
                     'customer' => $stripeCustomer->id,
-                    // Todo corriger pour implementer la logique de création de produit et de plan
-                    'items' => [['price' => 'price_id']],
+                    'items' => $stripeItems,
                 ]);
                 $payment->setStripeSubscriptionId($subscription->id);
             }
