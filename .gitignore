@@ -56,3 +56,4 @@ yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 /.env
 .env
+package-lock.json
