@@ -53,7 +53,7 @@
                                 data-product-tax-rate="{{ quoteProduct.taxRate }}">
                             <div>
                                 <button class="decrement-quantity bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">-</button>
-                                <span id="quantity-{{ quoteProduct.id }}" class="quantity-display mx-2">{{ quoteProduct.quantity }}</span>
+                                <span class="quantity-display mx-2">{{ quoteProduct.quantity }}</span>
                                 <button class="increment-quantity bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">+</button>
                             </div>
                             {% set total_item_price = (quoteProduct.price * quoteProduct.quantity) | round(2) %}

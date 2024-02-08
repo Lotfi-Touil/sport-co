@@ -1,8 +1,6 @@
 
 <script>
 $(document).ready(function() {
-    console.log(getPriceHT(20, 20)); // Appel de la fonction avec 20 comme prix TTC et 20 comme taux de taxe
-
     $('#product-search').on('input', function() {
         var searchTerm = $(this).val();
 
@@ -46,6 +44,7 @@ $(document).ready(function() {
     $(this).on('click', function(event) {
         if (!$(event.target).closest('#product-search, #product-results').length) {
             $('#product-results').hide();
+            $('#product-search').val('');
         }
     });
 
@@ -63,6 +62,7 @@ $(document).ready(function() {
         if (existingProduct.length > 0) {
             let quantity = parseInt(existingProduct.val());
             existingProduct.val(quantity + 1);
+            $(`.quantity-display[data-product-id=${productId}]`).html(quantity + 1);
             updateTotalPricePerProduct(existingProduct);
         } else {
             // Ajouter un nouveau produit
@@ -78,6 +78,7 @@ $(document).ready(function() {
                         data-product-tax-rate="${taxRate}">
                     <div>
                         <button class="decrement-quantity bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">-</button>
+                        <span class="quantity-display mx-2" data-product-id="${productId}">1</span>
                         <button class="increment-quantity bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">+</button>
                     </div>
                     <span class="ml-4 total-product-price">Prix : ${priceTTC} €</span>
@@ -171,7 +172,6 @@ $(document).ready(function() {
             var priceTTC = parseFloat($(this).find('.product-item').data('product-price')); // Prix TTC
             var taxRate = parseFloat($(this).find('.product-item').data('product-tax-rate')); // Taux de taxe
             var quantity = parseInt($(this).find('.product-item').val()); // Quantité
-            console.log(priceTTC, taxRate, quantity);
             if (!isNaN(priceTTC) && !isNaN(taxRate) && !isNaN(quantity)) {
                 var priceHT = getPriceHT(priceTTC, taxRate);
                 var totalPriceHT = getTotalPrice(priceHT, quantity);
@@ -193,8 +193,6 @@ $(document).ready(function() {
         let quantity = parseInt(inputElement.val());
         let price = parseFloat(inputElement.data('product-price'));
         let totalPriceElement = $(`.product-info[data-product-id=${productId}]`).find('.total-product-price');
-
-        console.log(quantity, price, totalPriceElement);
 
         totalPriceElement.text(`Prix: ${(price * quantity).toFixed(2)} €`);
         updateTotals();

@@ -76,14 +76,6 @@
 
             {{ form_start(form, {'attr': {'id': 'form-new-quote', 'class': 'w-full'}}) }}
 
-            {% if form.vars.errors|length > 0 %}
-                <div class="alert alert-danger">
-                    {% for error in form.vars.errors %}
-                        <p>{{ error.message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
                 {{ form_widget(form.quoteStatus, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
