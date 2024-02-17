@@ -1,54 +1,187 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Quote{% endblock %}
+{% block title %}Devis #{{ quote.id }}{% endblock %}
 
 {% block body %}
-    <h1>Quote</h1>
+    {% include '_partials/back/_platform_nav.html.twig' %}
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ quote.id }}</td>
-            </tr>
-            <tr>
-                <th>TotalAmount</th>
-                <td>{{ quote.totalAmount }}</td>
-            </tr>
-            <tr>
-                <th>Subtotal</th>
-                <td>{{ quote.subtotal }}</td>
-            </tr>
-            <tr>
-                <th>Taxes</th>
-                <td>{{ quote.taxes }}</td>
-            </tr>
-            <tr>
-                <th>Notes</th>
-                <td>{{ quote.notes }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ quote.createdAt ? quote.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>UpdatedAt</th>
-                <td>{{ quote.updatedAt ? quote.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>SubmittedAt</th>
-                <td>{{ quote.SubmittedAt ? quote.SubmittedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>ExpiryDate</th>
-                <td>{{ quote.expiryDate ? quote.expiryDate|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <section class="p-4 mt-14 w-full">
+        <div class="actions flex justify-end">
+            <a href="{{ path('platform_quote_index') }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                Revenir à la liste
+            </a>
+            {{ include('back/quote/_delete_form.html.twig') }}
+        </div>
 
-    <a href="{{ path('platform_quote_index') }}">back to list</a>
+        <div class="max-w-5xl ml-10 py-16 bg-white">
+            <article class="overflow-hidden">
+                <div class="bg-[white] rounded-b-md">
+                    <div class="pl-9 pb-9">
+                        <div class="space-y-6 text-slate-700">
+                            <p class="text-xl font-extrabold tracking-tight uppercase font-body">
+                                Devis #{{ quote.id }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="pl-9 pb-9">
+                        <div class="flex w-full">
+                            <div class="grid grid-cols-4 gap-12">
+                                <div class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">
+                                    Details
+                                    </p>
+                                    <p>Unwrapped</p>
+                                    <p>Fake Street 123</p>
+                                    <p>San Javier</p>
+                                    <p>CA 1234</p>
+                                </div>
+                                <div class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">Billed To</p>
+                                    <p>The Boring Company</p>
+                                    <p>Tesla Street 007</p>
+                                    <p>Frisco</p>
+                                    <p>CA 0000</p>
+                                </div>
+                                <div class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">Numéro de devis</p>
+                                    <p>{{ quote.id }}</p>
+                                    <p class="mt-2 text-sm font-normal text-slate-700">
+                                    Date of délivrance
+                                    </p>
+                                    <p>00.00.00</p>
+                                </div>
+                                <div class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">Validité</p>
+                                    <p>0 Days</p>
+                                    <p class="mt-2 text-sm font-normal text-slate-700">TODO</p>
+                                    <p>00.00.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pl-9 pb-9">
+                        <div class="flex flex-col mx-0 mt-8">
+                            <table class="min-w-full divide-y divide-slate-500">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-normal text-slate-700 sm:pl-6 md:pl-0">
+                                            Produit
+                                        </th>
+                                        <th scope="col" class="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell">
+                                            Quantité
+                                        </th>
+                                        <th scope="col" class="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell">
+                                            Taxe (%)
+                                        </th>
+                                        <th scope="col" class="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell">
+                                            Taxe (€)
+                                        </th>
+                                        <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                            Prix HT
+                                        </th>
+                                        <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                            Prix TTC
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for quoteProduct in quote.quoteProducts %}
+                                        {% set tax_amount = (quoteProduct.price * quoteProduct.taxRate / 100) | round(2) %}
+                                        <tr class="border-b border-slate-200">
+                                            <td class="py-4 pl-4 pr-3 text-sm sm:pl-6 md:pl-0">
+                                                <div class="font-medium text-slate-700">{{ quoteProduct.product.name }}</div>
+                                            </td>
+                                            <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                                                {{ quoteProduct.quantity }}
+                                            </td>
+                                            <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                                {{ quoteProduct.taxRate }}% 
+                                            </td>
+                                            <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                                {{ tax_amount }} € 
+                                            </td>
+                                            <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                                                {{ quoteProduct.price - tax_amount | number_format(2, '.', '') }} €
+                                            </td>
+                                            <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                                                {{ (quoteProduct.price) | number_format(2, '.', '') }} €
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr class="py-5">
+                                            <td colspan="5">Le devis ne contient aucun article.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th scope="row" colspan="5" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                            Sous-total
+                                        </th>
+                                        <th scope="row" class="pt-6 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
+                                            Total
+                                        </th>
+                                        <td class="pt-6 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                            {{ quote.subtotal|default('-')|number_format(2, ',', ' ') }} €
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" colspan="5" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                            Remise
+                                        </th>
+                                        <th scope="row" class="pt-6 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
+                                            Remise
+                                        </th>
+                                        <td class="pt-6 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                            0.00 €
+                                            {# TODO #}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" colspan="5" class="hidden pt-4 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                            Taxe
+                                        </th>
+                                        <th scope="row" class="pt-4 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
+                                            Taxe
+                                        </th>
+                                        <td class="pt-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                            {{ quote.totalAmount - quote.subtotal | number_format(2, '.', '') }} €
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" colspan="5" class="hidden pt-4 pl-6 pr-3 text-sm font-normal text-right text-slate-700 sm:table-cell md:pl-0">
+                                            Total
+                                        </th>
+                                        <th scope="row" class="pt-4 pl-4 pr-3 text-sm font-normal text-left text-slate-700 sm:hidden">
+                                            Total
+                                        </th>
+                                        <td class="pt-4 pl-3 pr-4 text-sm font-normal text-right text-slate-700 sm:pr-6 md:pr-0">
+                                            {{ quote.totalAmount|default('-')|number_format(2, ',', ' ') }} €
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mt-48 p-9">
+                        <div class="border-t pt-9 border-slate-200">
+                            <div class="text-sm font-light text-slate-700">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                                    sed do eiusmod tempor incididunt ut labore et dolore magna
+                                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    Duis aute irure dolor in reprehenderit in voluptate velit
+                                    esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                                    occaecat cupidatat non proident, sunt in culpa qui officia
+                                    deserunt mollit anim id est laborum.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
 
-    <a href="{{ path('platform_quote_edit', {'id': quote.id}) }}">edit</a>
-
-    {{ include('back/quote/_delete_form.html.twig') }}
 {% endblock %}
