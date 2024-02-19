@@ -82,6 +82,9 @@
                                         <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
                                             Prix TTC
                                         </th>
+                                        <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                            Total
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -106,16 +109,20 @@
                                             <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
                                                 {{ (quoteProduct.price) | number_format(2, '.', '') }} €
                                             </td>
+                                            {% set total_item_price = (quoteProduct.price * quoteProduct.quantity) | round(2) %}
+                                            <td class="total-product-price hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                                                {{ total_item_price | number_format(2, '.', '') }} €
+                                            </td>
                                         </tr>
                                     {% else %}
                                         <tr class="py-5">
-                                            <td colspan="5">Le devis ne contient aucun article.</td>
+                                            <td class="py-2" colspan="6">Le devis ne contient aucun article.</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th scope="row" colspan="5" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                        <th scope="row" colspan="6" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
                                             Sous-total
                                         </th>
                                         <th scope="row" class="pt-6 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
@@ -126,7 +133,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row" colspan="5" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                        <th scope="row" colspan="6" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
                                             Remise
                                         </th>
                                         <th scope="row" class="pt-6 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
@@ -138,7 +145,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row" colspan="5" class="hidden pt-4 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                        <th scope="row" colspan="6" class="hidden pt-4 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
                                             Taxe
                                         </th>
                                         <th scope="row" class="pt-4 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
@@ -149,7 +156,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row" colspan="5" class="hidden pt-4 pl-6 pr-3 text-sm font-normal text-right text-slate-700 sm:table-cell md:pl-0">
+                                        <th scope="row" colspan="6" class="hidden pt-4 pl-6 pr-3 text-sm font-normal text-right text-slate-700 sm:table-cell md:pl-0">
                                             Total
                                         </th>
                                         <th scope="row" class="pt-4 pl-4 pr-3 text-sm font-normal text-left text-slate-700 sm:hidden">
@@ -163,7 +170,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="mt-48 p-9">
+                    <div class="mt-5 p-9">
                         <div class="border-t pt-9 border-slate-200">
                             <div class="text-sm font-light text-slate-700">
                                 <p>

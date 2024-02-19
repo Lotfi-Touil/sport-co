@@ -32,6 +32,7 @@ class QuoteService
         $quoteProductsData = $this->decodeQuoteProductsData($params);
 
         if (!$quoteProductsData) {
+            $this->addError("Le devis ne contient aucun produit.");
             return false;
         }
 
@@ -96,8 +97,8 @@ class QuoteService
         $this->updateOrCreateQuoteProduct($quote, $product, $quantity, $existingQuoteProducts);
 
         $productTotalHT = $product->getPriceHT() * $quantity;
-        $productTotalTaxes = ($product->getPriceHT() * ($product->getTaxRate() / 100)) * $quantity;
-        $productTotalTTC = ($product->getPrice() + $productTotalTaxes) * $quantity;
+        $productTotalTaxes = $product->getTaxRate() * $quantity;
+        $productTotalTTC = $product->getPrice() * $quantity;
 
         $totalHT += $productTotalHT;
         $totalTaxes += $productTotalTaxes;

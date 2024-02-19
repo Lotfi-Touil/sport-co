@@ -67,35 +67,54 @@ $(document).ready(function() {
         } else {
             // Ajouter un nouveau produit
             let productHtml = `
-                <div class="product-info flex items-center justify-between bg-white p-4 rounded shadow" data-product-id="${productId}">
-                    <span class="text-lg">${productName}</span>
-                    <span class="text-lg">Prix Unit HT: ${priceHT.toFixed(2)} €</span>
-                    <span class="text-lg">Prix Unit. TTC: ${priceTTC.toFixed(2)} €</span>
-                    <span class="text-lg">Taxe (${taxRate}%): ${(getTaxAmountByProduct(priceTTC, taxRate)).toFixed(2)} €</span>
-                    <input type="hidden" class="product-item form-input mt-1 block w-16 text-center" value="1" min="1"
-                        data-product-id="${productId}"
-                        data-product-price="${priceTTC}"
-                        data-product-tax-rate="${taxRate}">
-                    <div>
-                        <button class="decrement-quantity bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">-</button>
-                        <span class="quantity-display mx-2" data-product-id="${productId}">1</span>
-                        <button class="increment-quantity bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">+</button>
-                    </div>
-                    <span class="ml-4 total-product-price">Prix : ${priceTTC} €</span>
-                    <button class="remove-product bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4">Retirer</button>
-                </div>
+                <tr class="product-info border-b border-slate-200" data-product-id="${productId}">
+                    <input type="hidden" class="product-item form-input mt-1 block w-16 text-center"
+                            value="1" min="1"
+                            data-product-id="${productId}"
+                            data-product-price="${priceTTC}"
+                            data-product-tax-rate="${taxRate}">
+                    <td class="py-4 pl-4 pr-3 text-sm sm:pl-6 md:pl-0">
+                        <div class="font-medium text-slate-700">${productName}</div>
+                    </td>
+                    <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                        <div>
+                            <button class="decrement-quantity bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">-</button>
+                            <span class="quantity-display mx-2" data-product-id="${productId}">1</span>
+                            <button class="increment-quantity bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">+</button>
+                        </div>
+                    </td>
+                    <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                        ${taxRate}%
+                    </td>
+                    <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                        ${(getTaxAmountByProduct(priceTTC, taxRate)).toFixed(2)} €
+                    </td>
+                    <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                        ${priceHT.toFixed(2)} €
+                    </td>
+                    <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                        ${priceTTC.toFixed(2)} €
+                    </td>
+                    <td class="total-product-price hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                        ${priceTTC.toFixed(2)} €
+                    </td>
+                    <td class="hidden text-sm text-right text-slate-500 sm:table-cell">
+                        <button class="remove-product bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" data-product-id="${productId}">Retirer</button>
+                    </td>
+                </tr>
             `;
-            $('#no-products').hide();
+            $('#no-products').remove();
             $('#added-products').append(productHtml);
         }
-        $('#no-products').hide();
+        $('#no-products').remove();
         updateTotals();
     });
 
     $(this).on('click', '.remove-product', function() {
-        $(this).parent().remove();
+        let productId = $(this).data('product-id');
+        $(`.product-info[data-product-id=${productId}]`).remove();
         if ($('#added-products').children().length === 0) {
-            $('#no-products').show();
+            $('#added-products').html('<tr class="py-5" id="no-products"><td class="py-2" colspan="7">Le devis ne contient aucun article.</td></tr>');
         }
         updateTotals();
     });
@@ -127,7 +146,7 @@ $(document).ready(function() {
 
     $(this).on('click', '.increment-quantity', function() {
         let quantityDisplay = $(this).siblings('.quantity-display');
-        let inputElement = $(this).closest('div').siblings('.product-item');
+        let inputElement = $(this).closest('td').siblings('.product-item');
         let currentQuantity = parseInt(inputElement.val());
         quantityDisplay.text(currentQuantity + 1);
         inputElement.val(currentQuantity + 1);
@@ -135,7 +154,7 @@ $(document).ready(function() {
     });
 
     $(this).on('click', '.decrement-quantity', function() {
-        let inputElement = $(this).closest('div').siblings('.product-item');
+        let inputElement = $(this).closest('td').siblings('.product-item');
         let quantityDisplay = $(this).siblings('.quantity-display');
         let currentQuantity = parseInt(inputElement.val());
         if (currentQuantity > 1) {
@@ -168,7 +187,7 @@ $(document).ready(function() {
         var subtotalHT = 0; // Sous-total HT
         var totalTaxes = 0; // Total des taxes
 
-        $('#added-products div').each(function () {
+        $('#added-products tr.product-info').each(function () {
             var priceTTC = parseFloat($(this).find('.product-item').data('product-price')); // Prix TTC
             var taxRate = parseFloat($(this).find('.product-item').data('product-tax-rate')); // Taux de taxe
             var quantity = parseInt($(this).find('.product-item').val()); // Quantité
@@ -181,7 +200,7 @@ $(document).ready(function() {
                 totalTaxes += taxAmount;
             }
         });
-
+        console.log(subtotalHT, totalTaxes);
         // Mise à jour des totaux sur la page
         $('#subtotal').text(subtotalHT.toFixed(2) + ' €'); // Afficher le sous-total HT
         $('#total-taxes').text(totalTaxes.toFixed(2) + ' €'); // Afficher le total des taxes
@@ -194,7 +213,7 @@ $(document).ready(function() {
         let price = parseFloat(inputElement.data('product-price'));
         let totalPriceElement = $(`.product-info[data-product-id=${productId}]`).find('.total-product-price');
 
-        totalPriceElement.text(`Prix: ${(price * quantity).toFixed(2)} €`);
+        totalPriceElement.text(`${(price * quantity).toFixed(2)} €`);
         updateTotals();
     }
 

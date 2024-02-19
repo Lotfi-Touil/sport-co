@@ -27,74 +27,131 @@
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6">
-
-            <div class="w-full p-4 bg-white shadow rounded-lg">
+        <div class="max-w-5xl ml-10 py-16 bg-white">
+            <div class="pl-9">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Ajouter un produit</label>
                 <form>
-                    <label for="product-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Rechercher un produit</label>
+                    <label for="product-search" class="text-sm font-medium text-gray-900 sr-only">Rechercher un produit</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"></div>
                         <input type="search" id="product-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Rechercher un produit" required>
                         <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Rechercher</button>
                     </div>
                 </form>
-
-                <div id="product-results" class="mt-4 bg-gray-50 p-4 rounded shadow-inner hidden">
+                <div id="product-results" class="mt-2 bg-gray-50 p-4 rounded shadow-inner hidden">
                     <!-- résultats -->
                 </div>
             </div>
 
-            <hr class="my-10">
+            <div class="pl-9 pb-9">
+                <div class="flex flex-col mx-0 mt-8">
+                    <table class="min-w-full divide-y divide-slate-500">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-normal text-slate-700 sm:pl-6 md:pl-0">
+                                    Produit
+                                </th>
+                                <th scope="col" class="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell">
+                                    Quantité
+                                </th>
+                                <th scope="col" class="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell">
+                                    Taxe (%)
+                                </th>
+                                <th scope="col" class="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell">
+                                    Taxe (€)
+                                </th>
+                                <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                    Prix HT
+                                </th>
+                                <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                    Prix TTC
+                                </th>
+                                <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                    Total
+                                </th>
+                                <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="added-products">
+                            <tr class="py-5" id="no-products">
+                                <td class="py-2" colspan="7">Le devis ne contient aucun article.</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th scope="row" colspan="7" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                    Sous-total
+                                </th>
+                                <th scope="row" class="pt-6 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
+                                    Total
+                                </th>
+                                <td id="subtotal" class="pt-6 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                    0.00 €
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" colspan="7" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                    Remise
+                                </th>
+                                <th scope="row" class="pt-6 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
+                                    Remise
+                                </th>
+                                <td id="total-remise" class="pt-6 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                    0.00 €
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" colspan="7" class="hidden pt-4 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                    Taxe
+                                </th>
+                                <th scope="row" class="pt-4 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
+                                    Taxe
+                                </th>
+                                <td id="total-taxes" class="pt-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                    0.00 €
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" colspan="7" class="hidden pt-4 pl-6 pr-3 text-sm font-normal text-right text-slate-700 sm:table-cell md:pl-0">
+                                    Total
+                                </th>
+                                <th scope="row" class="pt-4 pl-4 pr-3 text-sm font-normal text-left text-slate-700 sm:hidden">
+                                    Total
+                                </th>
+                                <td id="total-amount" class="pt-4 pl-3 pr-4 text-sm font-normal text-right text-slate-700 sm:pr-6 md:pr-0">
+                                    0.00 €
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
 
-            <div class="mt-6">
-                <h2 class="text-xl font-bold mb-4">Produits ajoutés au devis</h2>
-                <div id="no-products" class="text-gray-600">Le devis ne contient aucun article.</div>
-                <div id="added-products" class="space-y-4">
-                    <!-- Les produits ajoutés apparaîtront ici -->
+                <div>
+                    {{ form_start(form, {'attr': {'id': 'form-new-quote', 'class': 'w-full'}}) }}
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
+                        {{ form_widget(form.quoteStatus, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                        {{ form_errors(form.quoteStatus) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Notes et observations</label>
+                        {{ form_widget(form.notes, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                        {{ form_errors(form.notes) }}
+                    </div>
+
+                    <input type="hidden" id="form_products_json" name="form[products_json]" value="">
+
+                    <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        {{ button_label|default('Enregistrer') }}
+                    </button>
+
+                    {{ form_end(form) }}
                 </div>
             </div>
-
-            <hr class="my-10">
-
-            <div class="mt-4">
-                <div class="flex justify-between items-center">
-                    <span class="font-bold text-lg">Total HT:</span>
-                    <span id="subtotal" class="text-lg"></span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="font-bold text-lg">Total TTC:</span>
-                    <span id="total-amount" class="text-lg"></span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="font-bold text-lg">Montant des taxes:</span>
-                    <span id="total-taxes" class="text-lg"></span>
-                </div>
-            </div>
-
-            <hr class="my-10">
-
-            {{ form_start(form, {'attr': {'id': 'form-new-quote', 'class': 'w-full'}}) }}
-
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
-                {{ form_widget(form.quoteStatus, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                {{ form_errors(form.quoteStatus) }}
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Notes et observations</label>
-                {{ form_widget(form.notes, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                {{ form_errors(form.notes) }}
-            </div>
-
-            <input type="hidden" id="form_products_json" name="form[products_json]" value="">
-
-            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                {{ button_label|default('Enregistrer') }}
-            </button>
-
-            {{ form_end(form) }}
         </div>
     </section>
 
