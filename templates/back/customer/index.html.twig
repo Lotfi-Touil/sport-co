@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des clients{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+
+    <section class="p-4 mt-14 w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-lg font-bold">Liste des clients</h1>
+            <a href="{{ path('platform_customer_new') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Nouveau client
+            </a>
+        </div>
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            #
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Prénom
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Nom
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Email
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Téléphone
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                        <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                            <td class="px-6 py-4">{{ customer.id }}</td>
+                            <td class="px-6 py-4">{{ customer.firstName }}</td>
+                            <td class="px-6 py-4">{{ customer.lastName }}</td>
+                            <td class="px-6 py-4">{{ customer.email }}</td>
+                            <td class="px-6 py-4">{{ customer.phone }}</td>
+                            <td class="px-6 py-4 flex">
+                                <a href="{{ path('platform_customer_show', {'id': customer.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                    Voir
+                                </a>
+                                <a href="{{ path('platform_customer_edit', {'id': customer.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                    Modifier
+                                </a>
+                                <form method="post" action="{{ path('platform_customer_delete', {'id': customer.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce client ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ customer.id) }}">
+                                    <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr class="bg-gray-100 border-b dark:bg-gray-800">
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-600 dark:text-gray-400 text-lg">
+                                Aucun client pour le moment.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+{% endblock %}

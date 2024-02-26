@@ -39,6 +39,11 @@ class Address
         return $this->id;
     }
 
+    public function __toString()
+    {
+        return "{$this->getStreetNumber()} {$this->getStreetType()} {$this->getStreetName()}, {$this->getZipcode()} {$this->getCity()} ({$this->getCountry()})";
+    }
+
     public function getStreetNumber(): ?string
     {
         return $this->streetNumber;

@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau client{% endblock %}
+
+{% block body %}
+   {% include '_partials/back/_platform_nav.html.twig' %}
+
+    <section class="p-4 mt-14 w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold mb-5">Nouveau client</h1>
+
+            <div class="actions flex">
+                <a href="{{ path('platform_customer_index') }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                    Revenir à la liste
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg p-6">
+            {{ form_start(form, {'attr': {'class': 'w-full'}}) }}
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Prénom</label>
+                {{ form_widget(form.firstName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.firstName) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
+                {{ form_widget(form.lastName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.lastName) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                {{ form_widget(form.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Téléphone</label>
+                {{ form_widget(form.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.phone) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Société liée</label>
+                {{ form_widget(form.company, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.company) }}
+            </div>
+
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                {{ button_label|default('Enregistrer') }}
+            </button>
+
+            {{ form_end(form) }}
+        </div>
+    </section>
+{% endblock %}

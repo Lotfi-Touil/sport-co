@@ -31,9 +31,6 @@ class Customer
     #[ORM\Column(length: 255)]
     private ?string $phone = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Address $address = null;
-
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: QuoteUser::class)]
     private Collection $quoteUsers;
 
