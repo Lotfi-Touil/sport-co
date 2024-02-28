@@ -3,120 +3,108 @@
 {% block title %}.sportCo{% endblock %}
 
 {% block body %}
-<div class="">
-    {% include '_partials/front/_navbar.html.twig' %}
-    
-    {# 
+    <div class="">
+        {% include '_partials/front/_navbar.html.twig' %}
+
+        {#
         HERO BANNER
-    #}
-    <div class="hero custom-screen mt-12 ">
-        <div class="hero-content  w-full flex-col lg:flex-row-reverse">
-            <img src="{{asset('images/hero4.png')}}" class="max-w-sm rounded-lg " />
-            <div class=" max-w-lg">
-            <h1 class="text-5xl font-bold">Vore application de facture en ligne !</h1>
-            <p class="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
-            <button class="btn btn-primary">Nous rejoindre</button>
+        #}
+        <div class="hero custom-screen mt-12">
+            <div class="hero-content  w-full flex-col lg:flex-row-reverse">
+                <img src="{{asset('images/hero4.png')}}" class="max-w-sm rounded-lg " />
+                <div class="relative max-w-lg">
+                    <div class="absolute top-0 -right-4 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+                    <div class="absolute -bottom-8 left-20 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+                    <div class="absolute top-0 -left-4 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+                    <h1 class="text-5xl font-bold">Vore application de facture en ligne !</h1>
+                    <p class="relative py-6">Simplifiez la gestion de vos factures et devis avec notre solution tout-en-un. Notre outil en ligne vous permet de créer, envoyer et gérer vos factures et devis en quelques clics.</p>
+                    <a  href="{{ path('app_login') }}" class="relative text-white bg-primary hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                        Nous rejoindre
+                    </a>
+                </div>
             </div>
+
         </div>
-        <div
-    class="absolute inset-0 blur-sm h-[580px] z-0"
-    style="
-      background: linear-gradient(
-        143.6deg,
-        rgba(192, 132, 252, 0.25) 20.79%,
-        rgba(249, 199, 121, 0.26) 40.92%,
-        rgba(204, 171, 238, 0.15) 70.35%
-      );
-    "
-  ></div>
-    </div>
-    {# 
-       END HERO BANNER
-    #}
+        {#
+        END HERO BANNER
+        #}
+
+        <div class="divider my-32 custom-screen"></div>
 
 
-
-    {# 
-       FEATURE SECTION
-    #}
-    <section class=" pt-20"
-  x-data="{ features: [{ icon: `<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+        {#
+        FEATURE SECTION
+        #}
+        <section
+                x-data="{ features: [{ icon: `<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'/></svg>`, title: 'Analytics', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius, enim ex faucibus purus.' }, { icon: `<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z'/></svg>`,
    title: 'Datacenter security', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius, enim ex faucibus purus.' }] }"
->
-  <div
-    class="custom-screen gap-16 justify-between md:px-8 lg:flex mt-24"
-  >
-    <div>
-      <div class="max-w-xl space-y-3">
-        
-        <p class="text-gray-800 text-3xl font-semibold sm:text-4xl">
-          Une solution simple pour une facturation facilité
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-          congue, nisl eget molestie varius, enim ex faucibus purus
-        </p>
-      </div>
-      <div class="mt-12 max-w-lg lg:max-w-none">
-        <ul class="space-y-8">
-          <template x-for="(item, idx) in features" :key="idx">
-            <li class="flex gap-x-4">
-              <div
-                class="flex-none w-12 h-12 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center"
-                x-html="item.icon"
-              ></div>
-              <div>
-                <h4
-                  class="text-lg text-gray-800 font-semibold"
-                  x-text="item.title"
-                ></h4>
-                <p class="mt-3" x-text="item.desc"></p>
-              </div>
-            </li>
-          </template>
-        </ul>
-      </div>
-    </div>
-    <div class="mt-12 lg:mt-0">
-      <img
-        src="https://raw.githubusercontent.com/sidiDev/remote-assets/main/Safari%20(Big%20Sur)%20-%20Light.png"
-        class="w-full shadow-lg rounded-lg border"
-      />
-    </div>
-  </div>
-</section>
+        >
+            <div class="custom-screen relative gap-16 justify-between md:px-8 lg:flex">
+                <div>
+                    <div class="max-w-xl space-y-3">
+
+                        <p class="text-gray-800 text-3xl font-semibold sm:text-4xl">
+                            Une solution simple pour une facturation facilité
+                        </p>
+                        <p class="text-justify">
+                            Découvrez comment notre plateforme transforme la complexité de la facturation en un processus fluide et sans effort. Grâce à une interface épurée et intuitive, créez des factures professionnelles, envoyez-les instantanément et suivez leur paiement en temps réel, le tout depuis un seul et même endroit.
+                        </p>
+
+                    </div>
+                    <div class="mt-12 max-w-lg lg:max-w-none">
+                        <ul class="space-y-8">
+                            <template x-for="(item, idx) in features" :key="idx">
+                                <li class="flex gap-x-4">
+                                    <div
+                                            class="flex-none w-12 h-12 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center"
+                                            x-html="item.icon"
+                                    ></div>
+                                    <div>
+                                        <h4
+                                                class="text-lg text-gray-800 font-semibold"
+                                                x-text="item.title"
+                                        ></h4>
+                                        <p class="mt-3" x-text="item.desc"></p>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-12 z-10 relative lg:mt-0">
+                    <img
+                            src="https://raw.githubusercontent.com/sidiDev/remote-assets/main/Safari%20(Big%20Sur)%20-%20Light.png"
+                            class="w-full shadow-lg rounded-lg border"
+                    />
+                </div>
+                <div class="absolute z-0 -bottom-24 -right-4 w-96 h-96 bg-[#c45f2c] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+            </div>
+
+        </section>
+        <div class="divider my-32 custom-screen"></div>
 
 
-
-<section class="py-14">
-  <div class="custom-screen  text-gray-600 md:px-8">
-    <div class="relative  mx-auto">
-      <div class="relative z-10">
-        <h3 class="text-gray-800 text-3xl font-semibold sm:text-4xl">
-          Nos fonctionnalités
-        </h3>
-        <p class="mt-3">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-          congue, nisl eget molestie varius, enim ex faucibus purus.
-        </p>
-      </div>
-      <div
-        class="absolute inset-0 max-w-xs mx-auto h-44 blur-[118px]"
-        style="
-          background: linear-gradient(
-            152.92deg,
-            rgba(192, 132, 252, 0.2) 4.54%,
-            rgba(232, 121, 249, 0.26) 34.2%,
-            rgba(192, 132, 252, 0.1) 77.55%
-          );
-        "
-      ></div>
-    </div>
-    <div class="relative mt-12">
-      <ul
-        class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
-        x-data="{ features: [
+        <section>
+            <div class="custom-screen  text-gray-600 md:px-8">
+                <div class="relative  mx-auto">
+                    <div class="relative z-10">
+                        <h3 class="text-gray-800 text-3xl font-semibold sm:text-4xl">
+                            Nos fonctionnalités
+                        </h3>
+                        <p class="mt-3">
+                            Explorez la richesse de nos fonctionnalités, conçues pour répondre à tous vos besoins. De la gestion au suivi, tout est à portée de main.
+                        </p>
+                    </div>
+                    <div
+                            class="absolute inset-0  mx-auto h-44 blur-[118px]"
+                            style="background: linear-gradient(152deg, rgba(2,0,36,1) 0%, rgba(79,70,229,1) 60%);"
+                    ></div>
+                </div>
+                <div class="relative mt-12">
+                    <ul
+                            class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
+                            x-data="{ features: [
               {
                   icon: `<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
                       <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
@@ -162,446 +150,249 @@
                 desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius.'
             }
           ] }"
-      >
-        
-          <li class="bg-white space-y-3 p-4 border rounded-lg">
-            <div
-              class="flex items-center mb-4 text-indigo-600"
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
-                  </svg>
-            
-            </div>
-            <h5
-              class="text-lg font-semibold text-gray-800"
-            >
-              Fast Refresh
-            
-            </h5>
-            <p class="mt-2 text-base">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
-            </p>
-          </li>
-          <li class="bg-white space-y-3 p-4 border rounded-lg">
-            <div
-              class="flex items-center mb-4 text-indigo-600"
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
-                  </svg>
-            
-            </div>
-            <h5
-              class="text-lg font-semibold text-gray-800"
-            >
-              Fast Refresh
-            
-            </h5>
-            <p class="mt-2 text-base">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
-            </p>
-          </li>
-          <li class="bg-white space-y-3 p-4 border rounded-lg">
-            <div
-              class="flex items-center mb-4 text-indigo-600"
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
-                  </svg>
-            
-            </div>
-            <h5
-              class="text-lg font-semibold text-gray-800"
-            >
-              Fast Refresh
-            
-            </h5>
-            <p class="mt-2 text-base">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
-            </p>
-          </li>
-          <li class="bg-white space-y-3 p-4 border rounded-lg">
-            <div
-              class="flex items-center mb-4 text-indigo-600"
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
-                  </svg>
-            
-            </div>
-            <h5
-              class="text-lg font-semibold text-gray-800"
-            >
-              Fast Refresh
-            
-            </h5>
-            <p class="mt-2 text-base">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
-            </p>
-          </li>
-          <li class="bg-white space-y-3 p-4 border rounded-lg">
-            <div
-              class="flex items-center mb-4 text-indigo-600"
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
-                  </svg>
-            
-            </div>
-            <h5
-              class="text-lg font-semibold text-gray-800"
-            >
-              Fast Refresh
-            
-            </h5>
-            <p class="mt-2 text-base">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
-            </p>
-          </li>
-          <li class="bg-white space-y-3 p-4 border rounded-lg">
-            <div
-              class="flex items-center mb-4 text-indigo-600"
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
-                  </svg>
-            
-            </div>
-            <h5
-              class="text-lg font-semibold text-gray-800"
-            >
-              Fast Refresh
-            
-            </h5>
-            <p class="mt-2 text-base">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
-            </p>
-          </li>
-          <li class="bg-white space-y-3 p-4 border rounded-lg">
-            <div
-              class="flex items-center mb-4 text-indigo-600"
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
-                  </svg>
-            
-            </div>
-            <h5
-              class="text-lg font-semibold text-gray-800"
-            >
-              Fast Refresh
-            
-            </h5>
-            <p class="mt-2 text-base">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
-            </p>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</section>
+                    >
 
-{# 
-       END FEATURE SECTION
-    #}
+                        <li class="bg-white space-y-3 p-4 border rounded-lg">
+                            <div
+                                    class="flex items-center mb-4 text-indigo-600"
+                            >
+                                <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
+                                    <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
+                                </svg>
+
+                            </div>
+                            <h5
+                                    class="text-lg font-semibold text-gray-800"
+                            >
+                                Fast Refresh
+
+                            </h5>
+                            <p class="mt-2 text-base">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
+                            </p>
+                        </li>
+                        <li class="bg-white space-y-3 p-4 border rounded-lg">
+                            <div
+                                    class="flex items-center mb-4 text-indigo-600"
+                            >
+                                <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
+                                    <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
+                                </svg>
+
+                            </div>
+                            <h5
+                                    class="text-lg font-semibold text-gray-800"
+                            >
+                                Fast Refresh
+
+                            </h5>
+                            <p class="mt-2 text-base">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
+                            </p>
+                        </li>
+                        <li class="bg-white space-y-3 p-4 border rounded-lg">
+                            <div
+                                    class="flex items-center mb-4 text-indigo-600"
+                            >
+                                <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
+                                    <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
+                                </svg>
+
+                            </div>
+                            <h5
+                                    class="text-lg font-semibold text-gray-800"
+                            >
+                                Fast Refresh
+
+                            </h5>
+                            <p class="mt-2 text-base">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
+                            </p>
+                        </li>
+                        <li class="bg-white space-y-3 p-4 border rounded-lg">
+                            <div
+                                    class="flex items-center mb-4 text-indigo-600"
+                            >
+                                <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
+                                    <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
+                                </svg>
+
+                            </div>
+                            <h5
+                                    class="text-lg font-semibold text-gray-800"
+                            >
+                                Fast Refresh
+
+                            </h5>
+                            <p class="mt-2 text-base">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
+                            </p>
+                        </li>
+                        <li class="bg-white space-y-3 p-4 border rounded-lg">
+                            <div
+                                    class="flex items-center mb-4 text-indigo-600"
+                            >
+                                <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
+                                    <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
+                                </svg>
+
+                            </div>
+                            <h5
+                                    class="text-lg font-semibold text-gray-800"
+                            >
+                                Fast Refresh
+
+                            </h5>
+                            <p class="mt-2 text-base">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
+                            </p>
+                        </li>
+                        <li class="bg-white space-y-3 p-4 border rounded-lg">
+                            <div
+                                    class="flex items-center mb-4 text-indigo-600"
+                            >
+                                <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
+                                    <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
+                                </svg>
+
+                            </div>
+                            <h5
+                                    class="text-lg font-semibold text-gray-800"
+                            >
+                                Fast Refresh
+
+                            </h5>
+                            <p class="mt-2 text-base">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
+                            </p>
+                        </li>
+                        <li class="bg-white space-y-3 p-4 border rounded-lg">
+                            <div
+                                    class="flex items-center mb-4 text-indigo-600"
+                            >
+                                <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth='1.5' stroke='currentColor' class='w-6 h-6'>
+                                    <path strokeLinecap='round' strokeLinejoin='round' d='M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z' />
+                                </svg>
+
+                            </div>
+                            <h5
+                                    class="text-lg font-semibold text-gray-800"
+                            >
+                                Fast Refresh
+
+                            </h5>
+                            <p class="mt-2 text-base">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue, nisl eget molestie varius
+                            </p>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        {#
+        END FEATURE SECTION
+        #}
 
 
-{# 
+        {#
         Princing SECTION
-#}
+        #}
 
+        <div class="divider my-32 custom-screen"></div>
 
-
-
-<section
-  x-data="{ 
-    plans: [
-    {
-      name: 'Enterprise',
-      desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      price: 32,
-      isMostPop: true,
-      features: [
-          'Curabitur faucibus',
-          'massa ut pretium maximus',
-          'Sed posuere nisi',
-          'Pellentesque eu nibh et neque',
-          'Suspendisse a leo',
-          'Praesent quis venenatis ipsum',
-          'Duis non diam vel tortor',
-      ],
-  },
-  {
-      name: 'Startup',
-      desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      price: 12,
-      isMostPop: false,
-      features: [
-          'Curabitur faucibus',
-          'massa ut pretium maximus',
-          'Sed posuere nisi',
-          'Pellentesque eu nibh et neque',
-          'Suspendisse a leo',
-          'Praesent quis venenatis ipsum',
-          'Duis non diam vel tortor',
-      ],
-  },
-    ]
-  }"
->
-  <div class="relative py-14 bg-gray-900">
-    <div
-      class="absolute inset-0 blur-[118px] max-w-lg h-[800px] mx-auto sm:max-w-3xl sm:h-[400px]"
-      style="
-        background: linear-gradient(
-        143.6deg,
-        rgba(192, 132, 252, 0.25) 20.79%,
-        rgba(249, 199, 121, 0.26) 40.92%,
-        rgba(204, 171, 238, 0.15) 70.35%
-      );
-      "
-    ></div>
-    <div
-      class="relative max-w-screen-xl mx-auto text-gray-300 sm:px-4 md:px-8"
-    >
-      <div class="max-w-xl mx-auto space-y-3 px-4 sm:text-center sm:px-0">
-        <h3 class="text-cyan-400 font-semibold">Pricing</h3>
-        <p class="text-white text-3xl font-semibold sm:text-4xl">
-          Abonnement
-        </p>
-        <div class="max-w-xl">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-            efficitur consequat nunc.
-          </p>
-        </div>
-      </div>
-      <div class="mt-16 justify-center sm:flex">
-
-          <div
-            class="relative flex-1 flex items-stretch flex-col mt-6 border-2 sm:mt-0 sm:rounded-xl sm:max-w-md bg-gray-900 border-cyan-400 border-x-0 sm:border-x-2"
-          >
-            <div class="p-4 py-8 space-y-4 border-b border-gray-700 md:p-8">
-              <span class="text-gray-200 font-medium">
-              Freemium
-              </span>
-              <div class="text-cyan-400 text-3xl font-semibold">
-                <span>35</span>
-                <span class="text-xl font-normal">/mo</span>
-              </div>
-              <p class="text-gray-400" >Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              <button
-                class="px-3 py-3 rounded-lg w-full font-semibold text-sm duration-150 text-white bg-cyan-500 hover:bg-cyan-600 active:bg-cyan-700"
-              >
-                Get Started
-              </button>
+        <section>
+            <div class="">
+                <section class='relative py-14'>
+                    <div class="absolute top-0 w-full h-[521px]" style="background: linear-gradient(152.92deg, rgba(192, 132, 252, 0.2) 4.54%, rgba(232, 121, 249, 0.17) 34.2%, rgba(192, 132, 252, 0.1) 77.55%)"></div>
+                    <div class="max-w-screen-xl mx-auto text-gray-600 sm:px-4 md:px-8">
+                        <div class='relative max-w-xl mx-auto space-y-3 px-4 sm:text-center sm:px-0'>
+                            <h3 class="text-indigo-600 font-semibold">
+                                Tarifs
+                            </h3>
+                            <p class='text-gray-800 text-3xl font-semibold sm:text-4xl'>
+                                Votre parcours, nos offres
+                            </p>
+                            <div class='max-w-xl'>
+                                <p>
+                                    Avec notre offre gratuite, démarrez sans frais, et optez pour notre version payante quand vous êtes prêt à accélérer.
+                                </p>
+                            </div>
+                        </div>
+                        <div class='mt-16 justify-center sm:flex'>
+                            <!-- Plan 1: Enterprise -->
+                            <div class="relative flex-1 flex items-stretch flex-col mt-6 sm:mt-0 sm:rounded-xl sm:max-w-md bg-white shadow-lg sm:border">
+                                <div class="p-4 py-8 space-y-4 border-b md:p-8">
+                                    <span class='text-indigo-600 font-medium'>Enterprise</span>
+                                    <div class='text-gray-800 text-3xl font-semibold'>
+                                        <span>$32</span> <span class="text-xl text-gray-600 font-normal">/mo</span>
+                                    </div>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                    <button class='px-3 py-3 rounded-lg w-full font-semibold text-sm duration-150 text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700'>
+                                        Get Started
+                                    </button>
+                                </div>
+                                <ul class='p-4 py-8 space-y-3 md:p-8'>
+                                    <li class="pb-2 text-gray-800 font-medium">
+                                        Features
+                                    </li>
+                                    <!-- Features for Enterprise -->
+                                    <li class='flex items-center gap-5'>
+                                        <svg xmlns='http://www.w3.org/2000/svg' class='h-5 w-5 text-indigo-600' viewBox='0 0 20 20' fill='currentColor'>
+                                            <path fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'></path>
+                                        </svg>
+                                        <span>Curabitur faucibus</span>
+                                    </li>
+                                    <li class='flex items-center gap-5'>
+                                        <svg xmlns='http://www.w3.org/2000/svg' class='h-5 w-5 text-indigo-600' viewBox='0 0 20 20' fill='currentColor'>
+                                            <path fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'></path>
+                                        </svg>
+                                        <span>massa ut pretium maximus</span>
+                                    </li>
+                                    <!-- Répéter pour les autres fonctionnalités... -->
+                                </ul>
+                            </div>
+                            <div class="relative flex-1 flex items-stretch flex-col mt-6 sm:mt-0 sm:rounded-xl sm:max-w-md bg-white shadow-lg sm:border">
+                                <div class="p-4 py-8 space-y-4 border-b md:p-8">
+                                    <span class='text-indigo-600 font-medium'>Startup</span>
+                                    <div class='text-gray-800 text-3xl font-semibold'>
+                                        <span>$12</span> <span class="text-xl text-gray-600 font-normal">/mo</span>
+                                    </div>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                    <button class='px-3 py-3 rounded-lg w-full font-semibold text-sm duration-150 text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700'>
+                                        Get Started
+                                    </button>
+                                </div>
+                                <ul class='p-4 py-8 space-y-3 md:p-8'>
+                                    <li class="pb-2 text-gray-800 font-medium">
+                                        Features
+                                    </li>
+                                    <!-- Features for Startup -->
+                                    <li class='flex items-center gap-5'>
+                                        <svg xmlns='http://www.w3.org/2000/svg' class='h-5 w-5 text-indigo-600' viewBox='0 0 20 20' fill='currentColor'>
+                                            <path fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'></path>
+                                        </svg>
+                                        <span>Curabitur faucibus</span>
+                                    </li>
+                                    <li class='flex items-center gap-5'>
+                                        <svg xmlns='http://www.w3.org/2000/svg' class='h-5 w-5 text-indigo-600' viewBox='0 0 20 20' fill='currentColor'>
+                                            <path fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'></path>
+                                        </svg>
+                                        <span>massa ut pretium maximus</span>
+                                    </li>
+                                    <!-- Répéter pour les autres fonctionnalités listées pour le plan Startup -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-            <ul class="p-4 py-8 space-y-3 md:p-8">
-              
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    :class="{'text-cyan-600': item.isMostPop}"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    :class="{'text-cyan-600': item.isMostPop}"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    :class="{'text-cyan-600': item.isMostPop}"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    :class="{'text-cyan-600': item.isMostPop}"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    class="{'text-cyan-600': item.isMostPop}"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-              
-            </ul>
-          </div>
+        </section>
 
 
 
-
-
-          <div
-            class="relative flex-1 flex items-stretch flex-col mt-6 border-2 sm:mt-0 sm:rounded-xl sm:max-w-md border-transparent"
-          >
-            <div class="p-4 py-8 space-y-4 border-b border-gray-700 md:p-8">
-              <span class="text-gray-200 font-medium">
-              Premium
-
-              </span>
-              <div class="text-cyan-400 text-3xl font-semibold">
-                <span>0</span>
-                <span class="text-xl font-normal">/mo</span>
-              </div>
-              <p class="text-gray-400" >Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              <button
-                class="px-3 py-3 rounded-lg w-full font-semibold text-sm duration-150 text-white bg-cyan-500 hover:bg-cyan-600 active:bg-cyan-700"
-              >
-                Get Started
-              </button>
-            </div>
-            <ul class="p-4 py-8 space-y-3 md:p-8">
-              
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    :class="{'text-cyan-600': item.isMostPop}"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    class="text-cyan-600"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    class="text-cyan-600"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-                <li class="flex items-center gap-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    class="text-cyan-600"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>Curabitur faucibus</span>
-                </li>
-
-              
-            </ul>
-          </div>
-       
-      </div>
-    </div>
-  </div>
-</section>
-  
-
-    
-    {% include '_partials/front/_footer.html.twig' %}
+        {% include '_partials/front/_footer.html.twig' %}
     </div>
 {% endblock %}
 

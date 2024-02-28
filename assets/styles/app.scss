@@ -2,3 +2,24 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+
+@layer utilities {
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 6s;
+  }
+}
+
+.custom-screen {
+  @apply max-w-7xl mx-auto px-4 md:px-8;
+}
+
+.custom-btn-bg {
+  background: radial-gradient(67.5% 67.5% at 50% 50%, #4B5563 0%, rgba(75, 85, 99, 0) 100%)
+}
+
+.custom-btn-bg:hover {
+  background: radial-gradient(118.75% 118.75% at 50% 50%, #4B5563 0%, rgba(75, 85, 99, 0) 100%);
+}

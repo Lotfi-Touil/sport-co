@@ -1,75 +1,50 @@
-<div class="navbar custom-screen ">
-  <div class="navbar-start">
-    <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
-      </div>
-      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52  color">
-        <li><a>Accueil</a></li>
-        <li>
-          <a>Fonctionnalité</a>
-          <ul class="p-2">
-            <li><a>Submenu 1</a></li>
-            <li><a>Submenu 2</a></li>
-          </ul>
-        </li>
-        <li><a>Prix</a></li>
-        <li><a>A propos</a></li>
-        <li><a>Contact</a></li>
-      </ul>
-    </div>
-    <a class="text-primary font-extrabold text-xl">.sportCo</a>
-  </div>
-  <div class="navbar-center hidden lg:flex">
-    <ul class="menu menu-horizontal px-1">
-      <li><a>Acceuil</a></li>
-      <li>
-        <details>
-          <summary>Fonctionnalité</summary>
-          <ul class="p-2">
-            <li><a>Submenu 1</a></li>
-            <li><a>Submenu 2</a></li>
-          </ul>
-        </details>
-      </li>
-      <li><a>Prix</a></li>
-        <li><a>Contact</a></li>
-        <li><a>Accueil</a></li>
-    </ul>
-  </div>
-  <div class="navbar-end">
-    <button id="test" class="btn" onclick="my_modal_5.showModal()">open modal</button>
-<dialog id="my_modal_5" class="modal modal-bottom sm:modal-middle">
-  <div class="modal-box">
-  <div id="loginError" class="hidden text-red-500 text-sm mb-2"></div>
-
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-        <form id="loginbtn" action ="/api/login" method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-96">
-
-
-            <h1 class="text-xl mb-4 font-semibold">Merci de vous connecter</h1>
-            <div class="mb-4">
-                <label for="inputEmail" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                <input type="email"  name="email" id="inputEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" autocomplete="email" required autofocus>
+<div class="navbar max-w-7xl mx-auto px-4 md:px-8 ">
+    <div class="navbar-start">
+        <div class="dropdown">
+            <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
             </div>
-            <div class="mb-4">
-                <label for="inputPassword" class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
-                <input type="password" name="password" id="inputPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" autocomplete="current-password" required>
-            </div>
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            <button  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Se connecter</button>
-        </form>
-    </div>    <div class="modal-action">
-      <form method="dialog">
-        <!-- if there is a button in form, it will close the modal -->
-        <button class="btn">Close</button>
-      </form>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52  color">
+                <li><a>Accueil</a></li>
+                <li>
+                    <a>Fonctionnalité</a>
+                    <ul class="p-2">
+                        <li><a>Submenu 1</a></li>
+                        <li><a>Submenu 2</a></li>
+                    </ul>
+                </li>
+                <li><a>Prix</a></li>
+                <li><a>A propos</a></li>
+                <li><a>Contact</a></li>
+            </ul>
+        </div>
+        <a class="text-primary font-extrabold text-xl">.sportCo</a>
     </div>
-  </div>
-</dialog>
-  </div>
+    <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+            <li><a>Accueil</a></li>
+            <li>
+                <details>
+                    <summary>Fonctionnalité</summary>
+                    <ul class="p-2">
+                        <li><a>Submenu 1</a></li>
+                        <li><a>Submenu 2</a></li>
+                    </ul>
+                </details>
+            </li>
+            <li><a>Prix</a></li>
+            <li><a>Contact</a></li>
+        </ul>
+    </div>
+    <div class="navbar-end">
+
+
+        <!-- Modal toggle -->
+        <a  href="{{ path('app_login') }}" class="block text-white bg-primary hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+            Connexion
+        </a>
+
+        <!-- Main modal -->
+
+    </div>
 </div>
- {% block javascripts %}
-     
-     {{ encore_entry_script_tags('loginjs') }}
- {% endblock %}
