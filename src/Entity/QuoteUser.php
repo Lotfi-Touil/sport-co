@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\QuoteUserRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,14 +15,14 @@ class QuoteUser
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(fetch: 'EAGER', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Quote $quote = null;
 
-    #[ORM\ManyToOne(inversedBy: 'quoteUsers')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'quoteUsers')]
     private ?Customer $customer = null;
 
-    #[ORM\ManyToOne(inversedBy: 'quoteUsers')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'quoteUsers')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
 
@@ -89,7 +90,7 @@ class QuoteUser
         return $this->quote;
     }
 
-    public function setQuote(Quote $quote): static
+    public function setQuote(?Quote $quote): static
     {
         $this->quote = $quote;
 

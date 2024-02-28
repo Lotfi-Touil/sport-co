@@ -78,4 +78,16 @@ class CustomerController extends AbstractController
 
         return $this->redirectToRoute('platform_customer_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/search/customers', name: 'customer_search', methods: ['GET'])]
+    public function customerSearch(Request $request, CustomerRepository $customerRepository): Response
+    {
+        $term = $request->query->get('term');
+        // $customers = $customerRepository->findByEmail($term);
+        $customers = $customerRepository->findByTerm($term);
+
+        return $this->render('back/customer/_search_results.html.twig', [
+            'customers' => $customers,
+        ]);
+    }
 }

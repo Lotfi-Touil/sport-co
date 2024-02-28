@@ -43,16 +43,27 @@
                                     Details
                                     </p>
                                     <p>Unwrapped</p>
-                                    <p>Fake Street 123</p>
-                                    <p>San Javier</p>
-                                    <p>CA 1234</p>
+                                    <p>Fake Street 123 San Javier CA 1234</p>
                                 </div>
-                                <div class="text-sm font-light text-slate-500">
-                                    <p class="text-sm font-normal text-slate-700">Billed To</p>
-                                    <p>The Boring Company</p>
-                                    <p>Tesla Street 007</p>
-                                    <p>Frisco</p>
-                                    <p>CA 0000</p>
+                                <div id="bloc-destinataire" class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">Destinataire</p>
+                                    {% set hiddenClass = quote.quoteUsers.isEmpty() ? 'hidden' : '' %}
+                                    <button id="remove-customer" class="bg-red-500 hover:bg-red-700 text-white font-bold px-2 my-1 rounded {{ hiddenClass }}">
+                                        Retirer
+                                    </button>
+                                    <div class="zone-info-dest">
+                                    {% if quote.quoteUsers is not empty %}
+                                        {% set quoteUser = quote.quoteUsers[0] %}
+                                        <input id="user-dest-id" type="hidden" value="{{ quoteUser.customer.id }}" class="hidden"/>
+                                        <p class="user-dest-intitule disabled">{{ quoteUser.customer.firstName }} {{ quoteUser.customer.lastName }}</p>
+                                        <p class="user-dest-email disabled">{{ quoteUser.customer.email }}</p>
+                                        <p class="user-dest-address-street disabled">Adresse</p>
+                                    {% else %}
+                                        <p>-</p>
+                                        <p>-</p>
+                                        <p>-</p>
+                                    {% endif %}
+                                    </div>
                                 </div>
                                 <div class="text-sm font-light text-slate-500">
                                     <p class="text-sm font-normal text-slate-700">Numéro de devis</p>
@@ -72,7 +83,27 @@
                         </div>
                     </div>
 
-                    <div class="pl-9">
+                    <div class="pl-9 mt-5">
+                        <div class="flex justify-between mb-2">
+                            <label class="block text-gray-700 text-sm font-bold">
+                                Affecter le devis à :
+                            </label>
+                            <span id="warning-customer-delete" class="font-bold text-red-500">{{ quote.quoteUsers is not empty ? "(Attention: le destinataire actuel sera détaché du devis)" : '' }}</span>
+                        </div>
+                        <form>
+                            <label for="user-search" class="text-sm font-medium text-gray-900 sr-only">Rechercher un client</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"></div>
+                                <input type="search" id="user-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Tapez pour rechercher un utilisateur" required>
+                                <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Rechercher</button>
+                            </div>
+                        </form>
+                        <div id="user-results" class="mt-2 bg-gray-50 p-4 rounded shadow-inner hidden">
+                            <!-- résultats -->
+                        </div>
+                    </div>
+
+                    <div class="pl-9 mt-5">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Ajouter un produit</label>
                         <form>
                             <label for="product-search" class="text-sm font-medium text-gray-900 sr-only">Rechercher un produit</label>
@@ -239,6 +270,8 @@
                             </div>
 
                             <input type="hidden" id="form_products_json" name="form[products_json]" value="">
+
+                            <input type="hidden" id="form_customer_json" name="form[customer_json]" value="">
 
                             <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 {{ button_label|default('Enregistrer') }}

@@ -2,18 +2,25 @@
 
 namespace App\Service;
 
+use App\Entity\Customer;
 use App\Entity\Product;
 use App\Entity\Quote;
 use App\Entity\QuoteProduct;
+use App\Entity\QuoteUser;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class QuoteService
 {
-    private $entityManager;
+    private Security $security;
+    private EntityManagerInterface $entityManager;
+
     private $error;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(Security $security, EntityManagerInterface $entityManager)
     {
+        $this->security = $security;
         $this->entityManager = $entityManager;
     }
 
@@ -42,10 +49,23 @@ class QuoteService
             return false;
         }
 
+        $quoteCustomerData = $this->decodeCustomerData($params);
+        $existingQuoteUser = $this->getExistingQuoteUser($quote);
+
+        if (!$this->processCustomer($quote, $quoteCustomerData, $existingQuoteUser)) {
+            return false;
+        }
+
         $this->removeUnmatchedQuoteProducts($quote, $quoteProductsData, $existingQuoteProducts);
 
         $this->entityManager->flush();
         return true;
+    }
+
+    private function decodeCustomerData(array $params): ?array
+    {
+        $quoteCustomerJson = $params['form']['customer_json'];
+        return json_decode($quoteCustomerJson, true);
     }
 
     private function decodeQuoteProductsData(array $params): ?array
@@ -63,7 +83,69 @@ class QuoteService
         return $existingQuoteProducts;
     }
 
-    private function processQuoteProducts(Quote $quote, array $quoteProductsData, array &$existingQuoteProducts): bool
+    private function getExistingQuoteUser(Quote $quote): ?QuoteUser
+    {
+        return $this->entityManager->getRepository(QuoteUser::class)->findByQuoteId($quote->getId());
+    }
+
+    private function processCustomer(Quote $quote, array $customerData, ?QuoteUser $existingQuoteUser): bool
+    {
+        $customerId = $customerData['id'];
+
+        if (!$customerId) { // Devis soumis sans destinataire
+            if ($existingQuoteUser) {
+                $this->entityManager->remove($existingQuoteUser);
+            }
+            return true;
+        }
+
+        $customer = $this->entityManager->getRepository(Customer::class)->find($customerId);
+
+        if (!$customer) {
+            $this->addError("Une erreur est survenue lors de l'enregistrement du destinataire.");
+            return false;
+        }
+
+        // Voir s'il y a eu une tentative d'inspecter l'élément ^^
+        if ($customer->getEmail() != $customerData['email']) {
+            $this->addError("Une erreur est survenue lors de la vérification des informations.");
+            return false;
+        }
+
+        $this->updateOrCreateQuoteUser($quote, $customer, $existingQuoteUser);
+
+        return true;
+    }
+
+    private function updateOrCreateQuoteUser(Quote $quote, Customer $customer, ?QuoteUser &$existingQuoteUser): QuoteUser
+    {
+        $creator = $this->security->getUser();
+
+        if (!$creator) {
+            throw new \RuntimeException('Aucun utilisateur connecté.');
+        }
+
+        if ($existingQuoteUser) {
+            // Si QuoteUser existe déjà, on met à jour.
+            $quoteUser = $existingQuoteUser;
+
+            $quoteUser->setCustomer($customer);
+            $quoteUser->setCreator($creator);
+        } else {
+            // Si QuoteUser n'existe pas, on en crée un nouveau.
+            $quoteUser = new QuoteUser();
+
+            $quoteUser->setQuote($quote);
+            $quoteUser->setCustomer($customer);
+            $quoteUser->setCreator($creator);
+
+            $quote->addQuoteUser($quoteUser);
+        }
+
+        return $quoteUser;
+    }
+
+    private function processQuoteProducts(Quote $quote, array $quoteProductsData, ?array $existingQuoteProducts): bool
     {
         $totalHT = $totalTaxes = $totalTTC = 0;
 
@@ -78,7 +160,7 @@ class QuoteService
         return true;
     }
 
-    private function processSingleQuoteProduct(Quote $quote, array $productData, array &$existingQuoteProducts, &$totalHT, &$totalTaxes, &$totalTTC): bool
+    private function processSingleQuoteProduct(Quote $quote, array $productData, ?array $existingQuoteProducts, &$totalHT, &$totalTaxes, &$totalTTC): bool
     {
         $productId = $productData['product_id'];
         $product = $this->entityManager->getRepository(Product::class)->find($productId);
@@ -107,7 +189,7 @@ class QuoteService
         return true;
     }
 
-    private function updateOrCreateQuoteProduct(Quote $quote, Product $product, int $quantity, array &$existingQuoteProducts): QuoteProduct
+    private function updateOrCreateQuoteProduct(Quote $quote, Product $product, int $quantity, ?array $existingQuoteProducts): QuoteProduct
     {
         if (isset($existingQuoteProducts[$product->getId()])) {
             // Si le QuoteProduct existe déjà, on met à jour la quantité.
@@ -147,43 +229,21 @@ class QuoteService
 
     public function create(Quote $quote, array $params): bool
     {
-        $quoteProductsJson = $params['form']['products_json'];
-        $quoteProductsData = json_decode($quoteProductsJson, true);
+        $quoteCustomerData = $this->decodeCustomerData($params);
 
-        if (!$quoteProductsData)
-        {
-            $this->addError('Oups! Le devis ne contient aucun article.');
+        if (!$this->processCustomer($quote, $quoteCustomerData, null)) {
             return false;
         }
 
-        $repository = $this->entityManager->getRepository(Product::class);
+        $quoteProductsData = $this->decodeQuoteProductsData($params);
 
-        foreach ($quoteProductsData as $productData)
-        {
-            $product = $repository->find($productData['product_id']);
-            if ($product)
-            {
-                if ($product->getPrice() != $productData['price'] || $product->getTaxRate() != $productData['tax_rate'])
-                {
-                    $this->addError("Une erreur est survenue lors de l'ajout du produit n°{$productData['id']} ({$product->getName()}).");
-                    return false;
-                }
+        if (!$quoteProductsData) {
+            $this->addError("Le devis ne contient aucun produit.");
+            return false;
+        }
 
-                $quantity = $productData['quantity'];
-
-                // Créer une nouvelle instance de QuoteProduct ou utiliser une entité de jointure appropriée
-                $quoteProduct = new QuoteProduct();
-                $quoteProduct->setQuote($quote);
-                $quoteProduct->setProduct($product);
-                $quoteProduct->setQuantity($quantity);
-                $quoteProduct->setPrice($product->getPrice());
-                $quoteProduct->setTaxRate($product->getTaxRate());
-
-                // Ajouter cette entité de jointure à votre entité Quote
-                $quote->addQuoteProduct($quoteProduct);
-                $quote->incrementSubtotal($product->getPriceHT() * $quantity);
-                $quote->incrementTotalAmount($product->getPrice() * $quantity);
-            }
+        if (!$this->processQuoteProducts($quote, $quoteProductsData, null)) {
+            return false;
         }
 
         $this->entityManager->persist($quote);
@@ -191,4 +251,5 @@ class QuoteService
 
         return true;
     }
+
 }

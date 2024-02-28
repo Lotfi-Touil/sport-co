@@ -43,12 +43,16 @@ class Quote
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $expiryDate = null;
 
-    #[ORM\OneToMany(mappedBy: 'quote', targetEntity: QuoteProduct::class, cascade: ['persist'])]
+    #[ORM\OneToMany(mappedBy: 'quote', targetEntity: QuoteProduct::class, cascade: ['persist', 'remove'])]
     private Collection $quoteProducts;
+
+    #[ORM\OneToMany(mappedBy: 'quote', targetEntity: QuoteUser::class, cascade: ['persist', 'remove'])]
+    private Collection $quoteUsers;
 
     public function __construct()
     {
         $this->quoteProducts = new ArrayCollection();
+        $this->quoteUsers = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->expiryDate = (new \DateTime())->modify('+3 months'); // TODO Gérer les dates d'expirations
     }
@@ -197,5 +201,36 @@ class Quote
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, QuoteUser>
+     */
+    public function getQuoteUsers(): Collection
+    {
+        return $this->quoteUsers;
+    }
+
+    public function addQuoteUser(QuoteUser $quoteUser): static
+    {
+        if (!$this->quoteUsers->contains($quoteUser)) {
+            $this->quoteUsers->add($quoteUser);
+            $quoteUser->setQuote($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuoteUser(QuoteUser $quoteUser): static
+    {
+        if ($this->quoteUsers->removeElement($quoteUser)) {
+            // set the owning side to null (unless already changed)
+            if ($quoteUser->getQuote() === $this) {
+                $quoteUser->setQuote(null);
+            }
+        }
+
+        return $this;
+    }
+
 
 }

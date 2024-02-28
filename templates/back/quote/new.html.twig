@@ -28,6 +28,59 @@
         </div>
 
         <div class="max-w-5xl ml-10 py-16 bg-white">
+            <div class="pl-9 pb-9">
+                <div class="flex w-full">
+                    <div class="grid grid-cols-4 gap-12">
+                        <div class="text-sm font-light text-slate-500">
+                            <p class="text-sm font-normal text-slate-700">
+                            Details
+                            </p>
+                            <p>Unwrapped</p>
+                            <p>Fake Street 123 San Javier CA 1234</p>
+                        </div>
+                        <div id="bloc-destinataire" class="text-sm font-light text-slate-500">
+                            <p class="text-sm font-normal text-slate-700">Destinataire</p>
+                            <div class="zone-info-dest">
+                                <p>-</p>
+                                <p>-</p>
+                                <p>-</p>
+                            </div>
+                        </div>
+                        <div class="text-sm font-light text-slate-500">
+                            <p class="text-sm font-normal text-slate-700">Numéro de devis</p>
+                            <p>-</p>
+                            <p class="mt-2 text-sm font-normal text-slate-700">
+                            Date of délivrance
+                            </p>
+                            <p>00.00.00</p>
+                        </div>
+                        <div class="text-sm font-light text-slate-500">
+                            <p class="text-sm font-normal text-slate-700">Validité</p>
+                            <p>0 Days</p>
+                            <p class="mt-2 text-sm font-normal text-slate-700">TODO</p>
+                            <p>00.00.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pl-9 mb-5">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Affecter le devis à
+                </label>
+                <form>
+                    <label for="user-search" class="text-sm font-medium text-gray-900 sr-only">Rechercher un client</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"></div>
+                        <input type="search" id="user-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Tapez pour rechercher un utilisateur" required>
+                        <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Rechercher</button>
+                    </div>
+                </form>
+                <div id="user-results" class="mt-2 bg-gray-50 p-4 rounded shadow-inner hidden">
+                    <!-- résultats -->
+                </div>
+            </div>
+
             <div class="pl-9">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Ajouter un produit</label>
                 <form>
@@ -144,6 +197,8 @@
                     </div>
 
                     <input type="hidden" id="form_products_json" name="form[products_json]" value="">
+
+                    <input type="hidden" id="form_customer_json" name="form[customer_json]" value="">
 
                     <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         {{ button_label|default('Enregistrer') }}

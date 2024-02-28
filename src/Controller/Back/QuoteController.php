@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Entity\Quote;
 use App\Entity\QuoteProduct;
 use App\Entity\QuoteStatus;
+use App\Entity\User;
 use App\Form\QuoteType;
 use App\Repository\QuoteRepository;
 use App\Repository\QuoteStatusRepository;

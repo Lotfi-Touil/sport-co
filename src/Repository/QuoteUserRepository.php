@@ -21,6 +21,15 @@ class QuoteUserRepository extends ServiceEntityRepository
         parent::__construct($registry, QuoteUser::class);
     }
 
+    public function findByQuoteId($quoteId): ?QuoteUser
+    {
+        return $this->createQueryBuilder('q')
+            ->andWhere('q.quote = :val')
+            ->setParameter('val', $quoteId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
 //    /**
 //     * @return QuoteUser[] Returns an array of QuoteUser objects
 //     */

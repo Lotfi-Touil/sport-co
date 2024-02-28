@@ -1,6 +1,49 @@
-
 <script>
 $(document).ready(function() {
+
+    // CUSTOMER PART
+    $('#user-search').on('input', function() {
+        var searchTerm = $(this).val();
+
+        if (searchTerm.length < 2) {
+            $('#user-results').hide();
+            return;
+        }
+
+        $.ajax({
+            url: '{{ path('customer_search') }}',
+            type: 'GET',
+            data: {'term': searchTerm},
+            success: function(data) {
+                $('#user-results').html(data).show();
+            }
+        });
+    });
+
+    $(this).on('click', '#remove-customer', function() {
+        $(this).hide();
+        $('#warning-customer-delete').hide();
+        $('#user-dest-id').val('')
+        $('.zone-info-dest p').text('-');
+    });
+
+    $(this).on('click', '#user-results .add-customer', function() {
+        var userId = $(this).data('id');
+        var email = $(this).data('email');
+        var name = $(this).data('name');
+        var address = $(this).data('address');
+
+        $('#bloc-destinataire .zone-info-dest').html(`
+            <input id="user-dest-id" type="hidden" value="${userId}" class="hidden"/>
+            <p class="user-dest-intitule disabled">${name}</p>
+            <p class="user-dest-email disabled">${email}</p>
+            <p class="user-dest-address-street disabled">${address}</p>
+        `);
+        $('#remove-customer').show();
+        $('#warning-customer-delete').show();
+    });
+
+    // PRODUCT PART
     $('#product-search').on('input', function() {
         var searchTerm = $(this).val();
 
@@ -42,9 +85,11 @@ $(document).ready(function() {
     });
 
     $(this).on('click', function(event) {
-        if (!$(event.target).closest('#product-search, #product-results').length) {
+        if (!$(event.target).closest('#product-search, #product-results, #user-search, #user-results').length) {
             $('#product-results').hide();
             $('#product-search').val('');
+            $('#user-results').hide();
+            $('#user-search').val('');
         }
     });
 
@@ -122,8 +167,29 @@ $(document).ready(function() {
     $(this).on('submit', '#form-new-quote, #form-new-invoice', function(e) {
         e.preventDefault();
 
-        let productsData = [];
+        let customerData = collectCustomerData();
+        let productsData = collectProductsData();
 
+        updateCustomerField(customerData);
+        updateProductsField(productsData);
+
+        this.submit(); // Soumettre le formulaire
+    });
+
+    function collectCustomerData() {
+        let customerId = $('#bloc-destinataire .zone-info-dest #user-dest-id').val();
+        let customerEmail = $('#bloc-destinataire .zone-info-dest .user-dest-email').text().trim();
+
+        let id = customerId !== undefined ? customerId : '';
+
+        return {
+            id: id ?? '',
+            email: customerEmail
+        };
+    }
+
+    function collectProductsData() {
+        let productsData = [];
         $('#added-products .product-info').each(function() {
             let productId = $(this).data('product-id');
             let quantity = $(this).find('.product-item').val();
@@ -137,12 +203,18 @@ $(document).ready(function() {
                 tax_rate: taxRate,
             });
         });
+        return productsData;
+    }
 
+    function updateCustomerField(customerData) {
+        let customerJsonData = JSON.stringify(customerData);
+        $('#form_customer_json').val(customerJsonData);
+    }
+
+    function updateProductsField(productsData) {
         let jsonData = JSON.stringify(productsData);
         $('#form_products_json').val(jsonData);
-
-        this.submit(); // Soumettre le formulaire
-    });
+    }
 
     $(this).on('click', '.increment-quantity', function() {
         let quantityDisplay = $(this).siblings('.quantity-display');
@@ -200,7 +272,6 @@ $(document).ready(function() {
                 totalTaxes += taxAmount;
             }
         });
-        console.log(subtotalHT, totalTaxes);
         // Mise à jour des totaux sur la page
         $('#subtotal').text(subtotalHT.toFixed(2) + ' €'); // Afficher le sous-total HT
         $('#total-taxes').text(totalTaxes.toFixed(2) + ' €'); // Afficher le total des taxes

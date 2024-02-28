@@ -10,6 +10,9 @@
             <a href="{{ path('platform_quote_index') }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
                 Revenir à la liste
             </a>
+            <a href="{{ path('platform_quote_edit', {'id': quote.id}) }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                Modifier
+            </a>
             {{ include('back/quote/_delete_form.html.twig') }}
         </div>
 
@@ -35,12 +38,21 @@
                                     <p>San Javier</p>
                                     <p>CA 1234</p>
                                 </div>
-                                <div class="text-sm font-light text-slate-500">
-                                    <p class="text-sm font-normal text-slate-700">Billed To</p>
-                                    <p>The Boring Company</p>
-                                    <p>Tesla Street 007</p>
-                                    <p>Frisco</p>
-                                    <p>CA 0000</p>
+                                <div id="bloc-destinataire" class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">Destinataire</p>
+                                    <div class="zone-info-dest">
+                                    {% if quote.quoteUsers is not empty %}
+                                        {% set quoteUser = quote.quoteUsers[0] %}
+                                        <input id="user-dest-id" type="hidden" value="{{ quoteUser.customer.id }}" class="hidden"/>
+                                        <p class="user-dest-intitule disabled">{{ quoteUser.customer.firstName }} {{ quoteUser.customer.lastName }}</p>
+                                        <p class="user-dest-email disabled">{{ quoteUser.customer.email }}</p>
+                                        <p class="user-dest-address-street disabled">Adresse</p>
+                                    {% else %}
+                                        <p>-</p>
+                                        <p>-</p>
+                                        <p>-</p>
+                                    {% endif %}
+                                    </div>
                                 </div>
                                 <div class="text-sm font-light text-slate-500">
                                     <p class="text-sm font-normal text-slate-700">Numéro de devis</p>
