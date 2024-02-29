@@ -11,6 +11,9 @@
             {% if form_errors(registrationForm) %}
                 <div class="alert alert-danger">{{ form_errors(registrationForm)|trans({}, 'security') }}</div>
             {% endif %}
+            {% for flash_error in app.flashes('verify_email_error') %}
+                <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+            {% endfor %}
 
             {{ form_start(registrationForm) }}
 
@@ -126,5 +129,6 @@
             {{ form_end(registrationForm) }}
         </form>
     </div>
-    
+
 {% endblock %}
+

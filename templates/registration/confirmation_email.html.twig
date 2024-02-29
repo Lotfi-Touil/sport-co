@@ -1,0 +1,32 @@
+<section class="max-w-2xl px-6 py-8 mx-auto bg-white dark:bg-gray-900">
+    <header>
+        <h1>.sportCo</h1>
+    </header>
+
+    <main class="mt-8">
+        <p class="text-gray-700 dark:text-gray-200">Bonjour,</p>
+
+        <p class="mt-2 leading-loose text-gray-600 dark:text-gray-300">
+            Merci de vous être inscrit(e) sur <span class="font-semibold ">.sportCo</span>! Pour activer votre compte et commencer à utiliser nos services, veuillez cliquer sur le lien ci-dessous :
+        </p>
+
+        <a href='{{ signedUrl|raw }}' class="px-6 py-2 mt-4 text-sm font-medium tracking-wider text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80">
+            Vérifier mon email
+        </a>
+
+        <p class="mt-8 text-gray-600 dark:text-gray-300">
+            Merci, <br>
+            SportCo
+        </p>
+    </main>
+
+
+    <footer class="mt-8">
+        <p class="text-gray-500 dark:text-gray-400">
+            Ce lien expire dans
+            {{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}
+        </p>
+
+        <p class="mt-3 text-gray-500 dark:text-gray-400">© {{ "now"|date("m/d/Y") }} sportCo. Tout droit réservé.</p>
+    </footer>
+</section>
