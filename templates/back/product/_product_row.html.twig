@@ -1,0 +1,37 @@
+{% if (product) %}
+    <tr class="product-info border-b border-slate-200" data-product-id="{{ product.id }}">
+        <input type="hidden" class="product-item form-input mt-1 block w-16 text-center"
+                value="1" min="1"
+                data-product-id="{{ product.id }}"
+                data-product-price="{{ product.price }}"
+                data-product-tax-rate="{{ product.taxRate }}">
+        <td class="py-4 pl-4 pr-3 text-sm sm:pl-6 md:pl-0">
+            <div class="font-medium text-slate-700">{{ product.name }}</div>
+        </td>
+        <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+            <div>
+                <button class="decrement-quantity bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">-</button>
+                <span class="quantity-display mx-2" data-product-id="{{ product.id }}">1</span>
+                <button class="increment-quantity bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">+</button>
+            </div>
+        </td>
+        <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+            {{ product.taxRate }}%
+        </td>
+        <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+            {{ product.price - product.getPriceHT() | number_format(2, '.', ',') }} €
+        </td>
+        <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+            {{ product.getPriceHT() | number_format(2, '.', ',') }} €
+        </td>
+        <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+            {{ product.price | number_format(2, '.', ',') }} €
+        </td>
+        <td class="total-product-price hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+            {{ product.price | number_format(2, '.', ',') }} €
+        </td>
+        <td class="hidden text-sm text-right text-slate-500 sm:table-cell">
+            <button class="remove-product bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" data-product-id="{{ product.id }}">Retirer</button>
+        </td>
+    </tr>
+{% endif %}

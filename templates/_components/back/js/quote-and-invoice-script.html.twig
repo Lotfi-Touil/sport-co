@@ -56,30 +56,7 @@ $(document).ready(function() {
             url: '{{ path('product_search') }}',
             data: { term: searchTerm },
             success: function(data) {
-                var productsHtml = '';
-                if (data.length === 0) {
-                    productsHtml = '<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Aucun produit trouvé.</h2>';
-                } else {
-                    productsHtml = `<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Résultats de votre recherche :</h2>
-                                    <ul class="max-w-md space-y-1 text-gray-500 list-none list-inside dark:text-gray-400">`;
-
-                    productsHtml += data.map(function(product) {
-                        return `<li>
-                                    <span class="text-lg">
-                                        ${product.name} 
-                                    </span>
-                                    <button class="add-product btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded ml-5"
-                                            data-product-id="${product.id}"
-                                            data-product-price="${product.price}"
-                                            data-product-tax-rate="${product.taxRate}">
-                                        Ajouter
-                                    </button>
-                                </li>`;
-                    }).join('');
-
-                    productsHtml += '</ul>';
-                }
-                $('#product-results').html(productsHtml).show();
+                $('#product-results').html(data).show();
             }
         });
     });
@@ -95,7 +72,7 @@ $(document).ready(function() {
 
     $(this).on('click', '.add-product', function() {
         let productId = $(this).data('product-id');
-        let productName = $(this).siblings('span').text();
+        let productName = $(this).data('product-name');
         let priceTTC = parseFloat($(this).data('product-price'));
         let taxRate = parseFloat($(this).data('product-tax-rate'));
 
@@ -111,45 +88,13 @@ $(document).ready(function() {
             updateTotalPricePerProduct(existingProduct);
         } else {
             // Ajouter un nouveau produit
-            let productHtml = `
-                <tr class="product-info border-b border-slate-200" data-product-id="${productId}">
-                    <input type="hidden" class="product-item form-input mt-1 block w-16 text-center"
-                            value="1" min="1"
-                            data-product-id="${productId}"
-                            data-product-price="${priceTTC}"
-                            data-product-tax-rate="${taxRate}">
-                    <td class="py-4 pl-4 pr-3 text-sm sm:pl-6 md:pl-0">
-                        <div class="font-medium text-slate-700">${productName}</div>
-                    </td>
-                    <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
-                        <div>
-                            <button class="decrement-quantity bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">-</button>
-                            <span class="quantity-display mx-2" data-product-id="${productId}">1</span>
-                            <button class="increment-quantity bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">+</button>
-                        </div>
-                    </td>
-                    <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
-                        ${taxRate}%
-                    </td>
-                    <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
-                        ${(getTaxAmountByProduct(priceTTC, taxRate)).toFixed(2)} €
-                    </td>
-                    <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
-                        ${priceHT.toFixed(2)} €
-                    </td>
-                    <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
-                        ${priceTTC.toFixed(2)} €
-                    </td>
-                    <td class="total-product-price hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
-                        ${priceTTC.toFixed(2)} €
-                    </td>
-                    <td class="hidden text-sm text-right text-slate-500 sm:table-cell">
-                        <button class="remove-product bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" data-product-id="${productId}">Retirer</button>
-                    </td>
-                </tr>
-            `;
-            $('#no-products').remove();
-            $('#added-products').append(productHtml);
+            $.ajax({
+                url: '{{ path('product_row_view') }}',
+                data: { id: productId },
+                success: function(data) {
+                    $('#added-products').append(data);
+                }
+            });
         }
         $('#no-products').remove();
         updateTotals();

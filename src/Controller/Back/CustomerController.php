@@ -83,7 +83,6 @@ class CustomerController extends AbstractController
     public function customerSearch(Request $request, CustomerRepository $customerRepository): Response
     {
         $term = $request->query->get('term');
-        // $customers = $customerRepository->findByEmail($term);
         $customers = $customerRepository->findByTerm($term);
 
         return $this->render('back/customer/_search_results.html.twig', [

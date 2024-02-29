@@ -1,0 +1,27 @@
+{% if (products) %}
+<ul class="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
+{% for product in products %}
+    <li class="py-3">
+        <div class="flex items-center space-x-4 rtl:space-x-reverse">
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                    {{ product.name }}
+                </p>
+            </div>
+            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+            <button class="add-product btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded ml-5"
+                    data-product-id="{{ product.id }}"
+                    data-product-name="{{ product.name }}"
+                    data-product-price="{{ product.price }}"
+                    data-product-tax-rate="{{ product.taxRate }}"
+                >
+                Ajouter
+            </button>
+            </div>
+        </div>
+    </li>
+{% endfor %}
+</ul>
+{% else %}
+<p>Aucun produit trouvé.</p>
+{% endif %}

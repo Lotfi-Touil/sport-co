@@ -7,7 +7,6 @@ use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -94,21 +93,24 @@ class ProductController extends AbstractController
     }
 
     #[Route('/search/products', name: 'product_search', methods: ['GET'])]
-    public function searchProducts(Request $request, ProductRepository $productRepository): JsonResponse
+    public function searchProducts(Request $request, ProductRepository $productRepository): Response
     {
         $searchTerm = $request->query->get('term');
         $products = $productRepository->findBySearchTerm($searchTerm);
 
-        $productData = array_map(function ($product) {
-            return [
-                'id' => $product->getId(),
-                'name' => $product->getName(),
-                'price' => $product->getPrice(),
-                'taxRate' => $product->getTaxRate(),
-            ];
-        }, $products);
-
-        return $this->json($productData);
+        return $this->render('back/product/_search_results.html.twig', [
+            'products' => $products,
+        ]);
     }
 
+    #[Route('/view/row', name: 'product_row_view', methods: ['GET'])]
+    public function getProductRowView(Request $request, ProductRepository $productRepository): Response
+    {
+        $productId = $request->query->get('id');
+        $product = $productRepository->find($productId);
+
+        return $this->render('back/product/_product_row.html.twig', [
+            'product' => $product,
+        ]);
+    }
 }
