@@ -38,6 +38,8 @@ class Payment
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $stripeSubscriptionId = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdAt = null;
 
     public function getId(): ?int
     {
@@ -123,6 +125,18 @@ class Payment
     public function setStripeSubscriptionId(?string $stripeSubscriptionId): self
     {
         $this->stripeSubscriptionId = $stripeSubscriptionId;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
         return $this;
     }
 

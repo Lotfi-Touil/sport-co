@@ -6,6 +6,7 @@ use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 class Customer
@@ -37,9 +38,17 @@ class Customer
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: QuoteUser::class)]
     private Collection $quoteUsers;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profilePicture = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdAt = null;
+
+
     public function __construct()
     {
         $this->quoteUsers = new ArrayCollection();
+        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int
@@ -145,6 +154,31 @@ class Customer
                 $quoteUser->setCustomer(null);
             }
         }
+
+        return $this;
+    }
+
+    // Getter
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    // Setter
+    public function setProfilePicture(?string $profilePicture): self
+    {
+        $this->profilePicture = $profilePicture;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
