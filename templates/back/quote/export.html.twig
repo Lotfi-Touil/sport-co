@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Devis #{{ quote.id }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="header">
+        <h2>Devis #{{ quote.id }}</h2>
+        <p>Date de délivrance: {{ "now"|date("d/m/Y") }}</p>
+    </div>
+
+  <table class="invoice-info">
+    <tbody>
+      <tr>
+        <th>Destinataire:</th>
+        <td>{{ quote.quoteUsers[0].customer.firstName }} {{ quote.quoteUsers[0].customer.lastName }}</td>
+      </tr>
+      <tr>
+        <th>Email:</th>
+        <td>{{ quote.quoteUsers[0].customer.email }}</td>
+      </tr>
+      <tr>
+        <th>Adresse:</th>
+        <td>{{ quote.quoteUsers[0].customer.address }}</td>
+      </tr>
+      <tr>
+        <th>Numéro de devis:</th>
+        <td>{{ quote.id }}</td>
+      </tr>
+      <tr>
+        <th>Date de délivrance:</th>
+        <td>{{ "now"|date('d/m/Y') }}</td>
+      </tr>
+      <tr>
+        <th>Validité:</th>
+        <td>TODO</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th>Produit</th>
+        <th>Quantité</th>
+        <th>Prix HT</th>
+        <th>Taxe</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for quoteProduct in quote.quoteProducts %}
+        {% set tax_amount = (quoteProduct.price * quoteProduct.taxRate / 100) | round(2) %}
+        <tr>
+          <td>{{ quoteProduct.product.name }}</td>
+          <td>{{ quoteProduct.quantity }}</td>
+          <td>{{ quoteProduct.price - tax_amount }} €</td>
+          <td>{{ tax_amount }} €</td>
+          <td>{{ quoteProduct.price * quoteProduct.quantity | number_format(2, '.', '') }} €</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="5">Le devis ne contient aucun article.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot class="total">
+      <tr>
+        <th colspan="4">Total HT:</th>
+        <td>{{ quote.subtotal | number_format(2, '.', '') }} €</td>
+      </tr>
+      <tr>
+        <th colspan="4">TVA:</th>
+        <td>{{ quote.totalAmount - quote.subtotal | number_format(2, '.', '') }} €</td>
+      </tr>
+      <tr>
+        <th colspan="4">Total TTC:</th>
+        <td>{{ quote.totalAmount | number_format(2, '.', '') }} €</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="footer">
+    <p>Merci de faire affaire avec nous.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+  body { font-family: 'Helvetica', 'Arial', sans-serif; background-color: #fff; color: #333; }
+  .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h2 { margin: 0; }
+  .invoice-info, .items-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+  th { background-color: #f9f9f9; }
+  .total { text-align: right; }
+  .total th, .total td { border-top: 2px solid #333; font-weight: bold; }
+  .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #999; }
+</style>
+{% endblock %}

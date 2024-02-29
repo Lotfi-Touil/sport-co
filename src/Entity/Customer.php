@@ -31,6 +31,9 @@ class Customer
     #[ORM\Column(length: 255)]
     private ?string $phone = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $address = null;
+
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: QuoteUser::class)]
     private Collection $quoteUsers;
 
@@ -100,6 +103,18 @@ class Customer
     public function setPhone(string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
 
         return $this;
     }

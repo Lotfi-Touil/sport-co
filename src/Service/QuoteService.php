@@ -7,21 +7,25 @@ use App\Entity\Product;
 use App\Entity\Quote;
 use App\Entity\QuoteProduct;
 use App\Entity\QuoteUser;
-use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Symfony\Component\HttpFoundation\Response;
 
 class QuoteService
 {
     private Security $security;
     private EntityManagerInterface $entityManager;
+    private Dompdf $dompdf;
 
     private $error;
 
-    public function __construct(Security $security, EntityManagerInterface $entityManager)
+    public function __construct(Security $security, EntityManagerInterface $entityManager, Dompdf $dompdf)
     {
         $this->security = $security;
         $this->entityManager = $entityManager;
+        $this->dompdf = $dompdf;
     }
 
     private function addError(string $error): void
@@ -252,4 +256,23 @@ class QuoteService
         return true;
     }
 
+    public function exportPDF(Quote $quote, string $html): Response
+    {
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+
+        $this->dompdf->setOptions($pdfOptions);
+        $this->dompdf->loadHtml($html);
+        $this->dompdf->setPaper('A4', 'portrait');
+        $this->dompdf->render();
+
+        $filename = "devis-" . $quote->getId() . ".pdf";
+        $this->dompdf->stream($filename, [
+            "Attachment" => true
+        ]);
+
+        return new Response('', 200, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
 }

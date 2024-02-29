@@ -38,5 +38,15 @@ services:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
 
+    Dompdf\Dompdf:
+        arguments:
+            $options: '@Dompdf\Options'
+    Dompdf\Options:
+        calls:
+            - method: set
+              arguments:
+                  - 'defaultFont'
+                  - 'Arial'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

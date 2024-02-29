@@ -2,7 +2,6 @@
 
 namespace App\Form;
 
-use App\Entity\Address;
 use App\Entity\Company;
 use App\Entity\Customer;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -19,6 +18,7 @@ class CustomerType extends AbstractType
             ->add('lastName')
             ->add('email')
             ->add('phone')
+            ->add('address')
             ->add('company', EntityType::class, [
                 'class' => Company::class,
                 'choice_label' => 'name',

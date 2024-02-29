@@ -25,8 +25,8 @@ class Company
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Address $address = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $address = null;
 
     #[ORM\Column(length: 255)]
     private ?string $siret = null;
@@ -110,12 +110,12 @@ class Company
         return $this;
     }
 
-    public function getAddress(): ?Address
+    public function getAddress(): ?string
     {
         return $this->address;
     }
 
-    public function setAddress(?Address $address): static
+    public function setAddress(?string $address): self
     {
         $this->address = $address;
 

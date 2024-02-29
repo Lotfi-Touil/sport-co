@@ -2,21 +2,19 @@
 
 namespace App\Controller\Back;
 
-use App\Entity\Product;
 use App\Entity\Quote;
-use App\Entity\QuoteProduct;
 use App\Entity\QuoteStatus;
-use App\Entity\User;
 use App\Form\QuoteType;
 use App\Repository\QuoteRepository;
 use App\Repository\QuoteStatusRepository;
 use App\Service\QuoteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 #[Route('/platform/quote')]
 class QuoteController extends AbstractController
@@ -70,16 +68,26 @@ class QuoteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'platform_quote_show', methods: ['GET'])]
-    public function show(Quote $quote): Response
+    public function show(?Quote $quote): Response
     {
+        if (!$quote) {
+            $this->addFlash('error', 'Le devis demandé n\'existe pas.');
+            return $this->redirectToRoute('platform_quote_index');
+        }
+
         return $this->render('back/quote/show.html.twig', [
             'quote' => $quote,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'platform_quote_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Quote $quote, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, ?Quote $quote, EntityManagerInterface $entityManager): Response
     {
+        if (!$quote) {
+            $this->addFlash('error', 'Le devis demandé n\'existe pas.');
+            return $this->redirectToRoute('platform_quote_index');
+        }
+
         $statusList = $entityManager->getRepository(QuoteStatus::class)->findAll();
         $form = $this->createForm(QuoteType::class, $quote, ['status_choices' => $statusList]);
         $form->handleRequest($request);
@@ -108,8 +116,13 @@ class QuoteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'platform_quote_delete', methods: ['POST'])]
-    public function delete(Request $request, Quote $quote, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, ?Quote $quote, EntityManagerInterface $entityManager): Response
     {
+        if (!$quote) {
+            $this->addFlash('error', 'Le devis demandé n\'existe pas.');
+            return $this->redirectToRoute('platform_quote_index');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$quote->getId(), $request->request->get('_token'))) {
             foreach ($quote->getQuoteProducts() as $quoteProduct) {
                 $entityManager->remove($quoteProduct);
@@ -124,5 +137,20 @@ class QuoteController extends AbstractController
         }
 
         return $this->redirectToRoute('platform_quote_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/export', name: 'platform_quote_export', methods: ['GET'])]
+    public function export(Quote $quote, QuoteService $quoteService): Response
+    {
+        if (!$quote) {
+            $this->addFlash('error', 'Le devis demandé n\'existe pas.');
+            return $this->redirectToRoute('platform_quote_index');
+        }
+
+        $html = $this->renderView('back/quote/export.html.twig', [
+            'quote' => $quote
+        ]);
+
+        return $quoteService->exportPDF($quote, $html);
     }
 }
