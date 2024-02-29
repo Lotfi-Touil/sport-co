@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Rapport{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+    <div class="container mx-auto px-4 py-8 pt-20">
+        <div class="mb-4">
+            <a href="{{ path('platform_report') }}" class="text-blue-600 hover:text-blue-800 flex items-center"><i class="fas fa-arrow-left mr-2"></i> Retour</a>
+        </div>
+
+        <!-- Report Title Card -->
+        <div class="mb-6">
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                            {{ report.title }}
+                        </h3>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                            Créé le {{ report.createdAt|date('d/m/Y') }}
+                        </p>
+                    </div>
+                    <a href="{{ path('export_report', {'reportId': report.id}) }}" class="text-blue-600 hover:text-blue-800 flex items-center">
+                    <i class="fas fa-file-alt text-xl text-gray-400"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Sections -->
+        {% set rows = [
+            {title: 'Revenu Total', value: report.totalRevenue|format_currency('EUR'), icon: 'fas fa-coins', bg: 'bg-gray-50', isList: false},
+            {title: 'Dépenses Totales', value: report.totalExpenses|format_currency('EUR'), icon: 'fas fa-hand-holding-usd', bg: 'bg-white', isList: false},
+            {title: 'Profit Net', value: report.netProfit|format_currency('EUR'), icon: 'fas fa-wallet', bg: 'bg-gray-50', isList: false},
+            {title: 'Détails des Paiements', value: report.paymentDetails|json_decode, icon: 'fas fa-credit-card', bg: 'bg-white', isList: true, listType: 'payments'},
+            {title: 'Produits les Plus Vendus', value: report.topSellingProducts|json_decode, icon: 'fas fa-chart-line', bg: 'bg-gray-50', isList: true, listType: 'products'},
+            {title: 'Nombre de Nouveaux Clients', value: report.newCustomersCount, icon: 'fas fa-users', bg: 'bg-white', isList: false}
+        ] %}
+
+        {% for row in rows %}
+            <div class="{{ row.bg }} mb-6 shadow sm:rounded-lg">
+                <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500 flex items-center">
+                        <i class="{{ row.icon }} text-lg mr-2"></i> {{ row.title }}
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {% if row.isList|default(false) %}
+                            <div class="space-y-4">
+                                {% for item in row.value %}
+                                    <div class="bg-white p-4 rounded-lg shadow-lg flex justify-between items-center">
+                                        {% if row.listType == 'payments' %}
+                                            <div>
+                                                <h5 class="text-md font-bold">Paiement de: {{ item.customerFirstName }} {{ item.customerLastName }}</h5>
+                                                <p class="text-sm">Montant: {{ item.invoiceTotal|format_currency('EUR') }}</p>
+                                            </div>
+                                            <div class="ml-4 flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-yellow-100 text-yellow-800">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </div>
+                                        {% elseif row.listType == 'products' %}
+                                            <div>
+                                                <h5 class="text-md font-bold">Produit: {{ item.productName }}</h5>
+                                                <p class="text-sm">Quantité vendue: {{ item.totalQuantity }}</p>
+                                            </div>
+                                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                                Afficher plus
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ row.value }}
+                        {% endif %}
+                    </dd>
+
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{# templates/back/dashboard/company_dashboard.html.twig #}
+
+{% extends 'base.html.twig' %}
+{# Assurez-vous d'étendre le bon layout de base #}
+
+{% block title %}Tableau de bord de l'entreprise
+{% endblock %}
+
+{% block body %}
+{% include '_partials/back/_platform_nav.html.twig' %}
+{% if company is not null %}
+	<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+		<div class="pt-20 px-4">
+			<div class="mb-4">
+				<h2 class="text-2xl font-semibold text-gray-800">Bienvenue, {{ app.user.getUserIdentifier }} !</h2>
+			</div>
+			<div class="w-full grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+				<div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8  2xl:col-span-2">
+					<div class="flex items-center justify-between mb-4">
+						<div class="flex-shrink-0">
+							<span class="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
+								{{ companyRevenue | format_currency('EUR') }}</span>
+							<h3 class="text-base font-normal text-gray-500">Total Revenue de la semaine</h3>
+						</div>
+
+
+					</div>
+					<div id="main-chart" style="min-height: 435px;">
+
+						{{ render_chart(paymentChart) }}
+					</div>
+				</div>
+				{% include '_components/back/transactions_list.html.twig' with {'transactions': transactions} %}
+
+			</div>
+			<div class="mt-4 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+				{% include '_components/back/stat-card.twig' with {
+  									title: 'Nombre total de clients',
+  									count: customerCount,
+  									percentage_change: customerGrowthRate
+								} %}
+
+				{% include '_components/back/stat-card.twig' with {
+  title: 'Nombre de transactions',
+  count: transactionsCount,
+  percentage_change: transactionsGrowthRate
+} %}
+				{% include '_components/back/stat-card.twig' with {
+  title: 'Revenu total de l\'entreprise',
+  count: companyRevenue | format_currency('EUR'),
+  percentage_change: companyRevenueGrowthRate
+} %}
+
+			</div>
+			<div class="grid grid-cols-1 2xl:grid-cols-2 xl:gap-4 my-4">
+
+				{% include '_components/back/latest_customers.html.twig' with {'customers': latestCustomers} %}
+
+				<div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
+
+					<h3 class="text-xl leading-none font-bold text-gray-900 mb-10">Inscription par mois</h3>
+					<div class="block w-full overflow-x-auto">
+						{{ render_chart(signupChart) }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+{% else %}
+	<div class="flex items-center justify-center h-screen">
+		<div class="text-center py-12">
+			<h1 class="text-2xl font-semibold text-gray-800 mb-4">Pas d'Information Disponible</h1>
+			<p class="text-gray-600">Cet utilisateur n'est lié à aucune compagnie.</p>
+		</div>
+	</div>
+{% endif %}
+{% endblock %}

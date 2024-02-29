@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rapports Financiers{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+    <div class="container mx-auto px-4 py-8 pt-20">
+        <h2 class="text-2xl font-semibold mb-4">Rapports Financiers</h2>
+        {% if reports|length > 0 %}
+            <div class="mb-8 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for report in reports %}
+                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div class="p-4 flex items-center">
+                            <img class="h-20 w-20 rounded-full object-cover mr-4 shadow" src="https://via.placeholder.com/150" alt="Avatar of Jonathan Reinink">
+                            <div class="flex-grow">
+                                <div class="font-bold text-xl">{{ report.title }}</div>
+                                <p class="text-gray-700">
+                                    Créé le {{ report.createdAt|date('d/m/Y') }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4">
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="text-center">
+                                    <i class="fas fa-chart-line text-indigo-600"></i>
+                                    <span class="text-sm text-gray-600">Statut Financier</span>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fas fa-clipboard-list text-green-600"></i>
+                                    <span class="text-sm text-gray-600">Détails</span>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fas fa-dollar-sign text-yellow-600"></i>
+                                    <span class="text-sm text-gray-600">Valeur</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-6 pt-4 pb-2 flex justify-between items-center">
+                            <a href="{{ path('report_view', {'reportId': report.id}) }}" class="text-indigo-600 hover:text-indigo-800 inline-flex items-center"><i class="fas fa-eye mr-2"></i>Voir</a>
+                            <a href="{{ path('export_report', {'reportId': report.id}) }}" class="text-green-600 hover:text-green-800 inline-flex items-center"><i class="fas fa-download mr-2"></i>Télécharger</a>
+                            <a href="{{ path('delete_report', {'reportId': report.id}) }}" class="text-red-600 hover:text-red-800 inline-flex items-center"><i class="fas fa-trash-alt mr-2"></i>Supprimer</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="window.location.href='{{ path('generate_report') }}'">Générer un rapport</button>
+        {% else %}
+            <div class="text-center py-4 px-4 bg-gray-100 rounded-lg">
+                <p class="text-gray-700 mb-4">Pas de rapport financier</p>
+                <a href="{{ path('generate_report') }}" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    Générer un rapport
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

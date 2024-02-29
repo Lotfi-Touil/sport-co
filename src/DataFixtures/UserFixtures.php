@@ -1,4 +1,6 @@
-<?php namespace App\DataFixtures;
+<?php
+
+namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -19,14 +21,37 @@ class UserFixtures extends Fixture
     {
         $faker = Factory::create();
 
-        for ($i = 0; $i < 10; $i++) {
-            $user = new User();
-            $user->setEmail($faker->email);
-            $roles = $i % 2 == 0 ? ['ROLE_ADMIN'] : ['ROLE_USER'];
-            $user->setRoles($roles);
-            $user->setPassword($this->passwordHasher->hashPassword($user, 'password123'));
-            $manager->persist($user);
+        // Création d'administrateurs
+        for ($i = 0; $i < 2; $i++) {
+            $user = $this->createUser($faker->email, ['ROLE_ADMIN'], $manager);
         }
+
+        // Création de propriétaires d'entreprise
+        for ($i = 0; $i < 3; $i++) {
+            $user = $this->createUser($faker->email, ['ROLE_COMPANY'], $manager);
+        }
+
+        // Création d'employés d'entreprise
+        for ($i = 0; $i < 3; $i++) {
+            $user = $this->createUser($faker->email, ['ROLE_COMPANY_USER'], $manager);
+        }
+
+        // Création d'utilisateurs génériques
+        for ($i = 0; $i < 2; $i++) {
+            $user = $this->createUser($faker->email, ['ROLE_USER'], $manager);
+        }
+
         $manager->flush();
+    }
+
+    private function createUser($email, array $roles, ObjectManager $manager): User
+    {
+        $user = new User();
+        $user->setEmail($email);
+        $user->setRoles($roles);
+        $user->setPassword($this->passwordHasher->hashPassword($user, 'password123'));
+        $manager->persist($user);
+
+        return $user;
     }
 }

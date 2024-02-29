@@ -8,57 +8,81 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use App\Service\DashboardDataService;
 use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\Component\HttpFoundation\Request;
 
 class DashboardController extends AbstractController
 {
     private $pageAccessService;
+    private DashboardDataService $dashboardDataService;
 
-    public function __construct(PageAccessService $pageAccessService)
+    public function __construct(PageAccessService $pageAccessService, DashboardDataService $dashboardDataService)
     {
+        $this->dashboardDataService = $dashboardDataService;
         $this->pageAccessService = $pageAccessService;
     }
 
     #[Route('/platform/dashboard', name: 'platform_dashboard')]
-    public function dashboard(Request $request, ChartBuilderInterface $chartBuilder, AuthorizationCheckerInterface $authorizationChecker): Response
+    public function index(AuthorizationCheckerInterface $authorizationChecker, ChartBuilderInterface $chartBuilder): Response
     {
-        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+        if ($authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return $this->adminDashboard($chartBuilder);
+        } elseif ($authorizationChecker->isGranted('ROLE_COMPANY')) {
+            return $this->companyDashboard($chartBuilder);
+        }
 
-        $paymentChart = $chartBuilder->createChart(Chart::TYPE_LINE);
-        $paymentChart->setData([
-            'labels' => ['Janvier', 'Février', 'Mars', 'Avril'],
-            'datasets' => [
-                [
-                    'label' => 'Total de paiements',
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
-                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => [12000, 19000, 3000, 5000],
-                ],
-            ],
-        ]);
+        return $this->render('some_default_or_error_template.html.twig');
+    }
 
-        $signupChart = $chartBuilder->createChart(Chart::TYPE_BAR);
-        $signupChart->setData([
-            'labels' => ['Janvier', 'Février', 'Mars', 'Avril'],
-            'datasets' => [
-                [
-                    'label' => 'Nouveaux utilisateurs inscrits',
-                    'backgroundColor' => 'rgba(255, 99, 132, 0.2)',
-                    'borderColor' => 'rgba(255, 99, 132, 1)',
-                    'data' => [50, 25, 75, 100],
-                ],
-            ],
-        ]);
+    private function adminDashboard(ChartBuilderInterface $chartBuilder): Response
+    {
+        $data = $this->dashboardDataService->prepareDataForAdmin();
+        $paymentChart = $this->createChart($chartBuilder, $data['paymentsByMonth'], 'Total de paiements');
+        $signupChart = $this->createChart($chartBuilder, $data['signupsByMonth'], 'Nouveaux utilisateurs inscrits', Chart::TYPE_BAR);
 
-        $isUserAdmin = $authorizationChecker->isGranted('ROLE_ADMIN');
-        $isUserCompany = $authorizationChecker->isGranted('ROLE_COMPANY'); // Assurez-vous que ROLE_COMPANY est bien défini dans votre système
-
-        return $this->render('back/dashboard/index.html.twig', [
+        return $this->render('back/dashboard/admin_dashboard.html.twig', array_merge($data, [
             'paymentChart' => $paymentChart,
             'signupChart' => $signupChart,
-            'isUserAdmin' => $isUserAdmin,
-            'isUserCompany' => $isUserCompany,
+        ]));
+    }
+
+    private function companyDashboard(ChartBuilderInterface $chartBuilder): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        if (!$user) {
+            throw new \LogicException('No user found');
+        }
+        $company = $user->getCompany();
+        $data = $this->dashboardDataService->prepareDataForCompany($company);
+        $paymentChart = $this->createChart($chartBuilder, $data['paymentsByMonth'], 'Total de paiements');
+        $signupChart = $this->createChart($chartBuilder, $data['signupsByMonth'], 'Nouveaux utilisateurs inscrits', Chart::TYPE_BAR);
+
+        return $this->render('back/dashboard/company_dashboard.html.twig', array_merge(['company' => $company], $data, [
+            'paymentChart' => $paymentChart,
+            'signupChart' => $signupChart,
+        ]));
+    }
+
+    private function createChart(ChartBuilderInterface $chartBuilder, array $data, string $label, string $type = Chart::TYPE_LINE): Chart
+    {
+        $labels = array_column($data, 'month');
+        $values = array_column($data, $type === Chart::TYPE_BAR ? 'count' : 'total'); // Utiliser 'count' pour les inscriptions
+
+        $chart = $chartBuilder->createChart($type);
+        $chart->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => $label,
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                    'borderColor' => 'rgba(54, 162, 235, 1)',
+                    'data' => $values,
+                ],
+            ],
         ]);
+
+        return $chart;
     }
 }

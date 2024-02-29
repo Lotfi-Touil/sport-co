@@ -1,60 +1,64 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    stripe.secret_key: '%env(STRIPE_SECRET_KEY)%'
-    stripe.webhook_secret: '%env(STRIPE_WEBHOOK_SECRET)%'
+  stripe.secret_key: "%env(STRIPE_SECRET_KEY)%"
+  stripe.webhook_secret: "%env(STRIPE_WEBHOOK_SECRET)%"
 
 services:
-    # default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+  _defaults:
+    autowire: true
+    autoconfigure: true
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
-            - '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+  App\:
+    resource: '../src/'
+    exclude:
+      - '../src/DependencyInjection/'
+      - '../src/Entity/'
+      - '../src/Kernel.php'
+      - '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
-    App\Controller\Back\PaymentController:
-        autowire: true
-        arguments:
-            $stripeSecretKey: '%stripe.secret_key%'
-            $stripeWebhookSecret: '%stripe.webhook_secret%'
+  App\Controller\Back\PaymentController:
+    arguments:
+      $stripeSecretKey: '%stripe.secret_key%'
+      $stripeWebhookSecret: '%stripe.webhook_secret%'
 
-    App\Service\StripeService:
-        autowire: true
-        arguments:
-            $stripeApiKey: '%stripe.secret_key%'
+  App\Service\StripeService:
+    arguments:
+      $stripeApiKey: '%stripe.secret_key%'
 
-    App\Service\QuoteService:
-        arguments:
-            $entityManager: '@doctrine.orm.entity_manager'
+  App\Service\QuoteService:
+    arguments:
+      $entityManager: '@doctrine.orm.entity_manager'
 
-    Dompdf\Dompdf:
-        arguments:
-            $options: '@Dompdf\Options'
-    Dompdf\Options:
-        calls:
-            - method: set
-              arguments:
-                  - 'defaultFont'
-                  - 'Arial'
+  Dompdf\Dompdf:
+      arguments:
+          $options: '@Dompdf\Options'
+  Dompdf\Options:
+      calls:
+          - method: set
+            arguments:
+                - 'defaultFont'
+                - 'Arial'
 
-    App\Form\UserType:
-        arguments:
-            $security: '@security.helper'
+  App\Form\UserType:
+      arguments:
+          $security: '@security.helper'
 
-    App\Twig\AccessExtension:
-        tags:
-            - { name: twig.extension }
+  App\Twig\AccessExtension:
+      tags:
+          - { name: twig.extension }
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+  App\Controller\Back\ReportController:
+    arguments:
+      $reportGenerationService: '@App\Service\ReportGenerationService'
+      $pdfExportService: '@App\Service\PDFExportService'
+      $reportRepository: '@App\Repository\ReportRepository'
+      $userService: '@App\Service\UserService'
+      $security: '@security.helper'
+
+
+  App\Service\UserService:
+    arguments:
+      $security: '@security.helper'
+
+  App\Twig\JsonDecodeExtension:
+    tags:
+      - { name: twig.extension }
