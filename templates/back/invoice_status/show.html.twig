@@ -1,28 +1,38 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}InvoiceStatus{% endblock %}
+{% block title %}Status de facture{% endblock %}
 
 {% block body %}
-   {% include '_partials/back/_platform_nav.html.twig' %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+    <section class="p-4 mt-14 w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold mb-5">Status (facture) #{{ invoice_status.id }}</h1>
 
-    <h1>InvoiceStatus</h1>
+            <div class="actions flex">
+                <a href="{{ path('platform_invoice_status_index') }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                    Revenir à la liste
+                </a>
+                <a href="{{ path('platform_invoice_status_edit', {'id': invoice_status.id}) }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                    Modifier
+                </a>
+                {{ include('back/invoice_status/_delete_form.html.twig') }}
+            </div>
+        </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ invoice_status.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ invoice_status.title }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="bg-white shadow rounded-lg p-6">
+            <table class="w-full table-auto">
+                <tbody class="text-gray-700">
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left font-semibold">Id</th>
+                        <td class="py-2 px-4">{{ invoice_status.id }}</td>
+                    </tr>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left font-semibold">Titre</th>
+                        <td class="py-2 px-4">{{ invoice_status.title }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-    <a href="{{ path('platform_invoice_status_index') }}">back to list</a>
-
-    <a href="{{ path('platform_invoice_status_edit', {'id': invoice_status.id}) }}">edit</a>
-
-    {{ include('back/invoice_status/_delete_form.html.twig') }}
+    </section>
 {% endblock %}

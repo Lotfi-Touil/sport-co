@@ -1,37 +1,61 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}InvoiceStatus index{% endblock %}
+{% block title %}Liste des Status de facture{% endblock %}
 
 {% block body %}
-   {% include '_partials/back/_platform_nav.html.twig' %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
 
-    <h1>InvoiceStatus index</h1>
+    <section class="p-4 mt-14 w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-lg font-bold">Liste des produits</h1>
+            <a href="{{ path('platform_invoice_status_new') }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                Créer un Status de facture
+            </a>
+        </div>
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            #
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Titre
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice_status in invoice_statuses %}
+                        <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                            <td class="px-6 py-4">{{ invoice_status.id }}</td>
+                            <td class="px-6 py-4">{{ invoice_status.title }}</td>
+                            <td class="px-6 py-4 flex">
+                                <a href="{{ path('platform_invoice_status_show', {'id': invoice_status.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                    Voir
+                                </a>
+                                <a href="{{ path('platform_invoice_status_edit', {'id': invoice_status.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                    Modifier
+                                </a>
+                                <form method="post" action="{{ path('platform_invoice_status_delete', {'id': invoice_status.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce status ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ invoice_status.id) }}">
+                                    <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr class="bg-gray-100 border-b dark:bg-gray-800">
+                            <td colspan="3" class="px-6 py-4 text-center text-gray-600 dark:text-gray-400 text-lg">
+                                Aucun status pour le moment.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for invoice_status in invoice_statuses %}
-            <tr>
-                <td>{{ invoice_status.id }}</td>
-                <td>{{ invoice_status.title }}</td>
-                <td>
-                    <a href="{{ path('platform_invoice_status_show', {'id': invoice_status.id}) }}">show</a>
-                    <a href="{{ path('platform_invoice_status_edit', {'id': invoice_status.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    </section>
 
-    <a href="{{ path('platform_invoice_status_new') }}">Create new</a>
 {% endblock %}

@@ -1,15 +1,37 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit InvoiceStatus{% endblock %}
+{% block title %}Modifier Status (facture){% endblock %}
 
 {% block body %}
-   {% include '_partials/back/_platform_nav.html.twig' %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
 
-    <h1>Edit InvoiceStatus</h1>
+    <section class="p-4 mt-14 w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold mb-5">Status (facture) #{{ invoice_status.id }}</h1>
 
-    {{ include('back/invoice_status/_form.html.twig', {'button_label': 'Update'}) }}
+            <div class="actions flex">
+                <a href="{{ path('platform_invoice_status_index') }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                    Revenir à la liste
+                </a>
+                {{ include('back/invoice_status/_delete_form.html.twig') }}
+            </div>
+        </div>
 
-    <a href="{{ path('platform_invoice_status_index') }}">back to list</a>
+        <div class="bg-white shadow rounded-lg p-6">
+            {{ form_start(form, {'attr': {'class': 'w-full'}}) }}
 
-    {{ include('back/invoice_status/_delete_form.html.twig') }}
+            <div class="mb-4">
+                {{ form_label(form.title, null, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}}) }}
+                {{ form_widget(form.title, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.title) }}
+            </div>
+
+            <button type="submit" class="text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                Enregistrer
+            </button>
+
+            {{ form_end(form) }}
+        </div>
+    </section>
 {% endblock %}
+
