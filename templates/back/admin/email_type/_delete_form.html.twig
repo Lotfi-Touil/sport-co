@@ -1,0 +1,7 @@
+<form method="post" action="{{ path('admin_email_type_delete', {'id': email_type.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce type ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ email_type.id) }}">
+    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+        Supprimer
+    </button>
+</form>
+

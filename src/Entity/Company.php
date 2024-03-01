@@ -49,10 +49,14 @@ class Company
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true )]
     private ?\DateTimeInterface $updatedAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'company', targetEntity: EmailTemplate::class, orphanRemoval: true)]
+    private Collection $emailTemplates;
+
     public function __construct()
     {
         $this->customers = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->emailTemplates = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -224,6 +228,36 @@ class Company
     public function setUpdatedAt(\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EmailTemplate>
+     */
+    public function getEmailTemplates(): Collection
+    {
+        return $this->emailTemplates;
+    }
+
+    public function addEmailTemplate(EmailTemplate $emailTemplate): static
+    {
+        if (!$this->emailTemplates->contains($emailTemplate)) {
+            $this->emailTemplates->add($emailTemplate);
+            $emailTemplate->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmailTemplate(EmailTemplate $emailTemplate): static
+    {
+        if ($this->emailTemplates->removeElement($emailTemplate)) {
+            // set the owning side to null (unless already changed)
+            if ($emailTemplate->getCompany() === $this) {
+                $emailTemplate->setCompany(null);
+            }
+        }
 
         return $this;
     }

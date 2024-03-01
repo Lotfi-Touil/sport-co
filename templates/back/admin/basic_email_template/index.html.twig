@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des produits{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+
+    <section class="p-4 mt-14 w-full">
+        <div id="flash-messages" class="fixed bottom-4 mb-4 right-4 z-50 flex flex-col space-y-2">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash-message {{ label == 'success' ? 'bg-green-500 text-white' : '' }}
+                                {{ label == 'error' ? 'bg-red-500 text-white' : '' }}
+                                px-4 py-2 rounded shadow-md relative" role="alert">
+                        <span class="block sm:inline">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-lg font-bold">Liste des modeles d'email</h1>
+            <a href="{{ path('admin_basic_email_template_new') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Créer un modèle
+            </a>
+        </div>
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left">
+                        #
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left">
+                        Sujet
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left">
+                        Corps
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left">
+                        Type
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for template in basic_email_templates %}
+                    <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                        <td class="px-6 py-4">{{ template.id }}</td>
+                        <td class="px-6 py-4">{{ template.subjet }}</td>
+                        <td class="px-6 py-4">{{ template.type }}</td>
+                        <td class="px-6 py-4 flex">
+                            <a href="{{ path('admin_basic_email_template_show', {'id': template.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                Voir
+                            </a>
+                            <a href="{{ path('admin_basic_email_template_edit', {'id': template.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                Modifier
+                            </a>
+                            <form method="post" action="{{ path('admin_basic_email_template_delete', {'id': template.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce modele ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ template.id) }}">
+                                <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr class="bg-gray-100 border-b dark:bg-gray-800">
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-600 dark:text-gray-400 text-lg">
+                            Aucun modèle pour le moment.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+{% endblock %}
+

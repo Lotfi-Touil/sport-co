@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modele{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+    <section class="p-4 mt-14 w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold mb-5">Modèle #{{ basic_email_template.id }}</h1>
+
+            <div class="actions flex">
+                <a href="{{ path('admin_basic_email_template_index') }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                    Revenir à la liste
+                </a>
+                <a href="{{ path('admin_basic_email_template_edit', {'id': basic_email_template.id}) }}" class="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
+                    Modifier
+                </a>
+                {{ include('back/admin/basic_email_template/_delete_form.html.twig') }}
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg p-6">
+            <table class="w-full table-auto">
+                <tbody class="text-gray-700">
+                <tr class="border-b">
+                    <th class="py-2 px-4 text-left font-semibold">Id</th>
+                    <td class="py-2 px-4">{{ basic_email_template.id }}</td>
+                </tr>
+                <tr class="border-b">
+                    <th class="py-2 px-4 text-left font-semibold">Name</th>
+                    <td class="py-2 px-4">{{ basic_email_template.subjet }}</td>
+                </tr>
+                <tr class="border-b">
+                    <th class="py-2 px-4 text-left font-semibold">Description</th>
+                    <td class="py-2 px-4">{{ basic_email_template.body }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+{% endblock %}
+
