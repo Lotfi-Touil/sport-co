@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Invoice index{% endblock %}
+
+{% block body %}
+   {% include '_partials/back/_platform_nav.html.twig' %}
+
+    <h1>Invoice index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>TotalAmount</th>
+                <th>Subtotal</th>
+                <th>Notes</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>SubmittedAt</th>
+                <th>ExpiryDate</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for invoice in invoices %}
+            <tr>
+                <td>{{ invoice.id }}</td>
+                <td>{{ invoice.totalAmount }}</td>
+                <td>{{ invoice.subtotal }}</td>
+                <td>{{ invoice.notes }}</td>
+                <td>{{ invoice.createdAt ? invoice.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ invoice.updatedAt ? invoice.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ invoice.submittedAt ? invoice.submittedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ invoice.expiryDate ? invoice.expiryDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('platform_invoice_show', {'id': invoice.id}) }}">show</a>
+                    <a href="{{ path('platform_invoice_edit', {'id': invoice.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('platform_invoice_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Invoice{% endblock %}
+
+{% block body %}
+   {% include '_partials/back/_platform_nav.html.twig' %}
+
+    <h1>Create new Invoice</h1>
+
+    {{ include('back/invoice/_form.html.twig') }}
+
+    <a href="{{ path('platform_invoice_index') }}">back to list</a>
+{% endblock %}
