@@ -4,24 +4,42 @@
 
 {% block body %}
 <div class="container">
-    <div class="header">
-        <h2>Devis #{{ quote.id }}</h2>
-        <p>Date de délivrance: {{ "now"|date("d/m/Y") }}</p>
-    </div>
+  <div class="header">
+      <h2>Devis #{{ quote.id }}</h2>
+      <p>Date de délivrance: {{ (quote.submittedAt ? quote.submittedAt : 'now')|date('d/m/Y') }}</p>
+  </div>
 
   <table class="invoice-info">
     <tbody>
       <tr>
         <th>Destinataire:</th>
-        <td>{{ quote.quoteUsers[0].customer.firstName }} {{ quote.quoteUsers[0].customer.lastName }}</td>
+        <td>
+          {% if quote.quoteUsers|length > 0 %}
+            {{ quote.quoteUsers.first().customer.firstName }} {{ quote.quoteUsers.first().customer.lastName }}
+          {% else %}
+            Pas de client associé
+          {% endif %}
+        </td>
       </tr>
       <tr>
         <th>Email:</th>
-        <td>{{ quote.quoteUsers[0].customer.email }}</td>
+        <td>
+          {% if quote.quoteUsers|length > 0 %}
+            {{ quote.quoteUsers.first().customer.email }}
+          {% else %}
+            Pas d'email associé
+          {% endif %}
+        </td>
       </tr>
       <tr>
         <th>Adresse:</th>
-        <td>{{ quote.quoteUsers[0].customer.address }}</td>
+        <td>
+          {% if quote.quoteUsers|length > 0 %}
+            {{ quote.quoteUsers.first().customer.address }}
+          {% else %}
+            Pas d'adresse associée
+          {% endif %}
+        </td>
       </tr>
       <tr>
         <th>Numéro de devis:</th>
@@ -29,11 +47,7 @@
       </tr>
       <tr>
         <th>Date de délivrance:</th>
-        <td>{{ "now"|date('d/m/Y') }}</td>
-      </tr>
-      <tr>
-        <th>Validité:</th>
-        <td>TODO</td>
+        <td>{{ quote.submittedAt|default('now')|date('d/m/Y') }}</td>
       </tr>
     </tbody>
   </table>
@@ -87,16 +101,16 @@
 {% endblock %}
 
 {% block stylesheets %}
-<style>
-  body { font-family: 'Helvetica', 'Arial', sans-serif; background-color: #fff; color: #333; }
-  .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-  .header { text-align: center; margin-bottom: 20px; }
-  .header h2 { margin: 0; }
-  .invoice-info, .items-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-  th { background-color: #f9f9f9; }
-  .total { text-align: right; }
-  .total th, .total td { border-top: 2px solid #333; font-weight: bold; }
-  .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #999; }
-</style>
+  <style>
+    body { font-family: 'Helvetica', 'Arial', sans-serif; background-color: #fff; color: #333; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h2 { margin: 0; }
+    .invoice-info, .items-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background-color: #f9f9f9; }
+    .total { text-align: right; }
+    .total th, .total td { border-top: 2px solid #333; font-weight: bold; }
+    .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #999; }
+  </style>
 {% endblock %}

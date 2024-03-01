@@ -21,6 +21,16 @@ class PaymentRepository extends ServiceEntityRepository
         parent::__construct($registry, Payment::class);
     }
 
+    public function findByInvoiceId($invoiceId): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.invoice = :val')
+            ->setParameter('val', $invoiceId)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return Payment[] Returns an array of Payment objects
 //     */

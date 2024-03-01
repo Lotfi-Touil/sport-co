@@ -21,6 +21,15 @@ class InvoiceUserRepository extends ServiceEntityRepository
         parent::__construct($registry, InvoiceUser::class);
     }
 
+    public function findByInvoiceId($invoiceId): ?InvoiceUser
+    {
+        return $this->createQueryBuilder('q')
+            ->andWhere('q.invoice = :val')
+            ->setParameter('val', $invoiceId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return InvoiceUser[] Returns an array of InvoiceUser objects
     //     */

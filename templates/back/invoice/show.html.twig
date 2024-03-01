@@ -1,52 +1,203 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Invoice{% endblock %}
+{% block title %}Facture #{{ invoice.id }}{% endblock %}
 
 {% block body %}
-   {% include '_partials/back/_platform_nav.html.twig' %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
 
-    <h1>Invoice</h1>
+    <section class="p-4 mt-14 w-full">
+        <div class="actions flex justify-end">
+            <a href="{{ path('platform_invoice_index') }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                Revenir à la liste
+            </a>
+            <a href="{{ path('platform_invoice_export', {'id': invoice.id}) }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 me-2 mb-2">
+                Télécharger
+            </a>
+            <a href="{{ path('platform_invoice_edit', {'id': invoice.id}) }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                Modifier
+            </a>
+            {{ include('back/invoice/_delete_form.html.twig') }}
+        </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ invoice.id }}</td>
-            </tr>
-            <tr>
-                <th>TotalAmount</th>
-                <td>{{ invoice.totalAmount }}</td>
-            </tr>
-            <tr>
-                <th>Subtotal</th>
-                <td>{{ invoice.subtotal }}</td>
-            </tr>
-            <tr>
-                <th>Notes</th>
-                <td>{{ invoice.notes }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ invoice.createdAt ? invoice.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>UpdatedAt</th>
-                <td>{{ invoice.updatedAt ? invoice.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>SubmittedAt</th>
-                <td>{{ invoice.submittedAt ? invoice.submittedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>ExpiryDate</th>
-                <td>{{ invoice.expiryDate ? invoice.expiryDate|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="max-w-4xl ml-10 py-16 bg-white">
+            <article class="overflow-hidden">
+                <div class="bg-[white] rounded-b-md">
+                    <div class="pl-9 pb-9">
+                        <div class="space-y-6 text-slate-700">
+                            <p class="text-xl font-extrabold tracking-tight uppercase font-body">
+                                Facture #{{ invoice.id }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="pl-9 pb-9">
+                        <div class="flex w-full">
+                            <div class="grid grid-cols-4 gap-12">
+                                <div class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">
+                                    Details
+                                    {# TODO Lotfi : afficher company #}
+                                    </p>
+                                    <p>Unwrapped</p>
+                                    <p>Fake Street 123</p>
+                                    <p>San Javier</p>
+                                    <p>CA 1234</p>
+                                </div>
+                                <div id="bloc-destinataire" class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">Destinataire</p>
+                                    <div class="zone-info-dest">
+                                    {% if invoice.invoiceUsers is not empty %}
+                                        {% set invoiceUser = invoice.invoiceUsers[0] %}
+                                        <input id="user-dest-id" type="hidden" value="{{ invoiceUser.customer.id }}" class="hidden"/>
+                                        <p class="user-dest-intitule disabled">{{ invoiceUser.customer.firstName }} {{ invoiceUser.customer.lastName }}</p>
+                                        <p class="user-dest-email disabled">{{ invoiceUser.customer.email }}</p>
+                                        <p class="user-dest-address-street disabled">{{ invoiceUser.customer.address ?? '-' }}</p>
+                                    {% else %}
+                                        <p>-</p>
+                                        <p>-</p>
+                                        <p>-</p>
+                                    {% endif %}
+                                    </div>
+                                </div>
+                                <div class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">Numéro de facture</p>
+                                    <p>{{ invoice.id }}</p>
+                                    <p class="mt-2 text-sm font-normal text-slate-700">
+                                    Date of délivrance
+                                    </p>
+                                    {% if invoice.submittedAt %}
+                                        <p>{{ invoice.submittedAt|date('d/m/Y') }}</p>
+                                    {% else %}
+                                        <p>-</p>
+                                    {% endif %}
+                                </div>
+                                {# TODO #}
+                                {# <div class="text-sm font-light text-slate-500">
+                                    <p class="text-sm font-normal text-slate-700">Validité</p>
+                                    <p>0 Days</p>
+                                </div> #}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pl-9 pb-9">
+                        <div class="flex flex-col mx-0 mt-8">
+                            <table class="min-w-full divide-y divide-slate-500">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-normal text-slate-700 sm:pl-6 md:pl-0">
+                                            Produit
+                                        </th>
+                                        <th scope="col" class="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell">
+                                            Quantité
+                                        </th>
+                                        <th scope="col" class="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell">
+                                            Taxe (%)
+                                        </th>
+                                        <th scope="col" class="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell">
+                                            Taxe (€)
+                                        </th>
+                                        <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                            Prix HT
+                                        </th>
+                                        <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                            Prix TTC
+                                        </th>
+                                        <th scope="col" class="py-3.5 pl-3 pr-4 text-right text-sm font-normal text-slate-700 sm:pr-6 md:pr-0">
+                                            Total
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for invoiceProduct in invoice.invoiceProducts %}
+                                        {% set tax_amount = (invoiceProduct.price * invoiceProduct.taxRate / 100) | round(2) %}
+                                        <tr class="border-b border-slate-200">
+                                            <td class="py-4 pl-4 pr-3 text-sm sm:pl-6 md:pl-0">
+                                                <div class="font-medium text-slate-700">{{ invoiceProduct.product.name }}</div>
+                                            </td>
+                                            <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                                                {{ invoiceProduct.quantity }}
+                                            </td>
+                                            <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                                {{ invoiceProduct.taxRate }}% 
+                                            </td>
+                                            <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                                {{ tax_amount }} € 
+                                            </td>
+                                            <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                                                {{ invoiceProduct.price - tax_amount | number_format(2, '.', '') }} €
+                                            </td>
+                                            <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                                                {{ (invoiceProduct.price) | number_format(2, '.', '') }} €
+                                            </td>
+                                            {% set total_item_price = (invoiceProduct.price * invoiceProduct.quantity) | round(2) %}
+                                            <td class="total-product-price hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
+                                                {{ total_item_price | number_format(2, '.', '') }} €
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr class="py-5">
+                                            <td class="py-2" colspan="6">La facture ne contient aucun article.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th scope="row" colspan="6" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                            Sous-total
+                                        </th>
+                                        <th scope="row" class="pt-6 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
+                                            Total
+                                        </th>
+                                        <td class="pt-6 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                            {{ invoice.subtotal|default('-')|number_format(2, ',', ' ') }} €
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" colspan="6" class="hidden pt-6 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                            Remise
+                                        </th>
+                                        <th scope="row" class="pt-6 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
+                                            Remise
+                                        </th>
+                                        <td class="pt-6 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                            0.00 €
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" colspan="6" class="hidden pt-4 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0">
+                                            Taxe
+                                        </th>
+                                        <th scope="row" class="pt-4 pl-4 pr-3 text-sm font-light text-left text-slate-500 sm:hidden">
+                                            Taxe
+                                        </th>
+                                        <td class="pt-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
+                                            {{ invoice.totalAmount - invoice.subtotal | number_format(2, '.', '') }} €
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" colspan="6" class="hidden pt-4 pl-6 pr-3 text-sm font-normal text-right text-slate-700 sm:table-cell md:pl-0">
+                                            Total
+                                        </th>
+                                        <th scope="row" class="pt-4 pl-4 pr-3 text-sm font-normal text-left text-slate-700 sm:hidden">
+                                            Total
+                                        </th>
+                                        <td class="pt-4 pl-3 pr-4 text-sm font-normal text-right text-slate-700 sm:pr-6 md:pr-0">
+                                            {{ invoice.totalAmount|default('-')|number_format(2, ',', ' ') }} €
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mt-5 p-9">
+                        <div class="border-t pt-4 border-slate-200">
+                            <div class="text-sm font-light text-slate-700">
+                                <p class="text-center">Merci de faire affaire avec nous.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
 
-    <a href="{{ path('platform_invoice_index') }}">back to list</a>
-
-    <a href="{{ path('platform_invoice_edit', {'id': invoice.id}) }}">edit</a>
-
-    {{ include('back/invoice/_delete_form.html.twig') }}
 {% endblock %}

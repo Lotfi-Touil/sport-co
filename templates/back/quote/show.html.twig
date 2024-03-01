@@ -64,14 +64,17 @@
                                     <p class="mt-2 text-sm font-normal text-slate-700">
                                     Date of délivrance
                                     </p>
-                                    <p>00.00.00</p>
+                                    {% if quote.submittedAt %}
+                                        <p>{{ quote.submittedAt|date('d/m/Y') }}</p>
+                                    {% else %}
+                                        <p>-</p>
+                                    {% endif %}
                                 </div>
-                                <div class="text-sm font-light text-slate-500">
+                                {# TODO #}
+                                {# <div class="text-sm font-light text-slate-500">
                                     <p class="text-sm font-normal text-slate-700">Validité</p>
                                     <p>0 Days</p>
-                                    <p class="mt-2 text-sm font-normal text-slate-700">TODO</p>
-                                    <p>00.00.00</p>
-                                </div>
+                                </div> #}
                             </div>
                         </div>
                     </div>

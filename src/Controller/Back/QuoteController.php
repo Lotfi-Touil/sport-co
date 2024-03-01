@@ -121,6 +121,12 @@ class QuoteController extends AbstractController
             return $this->redirectToRoute('platform_quote_index');
         }
 
+        // TODO Lotfi : permettre au super admin + compte company de supprimer tt de meme
+        if ($quote->getSubmittedAt()) {
+            $this->addFlash('error', 'Suppression impossible ! le devis a été soumis au client.');
+            return $this->redirectToRoute('platform_invoice_index');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$quote->getId(), $request->request->get('_token'))) {
             foreach ($quote->getQuoteProducts() as $quoteProduct) {
                 $entityManager->remove($quoteProduct);

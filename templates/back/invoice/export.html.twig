@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Facture #{{ invoice.id }}{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="header">
+      <h2>Facture #{{ invoice.id }}</h2>
+      <p>Date de délivrance: {{ (invoice.submittedAt ? invoice.submittedAt : 'now')|date('d/m/Y') }}</p>
+  </div>
+
+  <table class="invoice-info">
+    <tbody>
+      <tr>
+        <th>Destinataire:</th>
+        <td>
+          {% if invoice.invoiceUsers|length > 0 %}
+            {{ invoice.invoiceUsers.first().customer.firstName }} {{ invoice.invoiceUsers.first().customer.lastName }}
+          {% else %}
+            Pas de client associé
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Email:</th>
+        <td>
+          {% if invoice.invoiceUsers|length > 0 %}
+            {{ invoice.invoiceUsers.first().customer.email }}
+          {% else %}
+            Pas d'email associé
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Adresse:</th>
+        <td>
+          {% if invoice.invoiceUsers|length > 0 %}
+            {{ invoice.invoiceUsers.first().customer.address }}
+          {% else %}
+            Pas d'adresse associée
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Numéro de facture:</th>
+        <td>{{ invoice.id }}</td>
+      </tr>
+      <tr>
+        <th>Date de délivrance:</th>
+        <td>{{ invoice.submittedAt|default('now')|date('d/m/Y') }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th>Produit</th>
+        <th>Quantité</th>
+        <th>Prix HT</th>
+        <th>Taxe</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for invoiceProduct in invoice.invoiceProducts %}
+        {% set tax_amount = (invoiceProduct.price * invoiceProduct.taxRate / 100) | round(2) %}
+        <tr>
+          <td>{{ invoiceProduct.product.name }}</td>
+          <td>{{ invoiceProduct.quantity }}</td>
+          <td>{{ invoiceProduct.price - tax_amount }} €</td>
+          <td>{{ tax_amount }} €</td>
+          <td>{{ invoiceProduct.price * invoiceProduct.quantity | number_format(2, '.', '') }} €</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="5">La facture ne contient aucun article.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot class="total">
+      <tr>
+        <th colspan="4">Total HT:</th>
+        <td>{{ invoice.subtotal | number_format(2, '.', '') }} €</td>
+      </tr>
+      <tr>
+        <th colspan="4">TVA:</th>
+        <td>{{ invoice.totalAmount - invoice.subtotal | number_format(2, '.', '') }} €</td>
+      </tr>
+      <tr>
+        <th colspan="4">Total TTC:</th>
+        <td>{{ invoice.totalAmount | number_format(2, '.', '') }} €</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="footer">
+    <p>Merci de faire affaire avec nous.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+  body { font-family: 'Helvetica', 'Arial', sans-serif; background-color: #fff; color: #333; }
+  .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h2 { margin: 0; }
+  .invoice-info, .items-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+  th { background-color: #f9f9f9; }
+  .total { text-align: right; }
+  .total th, .total td { border-top: 2px solid #333; font-weight: bold; }
+  .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #999; }
+</style>
+{% endblock %}

@@ -3,9 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Invoice;
-use App\Entity\InvoiceStatus;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,18 +12,17 @@ class InvoiceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $status = $options['status_choices'];
+
         $builder
-            ->add('totalAmount')
-            ->add('subtotal')
             ->add('notes')
-            ->add('createdAt')
-            ->add('updatedAt')
-            ->add('submittedAt')
-            ->add('expiryDate')
-            ->add('invoiceStatus', EntityType::class, [
-                'class' => InvoiceStatus::class,
-'choice_label' => 'id',
-            ])
+            ->add('invoiceStatus', ChoiceType::class, [
+                'choices' => $status,
+                'choice_label' => function($status) {
+                    return $status->getTitle();
+                },
+                'choice_value' => 'id',
+            ]);
         ;
     }
 
@@ -32,6 +30,7 @@ class InvoiceType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Invoice::class,
+            'status_choices' => [],
         ]);
     }
 }
