@@ -37,9 +37,13 @@ class Customer
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: QuoteUser::class)]
     private Collection $quoteUsers;
 
+    #[ORM\OneToMany(mappedBy: 'customer', targetEntity: InvoiceUser::class)]
+    private Collection $invoiceUsers;
+
     public function __construct()
     {
         $this->quoteUsers = new ArrayCollection();
+        $this->invoiceUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -143,6 +147,36 @@ class Customer
             // set the owning side to null (unless already changed)
             if ($quoteUser->getCustomer() === $this) {
                 $quoteUser->setCustomer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InvoiceUser>
+     */
+    public function getInvoiceUsers(): Collection
+    {
+        return $this->invoiceUsers;
+    }
+
+    public function addInvoiceUser(InvoiceUser $invoiceUser): static
+    {
+        if (!$this->invoiceUsers->contains($invoiceUser)) {
+            $this->invoiceUsers->add($invoiceUser);
+            $invoiceUser->setCustomer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvoiceUser(InvoiceUser $invoiceUser): static
+    {
+        if ($this->invoiceUsers->removeElement($invoiceUser)) {
+            // set the owning side to null (unless already changed)
+            if ($invoiceUser->getCustomer() === $this) {
+                $invoiceUser->setCustomer(null);
             }
         }
 

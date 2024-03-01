@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\QuoteUserRepository;
+use App\Repository\InvoiceUserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: QuoteUserRepository::class)]
-class QuoteUser
+#[ORM\Entity(repositoryClass: InvoiceUserRepository::class)]
+class InvoiceUser
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -16,12 +16,12 @@ class QuoteUser
 
     #[ORM\OneToOne(fetch: 'EAGER', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Quote $quote = null;
+    private ?Invoice $invoice = null;
 
-    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'quoteUsers')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'invoiceUsers')]
     private ?Customer $customer = null;
 
-    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'quoteUsers')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'invoiceUsers')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
 
@@ -34,6 +34,18 @@ class QuoteUser
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getInvoice(): ?Invoice
+    {
+        return $this->invoice;
+    }
+
+    public function setInvoice(?Invoice $invoice): static
+    {
+        $this->invoice = $invoice;
+
+        return $this;
     }
 
     public function getCustomer(): ?Customer
@@ -80,18 +92,6 @@ class QuoteUser
     public function setUpdatedAt(\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function getQuote(): ?Quote
-    {
-        return $this->quote;
-    }
-
-    public function setQuote(?Quote $quote): static
-    {
-        $this->quote = $quote;
 
         return $this;
     }

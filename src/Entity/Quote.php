@@ -7,8 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 #[ORM\Entity(repositoryClass: QuoteRepository::class)]
 class Quote
@@ -38,7 +36,7 @@ class Quote
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $SubmittedAt = null;
+    private ?\DateTimeInterface $submittedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $expiryDate = null;
@@ -136,12 +134,12 @@ class Quote
 
     public function getSubmittedAt(): ?\DateTimeInterface
     {
-        return $this->SubmittedAt;
+        return $this->submittedAt;
     }
 
-    public function setSubmittedAt(?\DateTimeInterface $SubmittedAt): static
+    public function setSubmittedAt(?\DateTimeInterface $submittedAt): static
     {
-        $this->SubmittedAt = $SubmittedAt;
+        $this->submittedAt = $submittedAt;
 
         return $this;
     }
@@ -231,6 +229,5 @@ class Quote
 
         return $this;
     }
-
 
 }

@@ -26,16 +26,16 @@ class Invoice
     #[ORM\Column(type: Types::DECIMAL, precision: 13, scale: 4)]
     private ?string $subtotal = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
-    private ?string $taxes = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $notes = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true , options: ["default" => "CURRENT_TIMESTAMP"])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ["default" => "CURRENT_TIMESTAMP"])]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true )]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true )]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $submittedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true )]
@@ -44,17 +44,19 @@ class Invoice
     #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: Payment::class)]
     private Collection $payments;
 
-    #[ORM\ManyToOne(targetEntity: Customer::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Customer $customer = null;
-
-    #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: InvoiceProduct::class)]
+    #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: InvoiceProduct::class, cascade: ['persist', 'remove'])]
     private Collection $invoiceProducts;
+
+    #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: InvoiceUser::class, cascade: ['persist', 'remove'])]
+    private Collection $invoiceUsers;
 
     public function __construct()
     {
         $this->payments = new ArrayCollection();
         $this->invoiceProducts = new ArrayCollection();
+        $this->invoiceUsers = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+        $this->expiryDate = (new \DateTime())->modify('+3 months');
     }
 
     public function getId(): ?int
@@ -98,14 +100,14 @@ class Invoice
         return $this;
     }
 
-    public function getTaxes(): ?string
+    public function getNotes(): ?string
     {
-        return $this->taxes;
+        return $this->notes;
     }
 
-    public function setTaxes(string $taxes): static
+    public function setNotes(string $notes): static
     {
-        $this->taxes = $taxes;
+        $this->notes = $notes;
 
         return $this;
     }
@@ -188,17 +190,6 @@ class Invoice
         return $this;
     }
 
-    public function getCustomer(): ?Customer
-    {
-        return $this->customer;
-    }
-
-    public function setCustomer(?Customer $customer): self
-    {
-        $this->customer = $customer;
-        return $this;
-    }
-
     /**
      * @return Collection<int, InvoiceProduct>
      */
@@ -223,6 +214,36 @@ class Invoice
             // set the owning side to null (unless already changed)
             if ($invoiceProduct->getInvoice() === $this) {
                 $invoiceProduct->setInvoice(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InvoiceUser>
+     */
+    public function getInvoiceUsers(): Collection
+    {
+        return $this->invoiceUsers;
+    }
+
+    public function addInvoiceUser(InvoiceUser $invoiceUser): static
+    {
+        if (!$this->invoiceUsers->contains($invoiceUser)) {
+            $this->invoiceUsers->add($invoiceUser);
+            $invoiceUser->setInvoice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvoiceUser(InvoiceUser $invoiceUser): static
+    {
+        if ($this->invoiceUsers->removeElement($invoiceUser)) {
+            // set the owning side to null (unless already changed)
+            if ($invoiceUser->getInvoice() === $this) {
+                $invoiceUser->setInvoice(null);
             }
         }
 

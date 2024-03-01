@@ -38,9 +38,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: QuoteUser::class)]
     private Collection $quoteUsers;
 
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: InvoiceUser::class)]
+    private Collection $invoiceUsers;
+
     public function __construct()
     {
         $this->quoteUsers = new ArrayCollection();
+        $this->invoiceUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -149,6 +153,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($quoteUser->getCreator() === $this) {
                 $quoteUser->setCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InvoiceUser>
+     */
+    public function getInvoiceUsers(): Collection
+    {
+        return $this->invoiceUsers;
+    }
+
+    public function addInvoiceUser(InvoiceUser $invoiceUser): static
+    {
+        if (!$this->invoiceUsers->contains($invoiceUser)) {
+            $this->invoiceUsers->add($invoiceUser);
+            $invoiceUser->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvoiceUser(InvoiceUser $invoiceUser): static
+    {
+        if ($this->invoiceUsers->removeElement($invoiceUser)) {
+            // set the owning side to null (unless already changed)
+            if ($invoiceUser->getCreator() === $this) {
+                $invoiceUser->setCreator(null);
             }
         }
 
