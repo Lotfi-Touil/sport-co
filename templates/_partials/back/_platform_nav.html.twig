@@ -1,2 +1,181 @@
-{% include '_partials/back/_platform_navbar.html.twig' %}
-{% include '_partials/back/_platform_sidebar.html.twig' %}
+{#{% include '_partials/back/_platform_navbar.html.twig' %}#}
+{#{% include '_partials/back/_platform_sidebar.html.twig' %}#}
+
+{% set currentRoute = app.request.attributes.get('_route') %} {# NE PAS OUBLIER DE LAJOUTER POUR QUE LE HOVER SOIT SUR LA PAGE ACTUEL #}
+
+<div id="menuButton" class="lg:hidden">
+    <svg width="46" height="46" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17 10H3"></path>
+        <path d="M21 6H3"></path>
+        <path d="M21 14H3"></path>
+        <path d="M17 18H3"></path>
+    </svg>
+</div>
+<aside id="sidebar" class=" absolute hidden lg:static lg:flex basis-1/5 flex flex-col  h-screen px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
+
+    <div class="flex justify-between lg:justify-center">
+        <a href="#" class="h3 text-black font-bold dark:text-white">
+            .sportCo
+        </a>
+        <div id="closeMenu" class="lg:hidden text-black dark:text-white">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 12H5"></path>
+                <path d="m12 19-7-7 7-7"></path>
+            </svg>
+        </div>
+    </div>
+    <hr class="my-6 border-gray-200 dark:border-gray-600" />
+
+    <a href="#" class="flex items-center px-4 -mx-2">
+        <img class="object-cover mx-2 rounded-full h-9 w-9" src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="avatar" />
+        <span class="mx-2 font-medium text-gray-800 dark:text-gray-200">John Doe</span>
+
+    </a>
+    <div class="flex gap-4 justify-center">
+    <a href="{{ path("app_logout") }}">
+        <svg width="24" height="24" fill="none" stroke="#4b5563" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <path d="m16 17 5-5-5-5"></path>
+            <path d="M21 12H9"></path>
+        </svg>
+    </a>
+
+    <div id="darkModeToggle" class="flex justify-center">
+        <svg  class="dark:fill-white" width="23" height="23" fill="#000000"  stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
+        </svg>
+    </div>
+
+    </div>
+
+    <hr class="my-6 border-gray-200 dark:border-gray-600" />
+
+    <div class="flex flex-col justify-between flex-1 mt-6">
+        <nav>
+            <a class="flex items-center px-4 py-2 text-gray-700 {{ currentRoute == 'platform_dashboard' ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200' : '' }} hover:bg-gray-100 rounded-md  dark:text-gray-200" href="{{ path('platform_dashboard') }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 20V10"></path>
+                    <path d="M18 20V4"></path>
+                    <path d="M6 20v-4"></path>
+                </svg>
+
+                <span class="mx-4 font-medium">Dashboard</span>
+            </a>
+
+            <a class="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-300 transform rounded-md dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="#">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
+                </svg>
+
+                <span class="mx-4 font-medium">Employés</span>
+            </a>
+
+            <a class="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-300 transform rounded-md dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700 {{ currentRoute == 'platform_customer_index' ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200' : '' }}" href="{{ path('platform_customer_index') }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <path d="M9 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+
+                <span class="mx-4 font-medium">Client</span>
+            </a>
+            <hr class="my-6 border-gray-200 dark:border-gray-600" />
+
+            <a class="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-300 transform rounded-md dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700{{ currentRoute == 'platform_product_index' ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200' : '' }}" href="{{ path('platform_product_index') }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 8v13H3V8"></path>
+                    <path d="M1 3h22v5H1z"></path>
+                    <path d="M10 12h4"></path>
+                </svg>
+
+                <span class="mx-4 font-medium">Produits</span>
+            </a>
+
+
+
+            <a class="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-300 transform rounded-md dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700 {{ currentRoute == 'platform_invoice_index' ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200' : '' }}" href="{{ path('platform_invoice_index') }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <path d="M14 2v6h6"></path>
+                    <path d="M16 13H8"></path>
+                    <path d="M16 17H8"></path>
+                    <path d="M10 9H8"></path>
+                </svg>
+
+                <span class="mx-4 font-medium">Facture</span>
+            </a>
+
+            <a class="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-300 transform rounded-md dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700 {{ currentRoute == 'platform_invoice_status__index' ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200' : '' }}" href="{{ path('platform_invoice_status_index') }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <path d="M14 2v6h6"></path>
+                    <path d="M16 13H8"></path>
+                    <path d="M16 17H8"></path>
+                    <path d="M10 9H8"></path>
+                </svg>
+
+                <span class="mx-4 font-medium">Status Facture</span>
+            </a>
+
+            <a class="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-300 transform rounded-md dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700 {{ currentRoute == 'platform_quote_index' ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200' : '' }}" href="{{ path('platform_quote_index') }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <path d="M14 2v6h6"></path>
+                    <path d="M9 15h6"></path>
+                </svg>
+
+                <span class="mx-4 font-medium">Devis</span>
+            </a>
+
+            <a class="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-300 transform rounded-md dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700 {{ currentRoute == 'platform_quote_status_index' ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200' : '' }}" href="{{ path('platform_quote_status_index') }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <path d="M14 2v6h6"></path>
+                    <path d="M9 15h6"></path>
+                </svg>
+
+                <span class="mx-4 font-medium">Status Devis</span>
+            </a>
+
+            <hr class="my-6 border-gray-200 dark:border-gray-600" />
+
+            <a class="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-300 transform rounded-md dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700 {{ currentRoute == 'platform_customer_index' ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200' : '' }}" href="{{ path('platform_quote_status_index') }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="22" height="16" x="1" y="4" rx="2" ry="2"></rect>
+                    <path d="M1 10h22"></path>
+                </svg>
+
+                <span class="mx-4 font-medium">Paiements</span>
+            </a>
+        </nav>
+
+
+    </div>
+</aside>
+<script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+        const menuButton = document.getElementById('menuButton');
+        const sidebar = document.getElementById('sidebar');
+        const closeMenu = document.getElementById('closeMenu');
+        menuButton.addEventListener('click', function () {
+        // Basculer la visibilité de la sidebar
+        sidebar.classList.toggle('hidden');
+        menuButton.classList.toggle('hidden');
+        });
+
+        closeMenu.addEventListener('click', function () {
+            // Basculer la visibilité de la sidebar
+            sidebar.classList.toggle('hidden');
+            menuButton.classList.toggle('hidden');
+        });
+
+    });
+            const btn = document.getElementById('darkModeToggle');
+            btn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+</script>

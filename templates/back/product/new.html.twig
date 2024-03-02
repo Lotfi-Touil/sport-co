@@ -1,38 +1,51 @@
 {% extends 'base.html.twig' %}
+{% form_theme form 'form/error_theme.html.twig' %}  {#Pour style erreur, pas possible dans form_error directement #}
 
 {% block title %}New Product{% endblock %}
 
 {% block body %}
-    {% include '_partials/back/_platform_nav.html.twig' %}
-
-    <section class="p-4 mt-14 w-full">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-2xl font-bold mb-5">Nouveau produit</h1>
-
-            <div class="actions flex">
-                <a href="{{ path('platform_product_index') }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
-                    Revenir à la liste
+   {% include '_partials/back/_platform_nav.html.twig' %}
+    <section class="flex-1  p-6  bg-gray-200  shadow-md dark:bg-gray-900">
+        <div class="flex justify-end mb-4">
+                <a href="{{ path('platform_product_index') }}" class="text-black dark:text-white">
+                    <svg width="42" height="42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12H5"></path>
+                        <path d="m12 19-7-7 7-7"></path>
+                    </svg>
                 </a>
-            </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6">
-            {{ form_start(form, {'attr': {'class': 'w-full'}}) }}
-
-            {% for field in form %}
-
-                {% if field.vars.name != '_token' %}
-                    <div class="mb-4">
-                        {{ form_label(field, null, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}}) }}
-                        {{ form_widget(field, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(field) }}
-                    </div>
-                {% endif %}
-            {% endfor %}
-
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                {{ button_label|default('Enregistrer') }}
-            </button>
+        <div class="bg-white shadow rounded-lg p-6 dark:bg-gray-800">
+            <h2 class="text-lg font-semibold text-gray-700 capitalize dark:text-white">Nouveau Produit</h2>
+            {{ form_start(form) }}
+            <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                <div>
+                    {{ form_label(form.name, null, {'label_attr': {'class': 'text-gray-700 dark:text-gray-200'}}) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring'}}) }}
+                    {{ form_errors(form.name) }}
+                </div>
+                <div>
+                    {{ form_label(form.price, null, {'label_attr': {'class': 'text-gray-700 dark:text-gray-200'}}) }}
+                    {{ form_widget(form.price, {'attr': {'class': 'block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring'}}) }}
+                    {{ form_errors(form.price) }}
+                </div>
+                <div>
+                    {{ form_label(form.description, null, {'label_attr': {'class': 'text-gray-700 dark:text-gray-200'}}) }}
+                    {{ form_widget(form.description, {'attr': {'class': 'block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring'}}) }}
+                    {{ form_errors(form.description) }}
+                </div>
+                <div>
+                    {{ form_label(form.tax_rate, null, {'label_attr': {'class': 'text-gray-700 dark:text-gray-200'}}) }}
+                    {{ form_widget(form.tax_rate, {'attr': {'class': 'block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring'}}) }}
+                    {{ form_errors(form.tax_rate) }}
+                </div>
+            </div>
+            <div class="flex justify-start mt-6">
+                <button class="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600" type="submit">Créer</button>
+            </div>
+{#            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">#}
+{#                {{ button_label|default('Enregistrer') }}#}
+{#            </button>#}
 
             {{ form_end(form) }}
         </div>
