@@ -33,9 +33,11 @@ class RegistrationController extends AbstractController
                 )
             );
 
+            $user->setRoles(['ROLE_COMPANY']);
+
+            $entityManager->persist($user->getCompany()); // Persiste d'abord l'entreprise
             $entityManager->persist($user);
             $entityManager->flush();
-            // do anything else you need here, like send an email
 
             return $this->redirectToRoute('home_index');
         }

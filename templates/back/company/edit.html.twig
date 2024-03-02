@@ -1,18 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau client{% endblock %}
+{% block title %}Modifier entreprise{% endblock %}
 
 {% block body %}
-   {% include '_partials/back/_platform_nav.html.twig' %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
 
     <section class="p-4 mt-14 w-full">
         <div class="flex justify-between items-center mb-4">
-            <h1 class="text-2xl font-bold mb-5">Nouveau client</h1>
+            <h1 class="text-2xl font-bold mb-5">Entreprise #{{ company.id }}</h1>
 
             <div class="actions flex">
-                <a href="{{ path('platform_customer_index') }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                <a href="{{ path('platform_company_index') }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
                     Revenir à la liste
                 </a>
+                {{ include('back/company/_delete_form.html.twig') }}
             </div>
         </div>
 
@@ -20,21 +21,21 @@
             {{ form_start(form, {'attr': {'class': 'w-full'}}) }}
 
             <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Prénom</label>
-                {{ form_widget(form.firstName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                {{ form_errors(form.firstName) }}
-            </div>
-
-            <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
-                {{ form_widget(form.lastName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                {{ form_errors(form.lastName) }}
+                {{ form_widget(form.name, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.name) }}
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
                 {{ form_widget(form.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
                 {{ form_errors(form.email) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">N° Siret</label>
+                {{ form_widget(form.siret, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.siret) }}
             </div>
 
             <div class="mb-4">
@@ -50,9 +51,15 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Société liée</label>
-                {{ form_widget(form.company, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                {{ form_errors(form.company) }}
+                <label class="block text-gray-700 text-sm font-bold mb-2">Site web</label>
+                {{ form_widget(form.website, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.website) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                {{ form_widget(form.description, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.description) }}
             </div>
 
             <button type="submit" class="text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">

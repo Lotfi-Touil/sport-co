@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des entreprises{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+
+    <section class="p-4 mt-14 w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-lg font-bold">Liste des entreprises</h1>
+            <a href="{{ path('platform_company_new') }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                Nouvelle entreprise
+            </a>
+        </div>
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            #
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Nom
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Email
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Adresse
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            N° Siret
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Téléphone
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Site web
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Description
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Créé le
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Dernière modifcation
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in companies %}
+                        <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                            <td class="px-6 py-4">
+                                {{ company.id }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ company.name }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ company.email }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ company.address ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ company.siret }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ company.phone }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ company.website|length > 20 ? company.website|slice(0, 20) ~ '...' : company.website }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ company.description|length > 20 ? company.description|slice(0, 20) ~ '...' : company.description }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ company.createdAt ? company.createdAt|date('Y-m-d H:i:s') : '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ company.updatedAt ? company.updatedAt|date('Y-m-d H:i:s') : '-' }}
+                            </td>
+                            <td class="px-6 py-4 flex">
+                                <a href="{{ path('platform_company_show', {'id': company.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                    Voir
+                                </a>
+                                <a href="{{ path('platform_company_edit', {'id': company.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                    Modifier
+                                </a>
+                                <form method="post" action="{{ path('platform_company_delete', {'id': company.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ company.id) }}">
+                                    <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr class="bg-gray-100 border-b dark:bg-gray-800">
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-600 dark:text-gray-400 text-lg">
+                                Aucun client pour le moment.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+{% endblock %}

@@ -17,42 +17,42 @@
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6">
+        <div class="p-6">
             {{ form_start(form, {'attr': {'class': 'w-full'}}) }}
 
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Prénom</label>
-                {{ form_widget(form.firstName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_widget(form.firstName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
                 {{ form_errors(form.firstName) }}
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
-                {{ form_widget(form.lastName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_widget(form.lastName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
                 {{ form_errors(form.lastName) }}
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                {{ form_widget(form.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_widget(form.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
                 {{ form_errors(form.email) }}
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Téléphone</label>
-                {{ form_widget(form.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_widget(form.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
                 {{ form_errors(form.phone) }}
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Adresse</label>
-                {{ form_widget(form.address, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_widget(form.address, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
                 {{ form_errors(form.address) }}
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Société liée</label>
-                {{ form_widget(form.company, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_widget(form.company, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
                 {{ form_errors(form.company) }}
             </div>
 

@@ -18,7 +18,21 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email')
+            ->add('firstName', null, [
+                'label' => 'Prénom',
+            ])
+            ->add('lastName', null, [
+                'label' => 'Nom',
+            ])
+            ->add('email', null, [
+                'label' => 'Email (servira d\'identifiant de connexion)',
+            ])
+            ->add('phone', null, [
+                'label' => 'Téléphone',
+            ])
+            ->add('address', null, [
+                'label' => 'Adresse',
+            ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'constraints' => [
@@ -38,16 +52,20 @@ class RegistrationFormType extends AbstractType
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a password',
+                        'message' => 'Veuillez entrer un mot de passe',
                     ]),
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
+                        'minMessage' => 'Le mot de passe doit contenir au minimum {{ limit }} charactères.',
                         // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),
                 ],
             ])
+            // Intégrer CompanyType comme sous-formulaire pour les informations de l'entreprise
+            ->add('company', CompanyType::class, [
+                'label' => false, // masque le label du sous-formulaire si nécessaire
+            ]);
         ;
     }
 

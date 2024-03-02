@@ -4,9 +4,9 @@
 
 {% block body %}
 
-    <div class="flex items-center justify-center h-screen">
+    <div class="flex items-center justify-center w-full">
         <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <h1 class="text-xl mb-4 font-semibold">Inscrivez-vous en 30 secondes !</h1>
+            <h1 class="text-xl mb-4 text-center font-semibold">Inscrivez-vous en 30 secondes !</h1>
 
             {% if form_errors(registrationForm) %}
                 <div class="alert alert-danger">{{ form_errors(registrationForm)|trans({}, 'security') }}</div>
@@ -14,38 +14,98 @@
 
             {{ form_start(registrationForm) }}
 
-            <div class="mb-4">
-                {{ form_row(registrationForm.email, {
-                    'attr': {
-                        'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',
-                        'id': 'registration_form_email',
-                        'autocomplete': 'email',
-                        'required': 'required',
-                    }
-                }) }}
+            <div class="flex">
+                <div class="left-bloc p-4">
+                    <h2 class="text-lg mb-4 font-semibold text-gray-800">Informations Personnelles</h2>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Prénom</label>
+                        {{ form_widget(registrationForm.firstName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_firstName', 'required': 'required'}}) }}
+                        {{ form_errors(registrationForm.firstName) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
+                        {{ form_widget(registrationForm.lastName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_lastName', 'required': 'required'}}) }}
+                        {{ form_errors(registrationForm.lastName) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_email', 'autocomplete': 'email', 'required': 'required'}}) }}
+                        {{ form_errors(registrationForm.email) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Téléphone</label>
+                        {{ form_widget(registrationForm.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_phone', 'autocomplete': 'tel', 'required': 'required'}}) }}
+                        {{ form_errors(registrationForm.phone) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Adresse</label>
+                        {{ form_widget(registrationForm.address, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_address', 'required': 'required'}}) }}
+                        {{ form_errors(registrationForm.address) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
+                        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_plainPassword_first', 'required': 'required'}}) }}
+                        {{ form_errors(registrationForm.plainPassword.first) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Confirmer mot de passe</label>
+                        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_plainPassword_second', 'required': 'required'}}) }}
+                        {{ form_errors(registrationForm.plainPassword.second) }}
+                    </div>
+                </div>
+                <div class="right-bloc p-4">
+                    <h2 class="text-lg mb-4 font-semibold text-gray-800">Informations entreprise</h2>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
+                        {{ form_widget(registrationForm.company.name, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                        {{ form_errors(registrationForm.company.name) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        {{ form_widget(registrationForm.company.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                        {{ form_errors(registrationForm.company.email) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">N° Siret</label>
+                        {{ form_widget(registrationForm.company.siret, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                        {{ form_errors(registrationForm.company.siret) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Téléphone</label>
+                        {{ form_widget(registrationForm.company.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                        {{ form_errors(registrationForm.company.phone) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Adresse</label>
+                        {{ form_widget(registrationForm.company.address, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                        {{ form_errors(registrationForm.company.address) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Site web</label>
+                        {{ form_widget(registrationForm.company.website, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                        {{ form_errors(registrationForm.company.website) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                        {{ form_widget(registrationForm.company.description, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                        {{ form_errors(registrationForm.company.description) }}
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-4">
-                {{ form_row(registrationForm.plainPassword.first, {
-                    'attr': {
-                        'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',
-                        'id': 'registration_form_plainPassword_first',
-                        'required': 'required',
-                    }
-                }) }}
-            </div>
-
-            <div class="mb-4">
-                {{ form_row(registrationForm.plainPassword.second, {
-                    'attr': {
-                        'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',
-                        'id': 'registration_form_plainPassword_second',
-                        'required': 'required',
-                    }
-                }) }}
-            </div>
-
-            <div class="mb-6">
+            <div class="mb-6 text-center">
                 {{ form_widget(registrationForm.agreeTerms, {
                     'attr': {
                         'class': 'mr-2 leading-tight',
@@ -53,11 +113,11 @@
                         'required': 'required',
                     }
                 }) }}
-                <span class="text-gray-700 font-bold">J'accepte les conditions générales d’utilisation (CGU).</span>
+                <label for="registration_form_agreeTerms" class="text-gray-700 font-bold cursor-pointer">J'accepte les conditions générales d’utilisation (CGU).</label>
             </div>
 
             <div class="flex items-center justify-center">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                <button type="submit" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
                     Inscription
                 </button>
             </div>
