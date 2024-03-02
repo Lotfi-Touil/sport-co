@@ -58,10 +58,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ["default" => "CURRENT_TIMESTAMP"])]
     private ?\DateTimeInterface $createdAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'employe', targetEntity: PageAccess::class)]
+    private Collection $pageAccesses;
+
     public function __construct()
     {
         $this->quoteUsers = new ArrayCollection();
         $this->invoiceUsers = new ArrayCollection();
+        $this->pageAccesses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -262,6 +266,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTimeInterface $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PageAccess>
+     */
+    public function getPageAccesses(): Collection
+    {
+        return $this->pageAccesses;
+    }
+
+    public function addPageAccess(PageAccess $pageAccess): static
+    {
+        if (!$this->pageAccesses->contains($pageAccess)) {
+            $this->pageAccesses->add($pageAccess);
+            $pageAccess->setEmploye($this);
+        }
+
+        return $this;
+    }
+
+    public function removePageAccess(PageAccess $pageAccess): static
+    {
+        if ($this->pageAccesses->removeElement($pageAccess)) {
+            // set the owning side to null (unless already changed)
+            if ($pageAccess->getEmploye() === $this) {
+                $pageAccess->setEmploye(null);
+            }
+        }
 
         return $this;
     }
