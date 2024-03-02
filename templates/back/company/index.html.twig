@@ -85,16 +85,22 @@
                                 {{ company.updatedAt ? company.updatedAt|date('Y-m-d H:i:s') : '-' }}
                             </td>
                             <td class="px-6 py-4 flex">
-                                <a href="{{ path('platform_company_show', {'id': company.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
-                                    Voir
-                                </a>
-                                <a href="{{ path('platform_company_edit', {'id': company.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
-                                    Modifier
-                                </a>
-                                <form method="post" action="{{ path('platform_company_delete', {'id': company.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ company.id) }}">
-                                    <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
-                                </form>
+                                {% if can_access('platform_company_show') %}
+                                    <a href="{{ path('platform_company_show', {'id': company.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                        Voir
+                                    </a>
+                                {% endif %}
+                                {% if can_access('platform_company_edit') %}
+                                    <a href="{{ path('platform_company_edit', {'id': company.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                        Modifier
+                                    </a>
+                                {% endif %}
+                                {% if can_access('platform_company_delete') %}
+                                    <form method="post" action="{{ path('platform_company_delete', {'id': company.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ company.id) }}">
+                                        <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
+                                    </form>
+                                {% endif %}
                             </td>
                         </tr>
                     {% else %}

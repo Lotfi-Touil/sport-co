@@ -31,7 +31,7 @@ class PageAccessService
         }
     }
 
-    private function canAccess(string $routeName): bool
+    public function canAccess(string $routeName): bool
     {
         if ($this->authorizationChecker->isGranted("ROLE_COMPANY")) {
             return true;
