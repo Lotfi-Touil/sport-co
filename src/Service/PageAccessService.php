@@ -33,11 +33,11 @@ class PageAccessService
 
     private function canAccess(string $routeName): bool
     {
-        if($this->authorizationChecker->isGranted("ROLE_ADMIN")) {
+        if ($this->authorizationChecker->isGranted("ROLE_COMPANY")) {
             return true;
         }
 
-        if ($this->authorizationChecker->isGranted("ROLE_COMPANY")) {
+        if($this->authorizationChecker->isGranted("ROLE_ADMIN")) {
             return true;
         }
 
@@ -46,10 +46,9 @@ class PageAccessService
             return false;
         }
 
-        // Vérifiez si la page existe
         $page = $this->pageRepository->findOneBy(['path' => $routeName]);
         if (!$page) {
-            // Si la page n'existe pas, considérez que l'accès est autorisé
+            // Si la page n'existe pas, on autorise
             return true;
         }
 
@@ -60,7 +59,7 @@ class PageAccessService
         ]);
 
         if (!$access) {
-            // Si aucun accès spécifique n'est défini, considérez que l'accès est autorisé par défaut
+            // Si aucune règle d'accès, on autorise
             return true;
         }
 

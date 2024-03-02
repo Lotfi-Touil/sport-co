@@ -9,6 +9,7 @@ use App\Form\InvoiceType;
 use App\Repository\InvoiceRepository;
 use App\Repository\InvoiceStatusRepository;
 use App\Service\InvoiceService;
+use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,16 +19,21 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/platform/invoice')]
 class InvoiceController extends AbstractController
 {
+    private $pageAccessService;
+
     private $invoiceService;
 
-    public function __construct(InvoiceService $invoiceService)
+    public function __construct(PageAccessService $pageAccessService, InvoiceService $invoiceService)
     {
         $this->invoiceService = $invoiceService;
+        $this->pageAccessService = $pageAccessService;
     }
 
     #[Route('/', name: 'platform_invoice_index', methods: ['GET'])]
-    public function index(InvoiceRepository $invoiceRepository, InvoiceStatusRepository $invoiceStatusRepository): Response
+    public function index(Request $request, InvoiceRepository $invoiceRepository, InvoiceStatusRepository $invoiceStatusRepository): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('back/invoice/index.html.twig', [
             'invoices' => $invoiceRepository->findAll(),
             'invoice_status' => $invoiceStatusRepository->findAll(),
@@ -37,6 +43,8 @@ class InvoiceController extends AbstractController
     #[Route('/new', name: 'platform_invoice_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAll();
 
         $invoice = new Invoice();
@@ -67,8 +75,10 @@ class InvoiceController extends AbstractController
     }
 
     #[Route('/{id}', name: 'platform_invoice_show', methods: ['GET'])]
-    public function show(?Invoice $invoice): Response
+    public function show(Request $request, ?Invoice $invoice): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if (!$invoice) {
             $this->addFlash('error', 'La facture demandé n\'existe pas.');
             return $this->redirectToRoute('platform_invoice_index');
@@ -82,6 +92,8 @@ class InvoiceController extends AbstractController
     #[Route('/{id}/edit', name: 'platform_invoice_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, ?Invoice $invoice, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if (!$invoice) {
             $this->addFlash('error', 'La facture demandé n\'existe pas.');
             return $this->redirectToRoute('platform_invoice_index');
@@ -117,6 +129,8 @@ class InvoiceController extends AbstractController
     #[Route('/{id}', name: 'platform_invoice_delete', methods: ['POST'])]
     public function delete(Request $request, ?Invoice $invoice, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if (!$invoice) {
             $this->addFlash('error', 'La facture demandé n\'existe pas.');
             return $this->redirectToRoute('platform_invoice_index');
@@ -148,6 +162,8 @@ class InvoiceController extends AbstractController
     #[Route('/{id}/export', name: 'platform_invoice_export', methods: ['GET'])]
     public function export(Invoice $invoice, InvoiceService $invoiceService): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if (!$invoice) {
             $this->addFlash('error', 'La facture demandé n\'existe pas.');
             return $this->redirectToRoute('platform_invoice_index');

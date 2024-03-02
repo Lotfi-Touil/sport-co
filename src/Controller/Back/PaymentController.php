@@ -13,6 +13,7 @@ use App\Entity\Payment;
 use App\Entity\Invoice;
 use App\Entity\PaymentStatus;
 use App\Entity\PaymentMethod;
+use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -20,14 +21,18 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 #[Route('/platform')]
 class PaymentController extends AbstractController
 {
+    private $pageAccessService;
+
     private $stripeClient;
     private $entityManager;
     private $stripeSecretKey;
     private $stripeWebhookSecret;
     private $authorizationChecker;
 
-    public function __construct(string $stripeSecretKey, string $stripeWebhookSecret,  EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker)
+    public function __construct(PageAccessService $pageAccessService, string $stripeSecretKey, string $stripeWebhookSecret,  EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker)
     {
+        $this->pageAccessService = $pageAccessService;
+
         $this->stripeSecretKey = $stripeSecretKey;
         $this->stripeWebhookSecret = $stripeWebhookSecret;
         $this->stripeClient = new StripeClient($stripeSecretKey);
@@ -94,6 +99,8 @@ class PaymentController extends AbstractController
     #[Route('/payment/create/{invoiceId}', name: 'payment_create')]
     public function create(Request $request, int $invoiceId): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if (!$this->authorizationChecker->isGranted('ROLE_COMPANY') &&
             !$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
             throw new AccessDeniedException('Accès refusé.');
@@ -194,8 +201,10 @@ class PaymentController extends AbstractController
 
 
     #[Route('/payment/checkout/{paymentId}', name: 'payment_checkout')]
-    public function checkout(int $paymentId): Response
+    public function checkout(Request $request, int $paymentId): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $payment = $this->entityManager->getRepository(Payment::class)->find($paymentId);
         if (!$payment) {
             throw $this->createNotFoundException('Paiement non trouvé.');
@@ -228,6 +237,8 @@ class PaymentController extends AbstractController
     #[Route('/payment/webhook', name: 'payment_webhook')]
     public function stripeWebhook(Request $request): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         // Remplacer par la clé secrète du webhook endpoint
         $endpoint_secret = $this->stripeWebhookSecret;
         $payload = $request->getContent();
@@ -269,22 +280,27 @@ class PaymentController extends AbstractController
 
 
     #[Route('/payment/success', name: 'payment_success')]
-    public function success(): Response
+    public function success(Request $request): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('back/payment/success.html.twig');
     }
 
 
     #[Route('/payment/failed', name: 'payment_failed')]
-    public function failed(): Response
+    public function failed(Request $request): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
         return $this->render('back/payment/failed.html.twig');
     }
 
     #[Route('/payment', name: 'app_payment')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $payments = $this->entityManager->getRepository(Payment::class)->findAll();
         // Récupération de toutes les factures
         $allInvoices = $this->entityManager->getRepository(Invoice::class)->findAll();

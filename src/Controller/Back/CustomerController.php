@@ -5,6 +5,7 @@ namespace App\Controller\Back;
 use App\Entity\Customer;
 use App\Form\CustomerType;
 use App\Repository\CustomerRepository;
+use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,9 +15,18 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/platform/customer')]
 class CustomerController extends AbstractController
 {
-    #[Route('/', name: 'platform_customer_index', methods: ['GET'])]
-    public function index(CustomerRepository $customerRepository): Response
+    private $pageAccessService;
+
+    public function __construct(PageAccessService $pageAccessService)
     {
+        $this->pageAccessService = $pageAccessService;
+    }
+
+    #[Route('/', name: 'platform_customer_index', methods: ['GET'])]
+    public function index(Request $request, CustomerRepository $customerRepository): Response
+    {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('/back/customer/index.html.twig', [
             'customers' => $customerRepository->findAll(),
         ]);
@@ -25,6 +35,8 @@ class CustomerController extends AbstractController
     #[Route('/new', name: 'platform_customer_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $customer = new Customer();
         $form = $this->createForm(CustomerType::class, $customer);
         $form->handleRequest($request);
@@ -43,8 +55,10 @@ class CustomerController extends AbstractController
     }
 
     #[Route('/{id}', name: 'platform_customer_show', methods: ['GET'])]
-    public function show(Customer $customer): Response
+    public function show(Request $request, Customer $customer): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('/back/customer/show.html.twig', [
             'customer' => $customer,
         ]);
@@ -53,6 +67,8 @@ class CustomerController extends AbstractController
     #[Route('/{id}/edit', name: 'platform_customer_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Customer $customer, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $form = $this->createForm(CustomerType::class, $customer);
         $form->handleRequest($request);
 
@@ -71,6 +87,8 @@ class CustomerController extends AbstractController
     #[Route('/{id}', name: 'platform_customer_delete', methods: ['POST'])]
     public function delete(Request $request, Customer $customer, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if ($this->isCsrfTokenValid('delete'.$customer->getId(), $request->request->get('_token'))) {
             $entityManager->remove($customer);
             $entityManager->flush();
@@ -82,6 +100,8 @@ class CustomerController extends AbstractController
     #[Route('/search/customers', name: 'customer_search', methods: ['GET'])]
     public function customerSearch(Request $request, CustomerRepository $customerRepository): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $term = $request->query->get('term');
         $customers = $customerRepository->findByTerm($term);
 

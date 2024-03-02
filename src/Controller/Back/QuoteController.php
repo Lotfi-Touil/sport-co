@@ -7,6 +7,7 @@ use App\Entity\QuoteStatus;
 use App\Form\QuoteType;
 use App\Repository\QuoteRepository;
 use App\Repository\QuoteStatusRepository;
+use App\Service\PageAccessService;
 use App\Service\QuoteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,16 +18,22 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/platform/quote')]
 class QuoteController extends AbstractController
 {
+    private $pageAccessService;
+
     private $quoteService;
 
-    public function __construct(QuoteService $quoteService)
+    public function __construct(PageAccessService $pageAccessService, QuoteService $quoteService)
     {
+        $this->pageAccessService = $pageAccessService;
+
         $this->quoteService = $quoteService;
     }
 
     #[Route('/', name: 'platform_quote_index', methods: ['GET'])]
-    public function index(QuoteRepository $quoteRepository, QuoteStatusRepository $quoteStatusRepository): Response
+    public function index(Request $request, QuoteRepository $quoteRepository, QuoteStatusRepository $quoteStatusRepository): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('back/quote/index.html.twig', [
             'quotes' => $quoteRepository->findAll(),
             'quote_status' => $quoteStatusRepository->findAll(),
@@ -36,6 +43,8 @@ class QuoteController extends AbstractController
     #[Route('/new', name: 'platform_quote_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $statusList = $entityManager->getRepository(QuoteStatus::class)->findAll();
 
         $quote = new Quote();
@@ -66,8 +75,10 @@ class QuoteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'platform_quote_show', methods: ['GET'])]
-    public function show(?Quote $quote): Response
+    public function show(Request $request, ?Quote $quote): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if (!$quote) {
             $this->addFlash('error', 'Le devis demandé n\'existe pas.');
             return $this->redirectToRoute('platform_quote_index');
@@ -81,6 +92,8 @@ class QuoteController extends AbstractController
     #[Route('/{id}/edit', name: 'platform_quote_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, ?Quote $quote, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if (!$quote) {
             $this->addFlash('error', 'Le devis demandé n\'existe pas.');
             return $this->redirectToRoute('platform_quote_index');
@@ -116,6 +129,8 @@ class QuoteController extends AbstractController
     #[Route('/{id}', name: 'platform_quote_delete', methods: ['POST'])]
     public function delete(Request $request, ?Quote $quote, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if (!$quote) {
             $this->addFlash('error', 'Le devis demandé n\'existe pas.');
             return $this->redirectToRoute('platform_quote_index');
@@ -144,8 +159,10 @@ class QuoteController extends AbstractController
     }
 
     #[Route('/{id}/export', name: 'platform_quote_export', methods: ['GET'])]
-    public function export(Quote $quote, QuoteService $quoteService): Response
+    public function export(Request $request, Quote $quote, QuoteService $quoteService): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if (!$quote) {
             $this->addFlash('error', 'Le devis demandé n\'existe pas.');
             return $this->redirectToRoute('platform_quote_index');

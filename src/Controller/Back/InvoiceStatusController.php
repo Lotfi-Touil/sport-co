@@ -5,6 +5,7 @@ namespace App\Controller\Back;
 use App\Entity\InvoiceStatus;
 use App\Form\InvoiceStatusType;
 use App\Repository\InvoiceStatusRepository;
+use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,9 +15,18 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/platform/invoice-status')]
 class InvoiceStatusController extends AbstractController
 {
-    #[Route('/', name: 'platform_invoice_status_index', methods: ['GET'])]
-    public function index(InvoiceStatusRepository $invoiceStatusRepository): Response
+    private $pageAccessService;
+
+    public function __construct(PageAccessService $pageAccessService)
     {
+        $this->pageAccessService = $pageAccessService;
+    }
+
+    #[Route('/', name: 'platform_invoice_status_index', methods: ['GET'])]
+    public function index(Request $request, InvoiceStatusRepository $invoiceStatusRepository): Response
+    {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('back/invoice_status/index.html.twig', [
             'invoice_statuses' => $invoiceStatusRepository->findAll(),
         ]);
@@ -25,6 +35,8 @@ class InvoiceStatusController extends AbstractController
     #[Route('/new', name: 'platform_invoice_status_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $invoiceStatus = new InvoiceStatus();
         $form = $this->createForm(InvoiceStatusType::class, $invoiceStatus);
         $form->handleRequest($request);
@@ -43,8 +55,10 @@ class InvoiceStatusController extends AbstractController
     }
 
     #[Route('/{id}', name: 'platform_invoice_status_show', methods: ['GET'])]
-    public function show(InvoiceStatus $invoiceStatus): Response
+    public function show(Request $request, InvoiceStatus $invoiceStatus): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('back/invoice_status/show.html.twig', [
             'invoice_status' => $invoiceStatus,
         ]);

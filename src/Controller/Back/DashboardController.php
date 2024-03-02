@@ -2,18 +2,29 @@
 
 namespace App\Controller\Back;
 
+use App\Service\PageAccessService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use Symfony\Component\HttpFoundation\Request;
 
 class DashboardController extends AbstractController
 {
-    #[Route('/platform/dashboard', name: 'platform_dashboard')]
-    public function dashboard(ChartBuilderInterface $chartBuilder, AuthorizationCheckerInterface $authorizationChecker): Response
+    private $pageAccessService;
+
+    public function __construct(PageAccessService $pageAccessService)
     {
+        $this->pageAccessService = $pageAccessService;
+    }
+
+    #[Route('/platform/dashboard', name: 'platform_dashboard')]
+    public function dashboard(Request $request, ChartBuilderInterface $chartBuilder, AuthorizationCheckerInterface $authorizationChecker): Response
+    {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $paymentChart = $chartBuilder->createChart(Chart::TYPE_LINE);
         $paymentChart->setData([
             'labels' => ['Janvier', 'Février', 'Mars', 'Avril'],

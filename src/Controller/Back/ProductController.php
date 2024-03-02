@@ -5,6 +5,7 @@ namespace App\Controller\Back;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
+use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,16 +16,22 @@ use App\Service\StripeService;
 #[Route('/platform/product')]
 class ProductController extends AbstractController
 {
+    private $pageAccessService;
+
     private $stripeService;
 
-    public function __construct(StripeService $stripeService)
+    public function __construct(PageAccessService $pageAccessService, StripeService $stripeService)
     {
+        $this->pageAccessService = $pageAccessService;
+
         $this->stripeService = $stripeService;
     }
 
     #[Route('/', name: 'platform_product_index', methods: ['GET'])]
-    public function index(ProductRepository $productRepository): Response
+    public function index(Request $request, ProductRepository $productRepository): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('back/product/index.html.twig', [
             'products' => $productRepository->findAll(),
         ]);
@@ -33,6 +40,8 @@ class ProductController extends AbstractController
     #[Route('/new', name: 'platform_product_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $product = new Product();
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
@@ -56,8 +65,10 @@ class ProductController extends AbstractController
     }
 
     #[Route('/{id}', name: 'platform_product_show', methods: ['GET'])]
-    public function show(Product $product): Response
+    public function show(Request $request, Product $product): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('back/product/show.html.twig', [
             'product' => $product,
         ]);
@@ -66,6 +77,8 @@ class ProductController extends AbstractController
     #[Route('/{id}/edit', name: 'platform_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
@@ -84,6 +97,8 @@ class ProductController extends AbstractController
     #[Route('/{id}', name: 'platform_product_delete', methods: ['POST'])]
     public function delete(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
             $entityManager->remove($product);
             $entityManager->flush();
@@ -95,6 +110,8 @@ class ProductController extends AbstractController
     #[Route('/search/products', name: 'product_search', methods: ['GET'])]
     public function searchProducts(Request $request, ProductRepository $productRepository): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $searchTerm = $request->query->get('term');
         $products = $productRepository->findBySearchTerm($searchTerm);
 
@@ -106,6 +123,8 @@ class ProductController extends AbstractController
     #[Route('/view/row', name: 'product_row_view', methods: ['GET'])]
     public function getProductRowView(Request $request, ProductRepository $productRepository): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $productId = $request->query->get('id');
         $product = $productRepository->find($productId);
 
