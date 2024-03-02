@@ -1,0 +1,45 @@
+{# templates/back/report/pdf_report_template.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport Financier - {{ report.title }}</title>
+</head>
+<body class="bg-gray-100 p-8">
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">{{ report.title }}</h1>
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-semibold mb-4">Résumé du Rapport</h2>
+        <p>Date de création: {{ report.createdAt|date('d/m/Y') }}</p>
+        <p>Total des revenus: {{ report.totalRevenue|number_format(2, ',', ' ') }}€</p>
+        <p>Total des dépenses: {{ report.totalExpenses|number_format(2, ',', ' ') }}€</p>
+        <p>Profit net: {{ report.netProfit|number_format(2, ',', ' ') }}€</p>
+        <p>Nombre de nouveaux clients: {{ report.newCustomersCount }}</p>
+    </div>
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Détails du Rapport</h2>
+        <p>Produits les plus vendus:</p>
+        <ul class="list-disc pl-5 mb-4">
+            {% set products = report.topSellingProducts | json_decode %}
+            {% for product in products %}
+                <li>
+                    <span class="font-semibold">Nom du produit:</span> {{ product.productName }}<br>
+                    <span class="font-semibold">Quantité vendue:</span> {{ product.totalQuantity }}
+                </li>
+            {% endfor %}
+        </ul>
+        <p>Détails des paiements:</p>
+        <ul class="list-disc pl-5">
+            {% set payments = report.paymentDetails | json_decode %}
+            {% for payment in payments %}
+                <li>
+                    <span class="font-semibold">Paiement de:</span> {{ payment.customerFirstName }} {{ payment.customerLastName }}<br>
+                    <span class="font-semibold">Montant:</span> {{ payment.invoiceTotal| format_currency('EUR') }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+</body>
+</html>

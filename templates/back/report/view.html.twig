@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Rapport{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+    <div class="container mx-auto px-4 py-8 pt-20">
+        <div class="mb-4">
+            <a href="{{ path('platform_report') }}" class="text-blue-600 hover:text-blue-800">Retour aux rapports</a>
+        </div>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div class="px-4 py-5 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    {{ report.title }}
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                    Créé le {{ report.createdAt|date('d/m/Y') }}
+                </p>
+            </div>
+            <div class="border-t border-gray-200">
+                <dl>
+                    <!-- Affichage des propriétés du rapport -->
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Revenu Total
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {{ report.totalRevenue| format_currency('EUR') }}
+                        </dd>
+                    </div>
+                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Dépenses Totales
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {{ report.totalExpenses| format_currency('EUR') }}
+                        </dd>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Profit Net
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {{ report.netProfit| format_currency('EUR') }}
+                        </dd>
+                    </div>
+                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Détails des Paiements
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {% set payments = report.paymentDetails | json_decode %}
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for payment in payments %}
+                                    <li>
+                                        <span class="font-semibold">Paiement de:</span> {{ payment.customerFirstName }} {{ payment.customerLastName }}<br>
+                                        <span class="font-semibold">Montant:</span> {{ payment.invoiceTotal| format_currency('EUR') }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </dd>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Produits les Plus Vendus
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {% set products = report.topSellingProducts | json_decode %}
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for product in products %}
+                                    <li>
+                                        <span class="font-semibold">Nom du produit:</span> {{ product.productName }}<br>
+                                        <span class="font-semibold">Quantité vendue:</span> {{ product.totalQuantity }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </dd>
+
+                    </div>
+                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Nombre de Nouveaux Clients
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {{ report.newCustomersCount }}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+{% endblock %}

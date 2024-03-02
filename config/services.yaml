@@ -27,3 +27,20 @@ services:
   App\Service\QuoteService:
     arguments:
       $entityManager: '@doctrine.orm.entity_manager'
+
+  App\Controller\Back\ReportController:
+    arguments:
+      $reportGenerationService: '@App\Service\ReportGenerationService'
+      $pdfExportService: '@App\Service\PDFExportService'
+      $reportRepository: '@App\Repository\ReportRepository'
+      $userService: '@App\Service\UserService'
+      $security: '@security.helper'
+
+
+  App\Service\UserService:
+    arguments:
+      $security: '@security.helper'
+
+  App\Twig\JsonDecodeExtension:
+    tags:
+      - { name: twig.extension }

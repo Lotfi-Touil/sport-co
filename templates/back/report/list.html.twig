@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rapports Financiers{% endblock %}
+
+{% block body %}
+    {% include '_partials/back/_platform_nav.html.twig' %}
+    <div class="container mx-auto px-4 py-8 pt-20">
+        <h2 class="text-2xl font-semibold mb-4">Rapports Financiers</h2>
+        {% if reports|length > 0 %}
+            <div class="overflow-x-auto mb-8">
+                <table class="w-full text-left shadow-lg bg-white rounded-lg">
+                    <thead class="bg-gray-200 text-gray-600 uppercase text-sm">
+                    <tr>
+                        <th class="py-3 px-4">Rapport</th>
+                        <th class="py-3 px-4">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                    {% for report in reports %}
+                        <tr class="border-b">
+                            <td class="py-3 px-4">{{ report.title }}</td>
+                            <td class="py-3 px-4">
+                                <a href="{{ path('report_view', {'reportId': report.id}) }}" class="text-indigo-600 hover:text-indigo-800">Voir</a>
+                                <a href="{{ path('export_report', {'reportId': report.id}) }}" class="ml-4 text-green-600 hover:text-green-800">Télécharger</a>
+                                <a href="{{ path('delete_report', {'reportId': report.id}) }}" class="ml-4 text-red-600 hover:text-red-800">Supprimer</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="window.location.href='{{ path('generate_report') }}'">Générer un rapport</button>
+            </div>
+        {% else %}
+            <div class="text-center py-4 px-4 bg-gray-100 rounded-lg">
+                <p class="text-gray-700 mb-4">Pas de rapport disponible.</p>
+                <a href="{{ path('generate_report') }}" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Générer un rapport</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

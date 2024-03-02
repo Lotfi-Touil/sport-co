@@ -32,7 +32,6 @@ class DashboardDataService
         $companyCount = $this->companyRepository->countCompanies();
         $userCount = $this->userRepository->countUsers();
         $totalAmountOfPayments = $this->paymentRepository->findTotalAmountOfPayments();
-        $latestPayments = $this->paymentRepository->findLatestPayments(7);
         $latestCustomers = $this->customerRepository->findLatestCustomers(5);
         $growthCompanies = $this->companyRepository->findGrowthRateCompaniesByMonth();
         $userGrowthRate = $this->userRepository->findGrowthRateUsersByMonth();
@@ -45,7 +44,7 @@ class DashboardDataService
         $transactions = [];
         foreach ($latestPayments as $payment) {
             $transactions[] = [
-                'description' => 'Paiement de facture de', // Ajustez selon votre logique d'affichage
+                'description' => 'Paiement de facture de',
                 'entity' => $payment->getInvoice()->getCustomer()->getFirstName() . ' ' . $payment->getInvoice()->getCustomer()->getLastName(),
                 'date' => $payment->getCreatedAt()->format('M d, Y'),
                 'amount' => $payment->getAmount(),
@@ -74,7 +73,6 @@ class DashboardDataService
         $customerCount = $this->customerRepository->countByCompany($company);
         $transactionsCount = $this->paymentRepository->countTransactionsByCompany($company);
         $companyRevenue = $this->paymentRepository->calculateRevenueByCompany($company);
-        $latestPayments = $this->paymentRepository->findLatestPaymentsForCompany($company, 5);
         $latestCustomers = $this->customerRepository->findLatestCustomersForCompany($company, 5);
         $customerGrowthRate = $this->customerRepository->findGrowthRateCustomersByMonthForCompany($company);
         $transactionsGrowthRate = $this->paymentRepository->findGrowthRateTransactionsByMonthForCompany($company);

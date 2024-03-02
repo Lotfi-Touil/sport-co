@@ -333,6 +333,58 @@ class PaymentRepository extends ServiceEntityRepository
     }
 
 
+    /**
+     * Récupère les détails de tous les paiements et les retourne sous forme de chaîne JSON.
+     *
+     * @return string Les détails de tous les paiements en format JSON.
+     */
+    public function findPaymentDetails(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('
+            p.id, 
+            p.amount, 
+            p.createdAt, 
+            i.id AS invoiceId, 
+            i.totalAmount AS invoiceTotal,
+            c.firstName AS customerFirstName,
+            c.lastName AS customerLastName
+        ')
+            ->join('p.invoice', 'i')
+            ->join('i.customer', 'c')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    /**
+     * Récupère les détails des paiements pour une entreprise spécifique et les retourne sous forme de chaîne JSON.
+     *
+     * @param Company $company L'entreprise concernée.
+     * @return string Les détails des paiements pour l'entreprise donnée en format JSON.
+     */
+    public function findPaymentDetailsForCompany(Company $company): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('
+            p.id, 
+            p.amount, 
+            p.createdAt, 
+            i.id AS invoiceId, 
+            i.totalAmount AS invoiceTotal,
+            c.firstName AS customerFirstName,
+            c.lastName AS customerLastName
+        ')
+            ->join('p.invoice', 'i')
+            ->join('i.customer', 'c')
+            ->where('c.company = :company') // Assurez-vous que 'company' est le nom correct de la relation/propriété dans l'entité Invoice
+            ->setParameter('company', $company)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+
+
+
 
     //    /**
     //     * @return Payment[] Returns an array of Payment objects
