@@ -165,7 +165,7 @@ class PaymentRepository extends ServiceEntityRepository
         $currentMonthTotal = $qb->select('SUM(p.amount)')
             ->where('p.createdAt BETWEEN :startCurrentMonth AND :endCurrentMonth')
             ->setParameter('startCurrentMonth', (new \DateTime('first day of this month'))->format('Y-m-d'))
-            ->setParameter('endCurrentMonth', (new \DateTime('now'))->format('Y-m-d'))
+            ->setParameter('endCurrentMonth', (new \DateTime('last day of this month'))->format('Y-m-d'))
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -210,7 +210,7 @@ class PaymentRepository extends ServiceEntityRepository
             ->select('SUM(p.amount)')
             ->andWhere('p.createdAt BETWEEN :startCurrentMonth AND :endCurrentMonth')
             ->setParameter('startCurrentMonth', (new \DateTime('first day of this month'))->format('Y-m-d'))
-            ->setParameter('endCurrentMonth', (new \DateTime('now'))->format('Y-m-d'))
+            ->setParameter('endCurrentMonth', (new \DateTime('last day of this month'))->format('Y-m-d'))
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -253,7 +253,7 @@ class PaymentRepository extends ServiceEntityRepository
             ->andWhere('p.createdAt BETWEEN :startCurrentMonth AND :endCurrentMonth')
             ->setParameter('company', $company)
             ->setParameter('startCurrentMonth', (new \DateTime('first day of this month'))->format('Y-m-d'))
-            ->setParameter('endCurrentMonth', (new \DateTime('now'))->format('Y-m-d'))
+            ->setParameter('endCurrentMonth', (new \DateTime('last day of this month'))->format('Y-m-d'))
             ->getQuery()
             ->getSingleScalarResult();
         
@@ -266,10 +266,6 @@ class PaymentRepository extends ServiceEntityRepository
         
         return round($growthRate, 2); 
     }
-    
-
-
-
 
     public function findGrowthRateRevenueByWeek(): float
     {
@@ -394,5 +390,23 @@ class PaymentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
     }
+
+    public function findOverduePayments(PaymentStatusRepository $paymentStatusRepository)
+    {
+        $status = $paymentStatusRepository->findOneBy(['name' => 'En attente']);
+
+        if (!$status) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('p');
+        $qb->where('p.paymentStatus = :status')
+            ->andWhere('p.createdAt <= :threshold')
+            ->setParameter('status', $status)
+            ->setParameter('threshold', new \DateTime('-7 days'));
+
+        return $qb->getQuery()->getResult();
+    }
+
 
 }

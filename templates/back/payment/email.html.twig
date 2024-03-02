@@ -1,0 +1,15 @@
+{% extends 'base_email.html.twig' %}
+
+{% block subject %}
+    Votre lien de paiement
+{% endblock %}
+
+{% block body %}
+    <h1>Bonjour,</h1>
+    <p>Vous avez une nouvelle facture prête à être payée. Pour régler cette facture, veuillez cliquer sur le lien ci-dessous :</p>
+    <p><a href="{{ paymentLink }}" style="display: inline-block; background-color: #007bff; color: #ffffff; padding: 10px 20px; margin: 10px 0; border-radius: 5px; text-decoration: none;">Payer ma facture</a></p>
+    <p>Si le lien ci-dessus ne fonctionne pas, veuillez copier et coller l'URL suivante dans votre navigateur :</p>
+    <p><a href="{{ paymentLink }}">{{ paymentLink }}</a></p>
+    <p>Merci pour votre prompt paiement.</p>
+    <p>Cordialement,<br>L'équipe SportCo</p>
+{% endblock %}

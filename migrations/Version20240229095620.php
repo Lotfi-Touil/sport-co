@@ -25,7 +25,7 @@ final class Version20240229095620 extends AbstractMigration
         $this->addSql('ALTER TABLE product_product_category DROP CONSTRAINT fk_437017aabe6903fd');
         $this->addSql('DROP TABLE product_product_category');
         $this->addSql('DROP TABLE product_category');
-        $this->addSql('ALTER TABLE "user" ADD is_verified BOOLEAN NOT NULL');
+        $this->addSql('ALTER TABLE "user" ADD is_verified BOOLEAN NOT NULL DEFAULT \'false\'');
     }
 
     public function down(Schema $schema): void

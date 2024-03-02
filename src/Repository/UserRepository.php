@@ -71,8 +71,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $result->fetchAllAssociative();
     }
 
-    public function findSignupCountsByMonthForCompany(Company $company)
-{
+    public function findSignupCountsByMonthForCompany(Company $company): array
+    {
     $users = $this->createQueryBuilder('u')
         ->select('u.createdAt, COUNT(u.id) AS count')
         ->where('u.company = :company')
@@ -134,7 +134,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $currentMonthCount = $qb->select('count(u.id)')
             ->where('u.createdAt BETWEEN :startCurrentMonth AND :endCurrentMonth')
             ->setParameter('startCurrentMonth', (new \DateTime('first day of this month'))->format('Y-m-d'))
-            ->setParameter('endCurrentMonth', (new \DateTime('now'))->format('Y-m-d'))
+            ->setParameter('endCurrentMonth', (new \DateTime('last day of this month'))->format('Y-m-d'))
             ->getQuery()
             ->getSingleScalarResult();
 

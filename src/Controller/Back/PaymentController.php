@@ -3,7 +3,11 @@
 namespace App\Controller\Back;
 
 
+use App\Repository\PaymentRepository;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,61 +44,6 @@ class PaymentController extends AbstractController
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    // #[Route('/payment/create/{invoiceId}', name: 'payment_create')]
-    // public function create(Request $request, int $invoiceId): Response
-    // {
-    //     // Vérifie que l'utilisateur est bien une entreprise ou un admin
-    //     if (
-    //         !$this->authorizationChecker->isGranted('ROLE_COMPANY') &&
-    //         !$this->authorizationChecker->isGranted('ROLE_ADMIN')
-    //     ) {
-    //         throw new AccessDeniedException('Accès refusé.');
-    //     }
-
-    //     try {
-    //         $invoice = $this->entityManager->getRepository(Invoice::class)->find($invoiceId);
-    //         if (!$invoice) {
-    //             throw new \Exception("Facture non trouvée");
-    //         }
-
-    //         // Vérifie si un paiement n'a pas déjà été initié pour cette facture
-    //         $existingPayment = $this->entityManager->getRepository(Payment::class)->findOneBy(['invoice' => $invoice]);
-    //         if ($existingPayment) {
-    //             throw new \Exception("Un paiement a déjà été initié pour cette facture.");
-    //         }
-
-    //         $amount = $invoice->getTotalAmount();
-
-    //         $paymentIntent = $this->stripeClient->paymentIntents->create([
-    //             'amount' => $amount * 100, // Convertit le montant en centimes
-    //             'currency' => 'eur',
-    //             'payment_method_types' => ['card'],
-    //         ]);
-
-    //         $payment = new Payment();
-    //         $payment->setAmount($amount);
-    //         $payment->setInvoice($invoice);
-    //         $payment->setStripePaymentIntentId($paymentIntent->id); // Stocke l'ID du PaymentIntent
-    //         $defaultPaymentStatus = $this->entityManager->getRepository(PaymentStatus::class)->findOneBy(['name' => 'En attente']);
-    //         if (!$defaultPaymentStatus) {
-    //             throw new \Exception("Statut de paiement par défaut introuvable.");
-    //         }
-
-    //         $payment->setPaymentStatus($defaultPaymentStatus);
-    //         $defaultPaymentMethod = $this->entityManager->getRepository(PaymentMethod::class)->findOneBy(['name' => 'Carte de crédit']);
-    //         if (!$defaultPaymentMethod) {
-    //             throw new \Exception("Méthode de paiement par défaut introuvable.");
-    //         }
-    //         $payment->setPaymentMethod($defaultPaymentMethod);
-    //         $this->entityManager->persist($payment);
-    //         $this->entityManager->flush();
-
-    //         // TODO : Rediriger vers la page de paiement ou le tableau de bord des paiements
-    //         return $this->json(['clientSecret' => $paymentIntent->client_secret]);
-    //     } catch (\Exception $e) {
-    //         return new Response('Erreur: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
-    //     }
-    // }
 
     #[Route('/payment/create/{invoiceId}', name: 'payment_create')]
     public function create(Request $request, int $invoiceId): Response
@@ -105,26 +54,34 @@ class PaymentController extends AbstractController
             !$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
             throw new AccessDeniedException('Accès refusé.');
         }
-    
+
         try {
             $invoice = $this->entityManager->getRepository(Invoice::class)->find($invoiceId);
             if (!$invoice) {
                 throw new \Exception("Facture non trouvée");
             }
 
-            // Récupérer le client lié à la facture
-            $customer = $invoice->getCustomer();
+            $invoiceUsers = $invoice->getInvoiceUsers();
+
+
+            if (count($invoiceUsers) != 1) {
+
+                return new Response('Erreur: Plus d\'un utilisateur ou aucun utilisateur associé à cette facture.', Response::HTTP_BAD_REQUEST);
+            }
+
+
+            $customer = $invoiceUsers->first()->getCustomer();
             if (!$customer) {
                 throw new \Exception("Client non trouvé pour cette facture.");
             }
-    
+
             $existingPayment = $this->entityManager->getRepository(Payment::class)->findOneBy(['invoice' => $invoice]);
             if ($existingPayment) {
                 throw new \Exception("Un paiement a déjà été initié pour cette facture.");
             }
-    
+
             $amount = $invoice->getTotalAmount();
-        
+
             $content = json_decode($request->getContent(), true);
             $paymentType = $content['payment_type'] ?? 'unique'; // Remplacer ici
             $isRecurring = $paymentType === 'recurring';
@@ -133,7 +90,19 @@ class PaymentController extends AbstractController
             $payment->setAmount($amount);
             $payment->setInvoice($invoice);
             $payment->setIsRecurring($isRecurring);
-    
+            $payment->setCreatedAt(new \DateTime());
+            $defaultPaymentStatus = $this->entityManager->getRepository(PaymentStatus::class)->findOneBy(['name' => 'En attente']);
+            if (!$defaultPaymentStatus) {
+                throw new \Exception("Statut de paiement par défaut introuvable.");
+            }
+            $payment->setPaymentStatus($defaultPaymentStatus);
+            $defaultPaymentMethod = $this->entityManager->getRepository(PaymentMethod::class)->findOneBy(['name' => 'Carte de crédit']);
+            if (!$defaultPaymentMethod) {
+                throw new \Exception("Méthode de paiement par défaut introuvable.");
+            }
+            $payment->setPaymentMethod($defaultPaymentMethod);
+
+
             if (!$isRecurring) {
                 $paymentIntent = $this->stripeClient->paymentIntents->create([
                     'amount' => $amount * 100,
@@ -141,64 +110,91 @@ class PaymentController extends AbstractController
                     'payment_method_types' => ['card'],
                 ]);
                 $payment->setStripePaymentIntentId($paymentIntent->id);
+                $this->entityManager->persist($payment);
+                $this->entityManager->flush();
+                return $this->json(['clientSecret' => $paymentIntent->client_secret]);
             } else {
-                // Récupération ou création du client Stripe
-                $stripeCustomer = $this->stripeClient->customers->create([
-                    'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstName() . ' ' . $customer->getLastName(),
-                ]);
-            
-                // Récupération des produits de la facture
                 $invoiceProducts = $invoice->getInvoiceProducts();
-                $stripeItems = [];
-            
-                foreach ($invoiceProducts as $invoiceProduct) {
-                    $product = $invoiceProduct->getProduct(); // Obtient l'entité produit
-                    $stripePriceId = $product->getStripePriceId(); // Obtient l'ID de prix Stripe du produit
-            
-                    if ($stripePriceId) {
-                        $stripeItems[] = ['price' => $stripePriceId];
-                    }
-                }
-            
+                $stripeItems = array_map(function ($invoiceProduct) {
+                    return ['price' => $invoiceProduct->getProduct()->getStripePriceId(), 'quantity' => 1];
+                }, $invoiceProducts->toArray());
+
                 if (empty($stripeItems)) {
-                    // Aucun produit Stripe n'est disponible
                     return new Response('Erreur: Aucun produit Stripe disponible pour la facture.', Response::HTTP_BAD_REQUEST);
                 }
-            
-                // Création de la souscription Stripe avec les produits
-                $subscription = $this->stripeClient->subscriptions->create([
+
+                $stripeCustomer = $this->stripeClient->customers->retrieve($customer->getStripeCustomerId());
+                $session = $this->stripeClient->checkout->sessions->create([
                     'customer' => $stripeCustomer->id,
-                    'items' => $stripeItems,
+                    'payment_method_types' => ['card'],
+                    'line_items' => $stripeItems,
+                    'mode' => 'subscription',
+                    'success_url' => $this->generateUrl('payment_success', [], UrlGeneratorInterface::ABSOLUTE_URL) . '?session_id={CHECKOUT_SESSION_ID}',
+                    'cancel_url' => $this->generateUrl('payment_failed', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 ]);
-                $payment->setStripeSubscriptionId($subscription->id);
+
+                $payment->setStripeSubscriptionId($session->subscription);
+                $this->entityManager->persist($payment);
+                $this->entityManager->flush();
+                return $this->json(['url' => $session->url]);
             }
-    
-            $defaultPaymentStatus = $this->entityManager->getRepository(PaymentStatus::class)->findOneBy(['name' => 'En attente']);
-            if (!$defaultPaymentStatus) {
-                throw new \Exception("Statut de paiement par défaut introuvable.");
-            }
-            $payment->setPaymentStatus($defaultPaymentStatus);
-    
-            $defaultPaymentMethod = $this->entityManager->getRepository(PaymentMethod::class)->findOneBy(['name' => 'Carte de crédit']);
-            if (!$defaultPaymentMethod) {
-                throw new \Exception("Méthode de paiement par défaut introuvable.");
-            }
-            $payment->setPaymentMethod($defaultPaymentMethod);
-    
-            $this->entityManager->persist($payment);
-            $this->entityManager->flush();
-    
-            $responseContent = $isRecurring ? ['subscriptionId' => $subscription->id] : ['clientSecret' => $paymentIntent->client_secret];
-            return $this->json($responseContent);
-    
+
         } catch (\Exception $e) {
             return new Response('Erreur: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
     }
-    
 
+    #[Route('/payment/send-email/{paymentId}', name: 'payment_send_email')]
+    public function sendPaymentEmail(MailerInterface $mailer, int $paymentId): Response
+    {
+        $payment = $this->entityManager->getRepository(Payment::class)->find($paymentId);
+        if (!$payment) {
+            return new Response('Paiement non trouvé.', Response::HTTP_NOT_FOUND);
+        }
 
+        $invoice = $payment->getInvoice();
+        $customerEmail = $invoice->getInvoiceUsers()->first()->getCustomer()->getEmail();
+
+        $paymentLink = $this->generateUrl('payment_checkout', ['paymentId' => $paymentId], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $email = (new TemplatedEmail())
+            ->from(new Address('no.reply.sportco@gmail.com', 'SportCo Bot'))
+            ->to($customerEmail)
+            ->subject('Votre lien de paiement')
+            ->htmlTemplate('back/payment/email.html.twig')
+            ->context([
+                'paymentLink' => $paymentLink,
+            ]);
+
+        $mailer->send($email);
+
+        return new Response('Email envoyé avec succès.', Response::HTTP_OK);
+    }
+
+    #[Route('/send-overdue-payment-reminders', name: 'send_overdue_payment_reminders')]
+    public function sendOverduePaymentReminders(PaymentRepository $paymentRepository, MailerInterface $mailer, UrlGeneratorInterface $urlGenerator): Response
+    {
+        $paymentStatus = $this->entityManager->getRepository(PaymentStatus::class);
+        $overduePayments = $paymentRepository->findOverduePayments($paymentStatus);
+
+        foreach ($overduePayments as $payment) {
+            $customerEmail = $payment->getInvoice()->getInvoiceUsers()->first()->getCustomer()->getEmail();
+            $paymentLink = $urlGenerator->generate('payment_checkout', ['paymentId' => $payment->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+            $email = (new TemplatedEmail())
+                ->from(new Address('no.reply.sportco@gmail.com', 'SportCo Bot'))
+                ->to($customerEmail)
+                ->subject('Rappel : Paiement 😭 ')
+                ->htmlTemplate('back/payment/email_payment_reminder.html.twig')
+                ->context([
+                    'paymentLink' => $paymentLink,
+                ]);
+
+            $mailer->send($email);
+        }
+
+        return new Response('Reminders sent for ' . count($overduePayments) . ' overdue payments.');
+    }
 
     #[Route('/payment/checkout/{paymentId}', name: 'payment_checkout')]
     public function checkout(Request $request, int $paymentId): Response
@@ -239,7 +235,6 @@ class PaymentController extends AbstractController
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
-        // Remplacer par la clé secrète du webhook endpoint
         $endpoint_secret = $this->stripeWebhookSecret;
         $payload = $request->getContent();
         $sig_header = $request->headers->get('Stripe-Signature');
@@ -254,12 +249,10 @@ class PaymentController extends AbstractController
             if ($event->type === 'checkout.session.completed') {
                 $session = $event->data->object;
 
-                // Récupére l'ID de paiement depuis les métadonnées
                 $paymentId = $session->metadata->payment_id;
                 $payment = $this->entityManager->getRepository(Payment::class)->find($paymentId);
 
                 if ($payment) {
-                    // Mise à jour du statut de paiement dans la base de données
                     $payment->setPaymentStatus('Paid');
                     $this->entityManager->flush();
                 }
@@ -267,13 +260,10 @@ class PaymentController extends AbstractController
 
             return new Response('Webhook Handled', Response::HTTP_OK);
         } catch (\UnexpectedValueException $e) {
-            // Payload invalide
             return new Response('Invalid payload', Response::HTTP_BAD_REQUEST);
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
-            // Signature invalide
             return new Response('Invalid signature', Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
-            // Autres erreurs
             return new Response('Internal error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -302,10 +292,8 @@ class PaymentController extends AbstractController
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
         $payments = $this->entityManager->getRepository(Payment::class)->findAll();
-        // Récupération de toutes les factures
         $allInvoices = $this->entityManager->getRepository(Invoice::class)->findAll();
 
-        // Filtrer pour obtenir seulement les factures sans paiements
         $invoicesWithoutPayments = array_filter($allInvoices, function ($invoice) {
             return $invoice->getPayments()->isEmpty();
         });

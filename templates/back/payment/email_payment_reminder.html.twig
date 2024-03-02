@@ -1,0 +1,16 @@
+{% extends 'base_email.html.twig' %}
+
+{% block title %}
+    Rappel de Paiement en Souffrance
+{% endblock %}
+
+{% block body %}
+    <h2>Rappel de Paiement en Souffrance</h2>
+    <p>Bonjour,</p>
+    <p>Nous avons remarqué que votre paiement est toujours en attente. Pour assurer la continuité de nos services, nous vous invitons à régler votre facture dès que possible.</p>
+    <p>Veuillez cliquer sur le lien ci-dessous pour effectuer votre paiement :</p>
+    <p><a href="{{ paymentLink }}" style="display: inline-block; background-color: #007bff; color: #ffffff; padding: 10px 20px; margin: 10px 0; border-radius: 5px; text-decoration: none;">Payer Maintenant</a></p>
+    <p>Si vous avez des questions ou si vous avez besoin d'assistance, n'hésitez pas à contacter notre service client.</p>
+    <p>Merci de votre prompte attention à cette question.</p>
+    <p>Cordialement,<br>L'équipe SportCo</p>
+{% endblock %}

@@ -43,6 +43,9 @@ class Product
     #[ORM\ManyToMany(targetEntity: ProductCategory::class, inversedBy: 'products')]
     private Collection $category;
 
+    #[ORM\Column(type: Types::BOOLEAN, options: ["default" => false])]
+    private ?bool $isRecurring = false;
+
     public function __construct()
     {
         $this->quoteProducts = new ArrayCollection();
@@ -214,4 +217,16 @@ class Product
 
         return $this;
     }
+
+    public function getIsRecurring(): ?bool
+    {
+        return $this->isRecurring;
+    }
+
+    public function setIsRecurring(bool $isRecurring): self
+    {
+        $this->isRecurring = $isRecurring;
+        return $this;
+    }
+
 }

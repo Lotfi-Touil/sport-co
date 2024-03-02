@@ -7,6 +7,7 @@ use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
+use Stripe\Exception\ApiErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,6 +38,9 @@ class ProductController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws ApiErrorException
+     */
     #[Route('/new', name: 'platform_product_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -47,14 +51,15 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $entityManager->persist($product);
             $entityManager->flush();
 
-            $stripeData = $this->stripeService->createStripeProduct($product);
+            $billingType = $product->getIsRecurring() ? 'recurring' : 'one_time';
+
+            $stripeData = $this->stripeService->createStripeProduct($product, $billingType);
             $product->setStripeProductId($stripeData['stripeProductId']);
             $product->setStripePriceId($stripeData['stripePriceId']);
-        
+
             $entityManager->flush();
             return $this->redirectToRoute('platform_product_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -64,6 +69,7 @@ class ProductController extends AbstractController
             'form' => $form,
         ]);
     }
+
 
     #[Route('/{id}', name: 'platform_product_show', methods: ['GET'])]
     public function show(Request $request, Product $product): Response

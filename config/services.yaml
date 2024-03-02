@@ -54,7 +54,6 @@ services:
       $userService: '@App\Service\UserService'
       $security: '@security.helper'
 
-
   App\Service\UserService:
     arguments:
       $security: '@security.helper'

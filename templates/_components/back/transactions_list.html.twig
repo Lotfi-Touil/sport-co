@@ -9,12 +9,17 @@
 		</div>
 	</div>
 
-	<div class="flex flex-col mt-8">
-		<div class="overflow-x-auto rounded-lg">
-			<div class="align-middle inline-block min-w-full">
-				<div class="shadow overflow-hidden sm:rounded-lg">
-					<table class="min-w-full divide-y divide-gray-200">
-						<thead class="bg-gray-50">
+	{% if transactions is empty %}
+		<div class="text-center py-4">
+			<p class="text-sm text-gray-500">Aucune transaction à afficher</p>
+		</div>
+	{% else %}
+		<div class="flex flex-col mt-8">
+			<div class="overflow-x-auto rounded-lg">
+				<div class="align-middle inline-block min-w-full">
+					<div class="shadow overflow-hidden sm:rounded-lg">
+						<table class="min-w-full divide-y divide-gray-200">
+							<thead class="bg-gray-50">
 							<tr>
 								<th scope="col" class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 									Transaction
@@ -26,8 +31,8 @@
 									Montant
 								</th>
 							</tr>
-						</thead>
-						<tbody class="bg-white">
+							</thead>
+							<tbody class="bg-white">
 							{% for transaction in transactions %}
 								<tr class="{{ loop.index is odd ? '' : 'bg-gray-50' }}">
 									<td class="p-4 whitespace-nowrap text-sm font-normal text-gray-900">
@@ -42,10 +47,11 @@
 									</td>
 								</tr>
 							{% endfor %}
-						</tbody>
-					</table>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	{% endif %}
 </div>

@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Company;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,6 +33,11 @@ class CompanyRepository extends ServiceEntityRepository
     }
 
     // Function that return the growth of companies in the database by month that returns an integer for the percentage of growth
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
     public function findGrowthRateCompaniesByMonth(): int
     {
         $qb = $this->createQueryBuilder('c');
@@ -42,11 +49,10 @@ class CompanyRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         $qb = $this->createQueryBuilder('c');
-
         $currentMonthCount = $qb->select('count(c.id)')
             ->where('c.createdAt BETWEEN :startCurrentMonth AND :endCurrentMonth')
             ->setParameter('startCurrentMonth', (new \DateTime('first day of this month'))->format('Y-m-d'))
-            ->setParameter('endCurrentMonth', (new \DateTime('now'))->format('Y-m-d'))
+            ->setParameter('endCurrentMonth', (new \DateTime('last day of this month'))->format('Y-m-d'))
             ->getQuery()
             ->getSingleScalarResult();
 

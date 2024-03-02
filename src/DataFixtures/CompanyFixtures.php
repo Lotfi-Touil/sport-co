@@ -20,8 +20,8 @@ class CompanyFixtures extends Fixture
                 ->setPhone($faker->phoneNumber)
                 ->setWebsite($faker->url)
                 ->setDescription($faker->text)
-                ->setCreatedAt($faker->dateTime())
-                ->setUpdatedAt($faker->dateTime());
+                ->setCreatedAt(new \DateTime())
+                ->setUpdatedAt(new \DateTime());
 
         $manager->persist($company);
 

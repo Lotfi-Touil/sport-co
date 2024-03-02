@@ -92,7 +92,7 @@ class CustomerRepository extends ServiceEntityRepository
             ->andWhere('c.createdAt BETWEEN :startCurrentMonth AND :endCurrentMonth')
             ->setParameter('company', $company)
             ->setParameter('startCurrentMonth', (new \DateTime('first day of this month'))->format('Y-m-d'))
-            ->setParameter('endCurrentMonth', (new \DateTime('now'))->format('Y-m-d'))
+            ->setParameter('endCurrentMonth', (new \DateTime('last day of this month'))->format('Y-m-d'))
             ->getQuery()
             ->getSingleScalarResult();
 

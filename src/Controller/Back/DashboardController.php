@@ -70,8 +70,24 @@ class DashboardController extends AbstractController
 
     private function createChart(ChartBuilderInterface $chartBuilder, array $data, string $label, string $type = Chart::TYPE_LINE): Chart
     {
-        $labels = array_column($data, 'month');
-        $values = array_column($data, $type === Chart::TYPE_BAR ? 'count' : 'total'); // Utiliser 'count' pour les inscriptions
+
+        $monthNamesFR = [
+            0 => 'Mois inconnu',
+            1 => 'Janvier', 2 => 'Février', 3 => 'Mars',
+            4 => 'Avril',   5 => 'Mai',      6 => 'Juin',
+            7 => 'Juillet', 8 => 'Août',     9 => 'Septembre',
+            10 => 'Octobre',11 => 'Novembre',12 => 'Décembre',
+        ];
+
+        $labels = array_map(function ($entry) use ($monthNamesFR) {
+            if (isset($entry['month']) && is_numeric($entry['month']) && (int)$entry['month'] >= 1 && (int)$entry['month'] <= 12) {
+                return $monthNamesFR[(int)$entry['month']];
+            } else {
+                return $monthNamesFR[$entry['month']] ?? $entry['month'];
+            }
+        }, $data);
+
+        $values = array_column($data, $type === Chart::TYPE_BAR ? 'count' : 'total');
 
         $chart = $chartBuilder->createChart($type);
         $chart->setData([
@@ -88,4 +104,6 @@ class DashboardController extends AbstractController
 
         return $chart;
     }
+
+
 }

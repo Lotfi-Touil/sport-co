@@ -19,7 +19,7 @@
             {{ product.taxRate }}%
         </td>
         <td class="py-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
-            {{ product.price - product.getPriceHT() | number_format(2, '.', ',') }} €
+            {{ (product.price - product.getPriceHT()) | number_format(2, '.', ',') }} €
         </td>
         <td class="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
             {{ product.getPriceHT() | number_format(2, '.', ',') }} €

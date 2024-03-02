@@ -19,7 +19,7 @@ class CustomerFixtures extends Fixture
                      ->setLastName($faker->lastName)
                      ->setEmail($faker->email)
                      ->setPhone($faker->phoneNumber)
-                     // Set the company from the CompanyFixtures
+                     ->setCreatedAt(new \DateTime())
                      ->setCompany($this->getReference('company'));
 
             $manager->persist($customer);

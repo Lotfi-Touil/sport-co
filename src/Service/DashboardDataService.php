@@ -7,6 +7,8 @@ use App\Repository\CompanyRepository;
 use App\Repository\CustomerRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 
 class DashboardDataService
 {
@@ -27,7 +29,11 @@ class DashboardDataService
         $this->customerRepository = $customerRepository;
     }
 
-    public function prepareDataForAdmin()
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function prepareDataForAdmin(): array
     {
         $companyCount = $this->companyRepository->countCompanies();
         $userCount = $this->userRepository->countUsers();
@@ -45,7 +51,7 @@ class DashboardDataService
         foreach ($latestPayments as $payment) {
             $transactions[] = [
                 'description' => 'Paiement de facture de',
-                'entity' => $payment->getInvoice()->getCustomer()->getFirstName() . ' ' . $payment->getInvoice()->getCustomer()->getLastName(),
+                'entity' => $payment->getInvoice()->getInvoiceUsers()->first()->getCustomer()->getFirstName() . ' ' . $payment->getInvoice()->getInvoiceUsers()->first()->getCustomer()->getLastName(),
                 'date' => $payment->getCreatedAt()->format('M d, Y'),
                 'amount' => $payment->getAmount(),
             ];
@@ -66,7 +72,7 @@ class DashboardDataService
         ];
     }
 
-    public function prepareDataForCompany(Company $company)
+    public function prepareDataForCompany(Company $company): array
     {
         $paymentsByMonth = $this->paymentRepository->findTotalPaymentsByMonthForCompany($company);
         $signupsByMonth = $this->userRepository->findSignupCountsByMonthForCompany($company);
@@ -83,7 +89,7 @@ class DashboardDataService
         foreach ($latestPayments as $payment) {
             $transactions[] = [
                 'description' => 'Paiement de facture de', // Ajustez selon votre logique d'affichage
-                'entity' => $payment->getInvoice()->getCustomer()->getFirstName() . ' ' . $payment->getInvoice()->getCustomer()->getLastName(),
+                'entity' => $payment->getInvoice()->getInvoiceUsers()->first()->getCustomer()->getFirstName() . ' ' . $payment->getInvoice()->getInvoiceUsers()->first()->getCustomer()->getLastName(),
                 'date' => $payment->getCreatedAt()->format('M d, Y'),
                 'amount' => $payment->getAmount(),
             ];

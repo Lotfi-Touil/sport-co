@@ -20,7 +20,6 @@ class ProductFixtures extends Fixture implements OrderedFixtureInterface
             $product->setTaxRate($faker->randomFloat(2, 5, 25));
             $product->setStripeProductId($faker->uuid);
             $product->setStripePriceId($faker->uuid);
-
             $manager->persist($product);
             $this->addReference('product-' . $i, $product);
         }
@@ -30,7 +29,6 @@ class ProductFixtures extends Fixture implements OrderedFixtureInterface
 
     public function getOrder()
     {
-        // L'ordre dans lequel cette fixture sera exécutée
         return 1;
     }
 }

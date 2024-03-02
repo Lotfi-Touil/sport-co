@@ -7,16 +7,21 @@
     {% include '_partials/back/_platform_nav.html.twig' %}
     <div class="flex flex-col md:flex-row min-h-screen pt-20 w-full">
         <div class="w-full px-4">
-            <div x-data="{ open: false, selectedInvoiceId: null }">
+            <div>
                 <div class="flex justify-between items-center mb-4">
                     <h1 class="text-xl font-bold mb-4 md:mb-0">Tableau de Bord des Paiements</h1>
-                    <!-- Bouton pour ouvrir le formulaire modal -->
-                    <button @click="open = true"
-                            class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                            type="button">
-
-                        Créer un Paiement
-                    </button>
+                    <div>
+                        <button id="openModal"
+                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                type="button">
+                            Créer un Paiement
+                        </button>
+                        <button id="sendReminders"
+                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                type="button" onclick="sendPaymentReminders()">
+                            Envoyer les Relances de Paiement
+                        </button>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto bg-white rounded shadow">
@@ -53,12 +58,13 @@
                                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                         <a href="{{ path('payment_checkout', {'paymentId': payment.id}) }}"
                                            class="text-blue-600 hover:text-blue-900">Payer</a>
+                                        <button onclick="sendPaymentEmail({{ payment.id }})" >Envoyer Mail</button>
                                     </td>
                                 </tr>
                             {% endfor %}
                         {% else %}
                             <tr>
-                                <td colspan="3" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                                <td colspan="3" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center w-full">
                                     Aucun paiement trouvé.
                                 </td>
                             </tr>
@@ -66,11 +72,9 @@
                         </tbody>
                     </table>
                 </div>
-                <div x-show="open" @click.away="open = false"
-                     class="fixed inset-0 z-50 flex items-center justify-center overflow-auto">
+                <div id="paymentModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-auto hidden">
                     <div class="fixed inset-0 bg-black opacity-50"></div>
-                    <div
-                            class="relative p-4 w-full max-w-md max-h-full">
+                    <div class="relative p-4 w-full max-w-md max-h-full">
                         <!-- Modal content -->
                         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
                             <!-- Modal header -->
@@ -78,7 +82,7 @@
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                                     Créer un Paiement
                                 </h3>
-                                <button @click="open = false" type="button"
+                                <button id="closeModal" type="button"
                                         class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
                                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                          fill="none" viewbox="0 0 14 14">
@@ -90,15 +94,15 @@
                             </div>
                             <!-- Modal body and rest of your modal content... -->
                             <div
-                                    class="p-4 md:p-5">
+                                    class="p-4 md:p-5 max-h-96 overflow-y-auto">
                                 <!-- Corps du Modal -->
                                 <form id="paymentForm">
                                     <ul class="space-y-4 mb-4">
                                         {% for invoice in invoices %}
                                             <li>
                                                 <input type="radio" id="invoice-{{ invoice.id }}" name="invoice"
-                                                       value="{{ invoice.id }}" class="hidden peer"
-                                                       @change="selectedInvoiceId = {{ invoice.id }}">
+                                                       value="{{ invoice.id }}"
+                                                       class="peer hidden">
                                                 <label for="invoice-{{ invoice.id }}"
                                                        class="inline-flex items-center justify-between w-full p-5 text-gray-900 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:bg-blue-100">
                                                     <div class="block">
@@ -122,7 +126,8 @@
                                         </select>
                                     </div>
                                     <div id="error-message" class="hidden text-red-500 text-sm mt-2"></div>
-                                    <button type="button" onclick="submitPaymentForm()"
+                                    <button type="button" id="submitPayment"
+                                            onclick="submitPaymentForm()"
                                             class="text-white inline-flex w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                                         Créer le Paiement
                                     </button>
@@ -137,44 +142,105 @@
 {% endblock %}
 {% block javascripts %}
     <script>
-        function submitPaymentForm() {
-            var selectedInvoiceId = document.querySelector('input[name="invoice"]:checked');
-            var paymentType = document.getElementById('payment-type').value;
-            var errorMessage = document.getElementById('error-message');
-
-            // Réinitialiser le message d'erreur
-            errorMessage.classList.add('hidden');
-            errorMessage.textContent = '';
-
-            // Validation
-            if (!selectedInvoiceId || !paymentType) {
-                errorMessage.textContent = 'Veuillez sélectionner une facture et un type de paiement.';
-                errorMessage.classList.remove('hidden');
+        function sendPaymentReminders() {
+            if (!confirm("Êtes-vous sûr de vouloir envoyer les relances de paiement ?")) {
                 return;
             }
 
-            fetch('/platform/payment/create/' + selectedInvoiceId.value, {
-                method: 'POST',
+            $.ajax({
+                url: '/platform/send-overdue-payment-reminders', // Assurez-vous que cette URL correspond à la route définie dans votre contrôleur Symfony
+                type: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest', // Ajout pour indiquer que c'est une requête AJAX
+                    'X-Requested-With': 'XMLHttpRequest',
+                    // Ajoutez ici les en-têtes nécessaires, par exemple, pour le CSRF si votre application l'exige
                 },
-                body: JSON.stringify({payment_type: paymentType})
-            }).then(response => {
-                if (response.ok) {
-                    response.json().then(data => {
-                        console.log('Paiement créé', data);
-                        //location.reload();
-                    });
-                } else {
-                    errorMessage.textContent = 'Erreur lors de la création du paiement.';
-                    errorMessage.classList.remove('hidden');
+                success: function(data) {
+                    alert('Les relances de paiement ont été envoyées avec succès.');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Erreur lors de l'envoi des relances de paiement: " + error);
+                    alert('Une erreur est survenue lors de l\'envoi des relances de paiement.');
                 }
-            }).catch(error => {
-                console.error('Erreur AJAX : ', error);
-                errorMessage.textContent = 'Erreur technique lors de la création du paiement.';
-                errorMessage.classList.remove('hidden');
             });
         }
+
+
+        function sendPaymentEmail(paymentId) {
+            $.ajax({
+                url: `/platform/payment/send-email/${paymentId}`,
+                type: 'POST',
+                success: function(data) {
+                    alert('Email de paiement envoyé avec succès.');
+                },
+                error: function() {
+                    alert('Erreur lors de l\'envoi de l\'email de paiement.');
+                }
+            });
+        }
+
+        function submitPaymentForm() {
+            var selectedInvoiceId = $('input[name="invoice"]:checked').val();
+            var paymentType = $('#payment-type').val();
+            var errorMessage = $('#error-message');
+
+            errorMessage.addClass('hidden').text('');
+
+            if (!selectedInvoiceId || !paymentType) {
+                errorMessage.text('Veuillez sélectionner une facture et un type de paiement.').removeClass('hidden');
+                return;
+            }
+
+            $.ajax({
+                url: '/platform/payment/create/' + selectedInvoiceId,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({payment_type: paymentType}),
+                success: function(data) {
+                    console.log('Paiement créé', data);
+                    // Gérer différemment en fonction de si une URL de paiement est fournie
+                    if(data.url) {
+                        window.location.href = data.url; // Redirection vers la page de paiement Stripe Checkout si URL présente
+                    } else if(data.clientSecret) {
+                        // Ici, vous pourriez initialiser le processus de paiement côté client avec Stripe.js en utilisant clientSecret
+                        console.log('Client secret pour paiement unique:', data.clientSecret);
+                        location.reload(); // Recharger la page si aucune URL fournie
+                    } else {
+                        console.log('Aucune action requise, rechargement de la page.');
+                        location.reload(); // Recharger la page si aucune URL fournie
+                    }
+                },
+                error: function() {
+                    errorMessage.text('Erreur lors de la création du paiement.').removeClass('hidden');
+                }
+            });
+        }
+
+
+        $(document).ready(function() {
+            $('#openModal').click(function() {
+                $('#paymentModal').removeClass('hidden');
+            });
+
+            $('#closeModal').click(function() {
+                $('#paymentModal').addClass('hidden');
+            });
+
+            // Correction pour fermer la modal si clic en dehors
+            $(document).mouseup(function(e) {
+                var container = $("#paymentModal");
+
+                // if the target of the click isn't the container nor a descendant of the container
+                if (!container.is(e.target) && container.has(e.target).length === 0) {
+                    container.addClass('hidden');
+                }
+            });
+
+            $('#paymentForm').submit(function(e) {
+                e.preventDefault(); // Empêcher le rechargement de la page
+                submitPaymentForm();
+            });
+
+
+        });
     </script>
 {% endblock %}

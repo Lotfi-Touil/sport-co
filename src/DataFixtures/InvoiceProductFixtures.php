@@ -27,8 +27,8 @@ class InvoiceProductFixtures extends Fixture implements OrderedFixtureInterface
             $invoiceProduct->setQuantity($faker->numberBetween(1, 10));
             $invoiceProduct->setPrice($faker->randomFloat(2, 10, 500));
             $invoiceProduct->setTaxRate($faker->randomFloat(2, 5, 25));
-            $invoiceProduct->setCreatedAt($faker->dateTimeThisYear);
-            $invoiceProduct->setUpdatedAt($faker->dateTimeThisYear);
+            $invoiceProduct->setCreatedAt(new \DateTime());
+            $invoiceProduct->setUpdatedAt(new \DateTime());
             $invoiceProduct->setInvoice($this->getReference('invoice-' . $invoiceIndex));
             $manager->persist($invoiceProduct);
         }

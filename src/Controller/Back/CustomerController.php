@@ -6,7 +6,9 @@ use App\Entity\Customer;
 use App\Form\CustomerType;
 use App\Repository\CustomerRepository;
 use App\Service\PageAccessService;
+use App\Service\StripeService;
 use Doctrine\ORM\EntityManagerInterface;
+use Stripe\Exception\ApiErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,10 +18,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class CustomerController extends AbstractController
 {
     private $pageAccessService;
+    private $stripeService;
 
-    public function __construct(PageAccessService $pageAccessService)
+    public function __construct(PageAccessService $pageAccessService, StripeService $stripeService)
     {
         $this->pageAccessService = $pageAccessService;
+        $this->stripeService = $stripeService;
     }
 
     #[Route('/', name: 'platform_customer_index', methods: ['GET'])]
@@ -32,6 +36,9 @@ class CustomerController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws ApiErrorException
+     */
     #[Route('/new', name: 'platform_customer_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -42,6 +49,8 @@ class CustomerController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $stripeCustomerId = $this->stripeService->createStripeCustomer($customer);
+            $customer->setStripeCustomerId($stripeCustomerId);
             $entityManager->persist($customer);
             $entityManager->flush();
 
