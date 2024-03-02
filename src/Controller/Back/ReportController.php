@@ -43,11 +43,9 @@ class ReportController extends AbstractController
     {
         if ($this->isGranted('ROLE_ADMIN')) {
             $reports = $this->reportRepository->findAll();
-        } elseif ($this->isGranted('ROLE_COMPANY')) {
+        } else {
             $company = $this->userService->getCurrentUserCompany();
             $reports = $this->reportRepository->findBy(['company' => $company]);
-        } else {
-            throw new AccessDeniedException('Vous n\'avez pas l\'autorisation d\'accéder à cette page.');
         }
 
         return $this->render('back/report/list.html.twig', [
@@ -77,16 +75,14 @@ class ReportController extends AbstractController
      */
     #[Route('/report/generate', name: 'generate_report')]
     public function generateReport(): Response {
-        if ($this->isGranted('ROLE_COMPANY')) {
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $this->reportGenerationService->generateGlobalReport();
+        } else {
             $company = $this->userService->getCurrentUserCompany();
             if (!$company) {
                 throw $this->createNotFoundException('Aucune entreprise trouvée pour cet utilisateur.');
             }
             $this->reportGenerationService->generateForCompany($company);
-        } elseif ($this->isGranted('ROLE_ADMIN')) {
-            $this->reportGenerationService->generateGlobalReport();
-        } else {
-            throw $this->createAccessDeniedException('Accès non autorisé.');
         }
 
         return $this->redirectToRoute('platform_report');

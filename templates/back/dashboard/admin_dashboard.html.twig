@@ -45,21 +45,22 @@
 				<div class="mt-4 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 
 					{% include '_components/back/stat-card.twig' with {
-  									title: 'Nombre d\'entreprises',
-  									count: companyCount,
-  									percentage_change: growthCompanies
-								} %}
+						title: 'Nombre d\'entreprises',
+						count: companyCount,
+						percentage_change: growthCompanies
+					} %}
 
-				{% include '_components/back/stat-card.twig' with {
-  title: 'Nombre d\'utilisateurs',
-  count: userCount,
-  percentage_change: userGrowthRate
-} %}
 					{% include '_components/back/stat-card.twig' with {
-  title: 'Nombre total de paiements',
-  count: totalAmountOfPayments | format_currency('EUR'),
-  percentage_change: paymentGrowthRate
-} %}
+						title: 'Nombre d\'utilisateurs',
+						count: userCount,
+						percentage_change: userGrowthRate
+					} %}
+
+					{% include '_components/back/stat-card.twig' with {
+						title: 'Nombre total de paiements',
+						count: totalAmountOfPayments | format_currency('EUR'),
+						percentage_change: paymentGrowthRate
+					} %}
 
 				</div>
 				<div class="grid grid-cols-1 2xl:grid-cols-2 xl:gap-4 my-4">

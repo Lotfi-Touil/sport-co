@@ -85,8 +85,7 @@ class CustomerRepository extends ServiceEntityRepository
             ->setParameter('endPreviousMonth', (new \DateTime('last day of last month'))->format('Y-m-d'))
             ->getQuery()
             ->getSingleScalarResult();
-    
-        
+
         $currentMonthTotal = $this->createQueryBuilder('c')
             ->select('count(c.id)')
             ->where('c.company = :company')
@@ -96,40 +95,35 @@ class CustomerRepository extends ServiceEntityRepository
             ->setParameter('endCurrentMonth', (new \DateTime('now'))->format('Y-m-d'))
             ->getQuery()
             ->getSingleScalarResult();
-    
-    
+
         if ($previousMonthTotal > 0) {
             return (($currentMonthTotal - $previousMonthTotal) / $previousMonthTotal) * 100;
         } else {
             return $currentMonthTotal > 0 ? 100 : 0;
         }
     }
-    
 
+    /**
+     * Compte le nombre de nouveaux clients pour une entreprise spécifique.
+     */
+    public function countNewCustomersForCompany(Company $company): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(DISTINCT c.id)')
+            ->where('c.company = :company')
+            ->setParameter('company', $company)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-
-    //    /**
-    //     * @return Customer[] Returns an array of Customer objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Customer
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Compte le nombre total de nouveaux clients.
+     */
+    public function countNewCustomers(): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(DISTINCT c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

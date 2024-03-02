@@ -69,6 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->quoteUsers = new ArrayCollection();
         $this->invoiceUsers = new ArrayCollection();
         $this->pageAccesses = new ArrayCollection();
+        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int

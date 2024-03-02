@@ -58,7 +58,8 @@ class PaymentRepository extends ServiceEntityRepository
         $result = $this->createQueryBuilder('p')
             ->select("p.createdAt, SUM(p.amount) AS total")
             ->join('p.invoice', 'i')
-            ->join('i.customer', 'c')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
             ->where('c.company = :company')
             ->setParameter('company', $company)
             ->groupBy('p.createdAt')
@@ -66,7 +67,6 @@ class PaymentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-    
         $monthlyTotals = [];
         foreach ($result as $payment) {
             $year = $payment['createdAt']->format('Y');
@@ -92,11 +92,8 @@ class PaymentRepository extends ServiceEntityRepository
         return $formattedResults;
     }
 
-
-
-
     // function that returns the total amount of payments
-    public function findTotalAmountOfPayments(): int
+    public function findTotalAmountOfPayments(): ?int
     {
         return $this->createQueryBuilder('p')
             ->select('SUM(p.amount)')
@@ -108,7 +105,8 @@ class PaymentRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->join('p.invoice', 'i') 
-            ->join('i.customer', 'c')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
             ->where('c.company = :company') 
             ->setParameter('company', $company)
             ->orderBy('p.createdAt', 'DESC')
@@ -116,8 +114,6 @@ class PaymentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-
 
     // Function that return the last 5 payments
     public function findLatestPayments(int $limit = 5): array
@@ -187,7 +183,8 @@ class PaymentRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('p')
             ->join('p.invoice', 'i')
-            ->join('i.customer', 'c')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
             ->where('c.company = :company')
             ->setParameter('company', $company);
 
@@ -203,7 +200,8 @@ class PaymentRepository extends ServiceEntityRepository
         
         $qb = $this->createQueryBuilder('p')
             ->join('p.invoice', 'i')
-            ->join('i.customer', 'c')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
             ->where('c.company = :company')
             ->setParameter('company', $company);
 
@@ -233,7 +231,8 @@ class PaymentRepository extends ServiceEntityRepository
         $previousMonthTotal = $qb
             ->select('COUNT(p.id)')
             ->join('p.invoice', 'i') 
-            ->join('i.customer', 'c') 
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
             ->where('c.company = :company') 
             ->andWhere('p.createdAt BETWEEN :startPreviousMonth AND :endPreviousMonth')
             ->setParameter('company', $company)
@@ -241,15 +240,15 @@ class PaymentRepository extends ServiceEntityRepository
             ->setParameter('endPreviousMonth', (new \DateTime('last day of last month'))->format('Y-m-d'))
             ->getQuery()
             ->getSingleScalarResult();
-        
-        
+
         $qb = $this->createQueryBuilder('p');
         
         
         $currentMonthTotal = $qb
             ->select('COUNT(p.id)')
             ->join('p.invoice', 'i')
-            ->join('i.customer', 'c')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
             ->where('c.company = :company')
             ->andWhere('p.createdAt BETWEEN :startCurrentMonth AND :endCurrentMonth')
             ->setParameter('company', $company)
@@ -322,7 +321,8 @@ class PaymentRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('p')
             ->select('count(p.id)')
             ->join('p.invoice', 'i')
-            ->join('i.customer', 'c')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
             ->where('c.company = :company')
             ->setParameter('company', $company);
 
@@ -335,7 +335,8 @@ class PaymentRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->select('SUM(p.amount) as totalRevenue')
             ->join('p.invoice', 'i')
-            ->join('i.customer', 'c')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
             ->where('c.company = :company')
             ->setParameter('company', $company)
             ->getQuery()
@@ -352,16 +353,17 @@ class PaymentRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->select('
-            p.id, 
-            p.amount, 
-            p.createdAt, 
-            i.id AS invoiceId, 
-            i.totalAmount AS invoiceTotal,
-            c.firstName AS customerFirstName,
-            c.lastName AS customerLastName
-        ')
+                p.id, 
+                p.amount, 
+                p.createdAt, 
+                i.id AS invoiceId, 
+                i.totalAmount AS invoiceTotal,
+                c.firstName AS customerFirstName,
+                c.lastName AS customerLastName
+            ')
             ->join('p.invoice', 'i')
-            ->join('i.customer', 'c')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
             ->getQuery()
             ->getArrayResult();
     }
@@ -376,48 +378,21 @@ class PaymentRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->select('
-            p.id, 
-            p.amount, 
-            p.createdAt, 
-            i.id AS invoiceId, 
-            i.totalAmount AS invoiceTotal,
-            c.firstName AS customerFirstName,
-            c.lastName AS customerLastName
-        ')
+                p.id, 
+                p.amount, 
+                p.createdAt, 
+                i.id AS invoiceId, 
+                i.totalAmount AS invoiceTotal,
+                c.firstName AS customerFirstName,
+                c.lastName AS customerLastName
+            ')
             ->join('p.invoice', 'i')
-            ->join('i.customer', 'c')
-            ->where('c.company = :company') // Assurez-vous que 'company' est le nom correct de la relation/propriété dans l'entité Invoice
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
+            ->where('c.company = :company')
             ->setParameter('company', $company)
             ->getQuery()
             ->getArrayResult();
     }
 
-
-
-
-
-    //    /**
-    //     * @return Payment[] Returns an array of Payment objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Payment
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }
