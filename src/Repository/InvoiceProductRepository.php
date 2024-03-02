@@ -22,11 +22,10 @@ class InvoiceProductRepository extends ServiceEntityRepository
         parent::__construct($registry, InvoiceProduct::class);
     }
 
-
     public function findTopSellingProducts(): array
     {
         $qb = $this->createQueryBuilder('ip')
-            ->select('p.name as productName, SUM(ip.quantity) as totalQuantity')
+            ->select('p.id AS productId, p.name as productName, SUM(ip.quantity) as totalQuantity')
             ->join('ip.product', 'p')
             ->groupBy('p.id')
             ->orderBy('totalQuantity', 'DESC')
@@ -39,11 +38,12 @@ class InvoiceProductRepository extends ServiceEntityRepository
     public function findTopSellingProductsForCompany(Company $company): array
     {
         $result = $this->createQueryBuilder('ip')
-            ->select('p.name as productName, SUM(ip.quantity) as totalQuantity')
+            ->select('p.id AS productId, p.name as productName, SUM(ip.quantity) as totalQuantity')
             ->join('ip.product', 'p')
-            ->join('ip.invoice', 'i') // Joindre la facture à partir de InvoiceProduct
-            ->join('i.customer', 'c') // Joindre le client à partir de la facture
-            ->where('c.company = :company') // Filtrer par la compagnie reliée au client
+            ->join('ip.invoice', 'i')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
+            ->where('c.company = :company')
             ->setParameter('company', $company)
             ->groupBy('p.id')
             ->orderBy('totalQuantity', 'DESC')
@@ -52,7 +52,6 @@ class InvoiceProductRepository extends ServiceEntityRepository
 
         return $result->getResult();
     }
-
 
 //    /**
 //     * @return InvoiceProduct[] Returns an array of InvoiceProduct objects

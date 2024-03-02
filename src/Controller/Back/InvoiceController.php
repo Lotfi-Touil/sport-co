@@ -160,7 +160,7 @@ class InvoiceController extends AbstractController
     }
 
     #[Route('/{id}/export', name: 'platform_invoice_export', methods: ['GET'])]
-    public function export(Invoice $invoice, InvoiceService $invoiceService): Response
+    public function export(Request $request, Invoice $invoice, InvoiceService $invoiceService): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 

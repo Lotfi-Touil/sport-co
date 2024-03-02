@@ -11,11 +11,12 @@ use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use App\Service\DashboardDataService;
 use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class DashboardController extends AbstractController
 {
-    private $pageAccessService;
     private DashboardDataService $dashboardDataService;
+    private $pageAccessService;
 
     public function __construct(PageAccessService $pageAccessService, DashboardDataService $dashboardDataService)
     {
@@ -24,15 +25,17 @@ class DashboardController extends AbstractController
     }
 
     #[Route('/platform/dashboard', name: 'platform_dashboard')]
-    public function index(AuthorizationCheckerInterface $authorizationChecker, ChartBuilderInterface $chartBuilder): Response
+    public function index(Request $request, AuthorizationCheckerInterface $authorizationChecker, ChartBuilderInterface $chartBuilder): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if ($authorizationChecker->isGranted('ROLE_ADMIN')) {
             return $this->adminDashboard($chartBuilder);
-        } elseif ($authorizationChecker->isGranted('ROLE_COMPANY')) {
+        } else {
             return $this->companyDashboard($chartBuilder);
         }
 
-        return $this->render('some_default_or_error_template.html.twig');
+        throw new AccessDeniedHttpException('Accès refusé.');
     }
 
     private function adminDashboard(ChartBuilderInterface $chartBuilder): Response

@@ -36,14 +36,14 @@ class InvoiceRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('i')
             ->select('SUM(i.totalAmount) as totalRevenue')
-            ->join('i.customer', 'c') // Joindre la table Customer via la relation dans Invoice
-            ->where('c.company = :company') // Utiliser la relation Company de Customer
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
+            ->where('c.company = :company')
             ->setParameter('company', $company)
             ->getQuery();
 
         return (float) $qb->getSingleScalarResult();
     }
-
 
     /**
      * Calcule le revenu total pour toutes les entreprises.
@@ -72,15 +72,15 @@ class InvoiceRepository extends ServiceEntityRepository
     public function calculateTotalExpensesForCompany(Company $company): float
     {
         $qb = $this->createQueryBuilder('i')
-            ->join('i.customer', 'c') // Joindre la table Customer via la relation dans Invoice
-            ->where('c.company = :company') // Filtrer par la compagnie du client
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
+            ->where('c.company = :company')
             ->setParameter('company', $company)
             ->select('SUM(i.totalAmount) as totalExpenses')
             ->getQuery();
 
         return (float) $qb->getSingleScalarResult();
     }
-
 
     /**
      * Calcule le total des dépenses pour toutes les entreprises.
@@ -96,32 +96,6 @@ class InvoiceRepository extends ServiceEntityRepository
         ->getQuery();
 
         return (float) $qb->getSingleScalarResult();
-    }
-
-    /**
-     * Compte le nombre de nouveaux clients pour une entreprise spécifique.
-     */
-    public function countNewCustomersForCompany(Company $company): int
-    {
-        return $this->createQueryBuilder('c')
-            ->select('COUNT(c.id)')
-            ->join('c.customer', 'i') // Joindre la table Invoice via la relation dans Customer
-            ->where('i.company = :company')
-            ->setParameter('company', $company)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    /**
-     * Compte le nombre total de nouveaux clients.
-     */
-    public function countNewCustomers(): int
-    {
-        return $this->createQueryBuilder('c')
-            ->select('COUNT(c.id)')
-            // Ajoutez ici des critères supplémentaires si nécessaire
-            ->getQuery()
-            ->getSingleScalarResult();
     }
 
 //    /**

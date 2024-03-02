@@ -4,6 +4,7 @@ namespace App\Service;
 use App\Entity\Company;
 use App\Entity\Report;
 use App\Repository\CompanyRepository;
+use App\Repository\CustomerRepository;
 use App\Repository\InvoiceProductRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\PaymentRepository;
@@ -16,6 +17,7 @@ class ReportGenerationService
 {
     private EntityManagerInterface $entityManager;
     private InvoiceRepository $invoiceRepository;
+    private CustomerRepository $customerRepository;
 
     private InvoiceProductRepository $invoiceProductRepository;
     private CompanyRepository $companyRepository;
@@ -23,7 +25,7 @@ class ReportGenerationService
 
     private PaymentRepository $paymentRepository;
 
-    public function __construct(EntityManagerInterface $entityManager, InvoiceRepository $invoiceRepository, CompanyRepository $companyRepository, ReportRepository $reportRepository, InvoiceProductRepository $invoiceProductRepository, PaymentRepository $paymentRepository)
+    public function __construct(EntityManagerInterface $entityManager, InvoiceRepository $invoiceRepository, CustomerRepository $customerRepository, CompanyRepository $companyRepository, ReportRepository $reportRepository, InvoiceProductRepository $invoiceProductRepository, PaymentRepository $paymentRepository)
     {
         $this->entityManager = $entityManager;
         $this->invoiceRepository = $invoiceRepository;
@@ -31,6 +33,7 @@ class ReportGenerationService
         $this->reportRepository = $reportRepository;
         $this->invoiceProductRepository = $invoiceProductRepository;
         $this->paymentRepository = $paymentRepository;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -48,7 +51,7 @@ class ReportGenerationService
             $totalExpenses = $this->invoiceRepository->calculateTotalExpensesForCompany($company);
             $netProfit = $totalRevenue - $totalExpenses;
             $topSellingProducts = json_encode($this->invoiceProductRepository->findTopSellingProductsForCompany($company));
-            $newCustomersCount = $this->invoiceRepository->countNewCustomersForCompany($company);
+            $newCustomersCount = $this->customerRepository->countNewCustomersForCompany($company);
             $paymentDetails = json_encode($this->paymentRepository->findPaymentDetailsForCompany($company));
             $report->setTopSellingProducts($topSellingProducts);
             $report->setNewCustomersCount($newCustomersCount);
@@ -79,7 +82,7 @@ class ReportGenerationService
         $report->setNetProfit($report->getTotalRevenue() - $report->getTotalExpenses());
         $topSellingProducts = json_encode($this->invoiceProductRepository->findTopSellingProducts());
         $report->setTopSellingProducts($topSellingProducts);
-        $report->setNewCustomersCount($this->invoiceRepository->countNewCustomers());
+        $report->setNewCustomersCount($this->customerRepository->countNewCustomers());
         $paymentDetails = json_encode($this->paymentRepository->findPaymentDetails());
         $report->setPaymentDetails($paymentDetails);
         $this->entityManager->persist($report);

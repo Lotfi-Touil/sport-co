@@ -1,5 +1,3 @@
-{# templates/some_default_or_error_template.html.twig #}
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Accès Refusé{% endblock %}
@@ -10,7 +8,7 @@
         <h4 class="alert-heading">Accès Refusé!</h4>
         <p>Vous n'avez pas la permission d'accéder à cette page. Si vous pensez qu'il s'agit d'une erreur, veuillez contacter l'administrateur du système.</p>
         <hr>
-        <p class="mb-0">Vous pouvez revenir à la <a href="{{ path('homepage') }}" class="alert-link">page d'accueil</a> ou utiliser le menu pour naviguer vers une autre page.</p>
+        <p class="mb-0">Vous pouvez revenir à la <a href="{{ path('home_index') }}" class="alert-link">page d'accueil</a> ou utiliser le menu pour naviguer vers une autre page.</p>
     </div>
 </div>
 {% endblock %}
