@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\PageAccess;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,28 +22,15 @@ class PageAccessRepository extends ServiceEntityRepository
         parent::__construct($registry, PageAccess::class);
     }
 
-//    /**
-//     * @return PageAccess[] Returns an array of PageAccess objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?PageAccess
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @return PageAccess[] Returns an array of PageAccess objects for a given user
+     */
+    public function findPermissionsByUser(User $user): array
+    {
+        return $this->createQueryBuilder('pa')
+            ->andWhere('pa.employe = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
 }

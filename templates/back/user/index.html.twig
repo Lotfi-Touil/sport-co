@@ -32,9 +32,11 @@
                         <th scope="col" class="px-6 py-3 text-left">
                             Entreprise
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left">
-                            Roles
-                        </th>
+                        {% if is_granted("ROLE_ADMIN") %}
+                            <th scope="col" class="px-6 py-3 text-left">
+                                Roles
+                            </th>
+                        {% endif %}
                         <th scope="col" class="px-6 py-3 text-left">
                             Email
                         </th>
@@ -54,9 +56,21 @@
                 </thead>
                 <tbody>
                     {% for user in users %}
+                        {% set hide_confidential_info = 
+                                'ROLE_COMPANY' in user.roles
+                                and is_granted("ROLE_ADMIN") == false
+                                and is_granted("ROLE_COMPANY") == false
+                        %}
+                        {% set blur = hide_confidential_info ? "blur" : "" %}
+
                         <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                             <td class="px-6 py-4">
-                                {{ user.id }}
+                                <div class="flex">
+                                    <span class="{{ blur }}">{{ hide_confidential_info ? '###' : user.id }}</span>
+                                    {% if 'ROLE_COMPANY' in user.roles %}
+                                        <span class="text-xs font-semibold ml-2 px-2.5 py-0.5 rounded bg-yellow-200 text-yellow-800">CEO</span>
+                                    {% endif %}
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 {{ user.firstName }}
@@ -67,37 +81,66 @@
                             <td class="px-6 py-4">
                                 {{ user.company.name ?? '-' }}
                             </td>
-                            <td class="px-6 py-4">
-                                {{ user.roles ? user.roles|json_encode : '' }}
+                            {% if is_granted("ROLE_ADMIN") %}
+                                <td class="px-6 py-4">
+                                    {{ user.roles ? user.roles|json_encode : '' }}
+                                </td>
+                            {% endif %}
+                            <td class="px-6 py-4 {{ blur }}">
+                                {{ hide_confidential_info ? 'confidentiel' : user.email }}
                             </td>
-                            <td class="px-6 py-4">
-                                {{ user.email }}
+                            <td class="px-6 py-4 {{ blur }}">
+                                {{ hide_confidential_info ? 'confidentiel' : user.phone }}
                             </td>
-                            <td class="px-6 py-4">
-                                {{ user.phone }}
+                            <td class="px-6 py-4 {{ blur }}">
+                                {{ hide_confidential_info ? 'confidentiel' : user.address|length > 20 ? user.address|slice(0, 20) ~ '...' : user.address }}
                             </td>
-                            <td class="px-6 py-4">
-                                {{ user.address }}
+                            <td class="px-6 py-4 {{ blur }}">
+                                {{ hide_confidential_info ? 'confidentiel' : user.createdAt ? user.createdAt|date('Y-m-d H:i:s') : '-' }}
                             </td>
-                            <td class="px-6 py-4">
-                                {{ user.createdAt ? user.createdAt|date('Y-m-d H:i:s') : '-' }}
-                            </td>
-                            <td class="px-6 py-4 flex">
+                            <td class="px-6 py-4 flex {{ blur }}">
+                                {% if can_access('platform_page_access_edit') %}
+                                    {% if hide_confidential_info %}
+                                        <a href="#" class="font-medium text-green-600 dark:text-green-500 hover:underline mr-2">
+                                            Droits et accès
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ path('platform_page_access_edit', {'id': user.id}) }}" class="font-medium text-green-600 dark:text-green-500 hover:underline mr-2">
+                                            Droits et accès
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
                                 {% if can_access('platform_user_show') %}
-                                    <a href="{{ path('platform_user_show', {'id': user.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
-                                        Voir
-                                    </a>
+                                    {% if hide_confidential_info %}
+                                        <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                            Voir
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ path('platform_user_show', {'id': user.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                            Voir
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                                 {% if can_access('platform_user_edit') %}
-                                    <a href="{{ path('platform_user_edit', {'id': user.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
-                                        Modifier
-                                    </a>
+                                    {% if hide_confidential_info %}
+                                        <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                            Modifier
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ path('platform_user_edit', {'id': user.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                            Modifier
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                                 {% if can_access('platform_user_delete') %}
-                                    <form method="post" action="{{ path('platform_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ?');">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                    {% if hide_confidential_info %}
                                         <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
-                                    </form>
+                                    {% else %}
+                                        <form method="post" action="{{ path('platform_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                            <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
+                                        </form>
+                                    {% endif %}
                                 {% endif %}
                             </td>
                         </tr>
@@ -108,6 +151,7 @@
                             </td>
                         </tr>
                     {% endfor %}
+                    
                 </tbody>
             </table>
         </div>
