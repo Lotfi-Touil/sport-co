@@ -22,6 +22,17 @@ class CustomerRepository extends ServiceEntityRepository
         parent::__construct($registry, Customer::class);
     }
 
+    public function findAllByCompanyId($companyId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.company = :val')
+            ->setParameter('val', $companyId)
+            ->orderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function findByTerm($term)
     {
         $searchTerms = explode(' ', $term); // Sépare le terme en mots-clés individuels

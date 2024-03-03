@@ -52,11 +52,23 @@ class Company
     #[ORM\OneToMany(mappedBy: 'company', targetEntity: EmailTemplate::class, orphanRemoval: true)]
     private Collection $emailTemplates;
 
+    #[ORM\OneToMany(mappedBy: 'company', targetEntity: InvoiceStatus::class)]
+    private Collection $invoiceStatuses;
+
+    #[ORM\OneToMany(mappedBy: 'company', targetEntity: QuoteStatus::class)]
+    private Collection $quoteStatuses;
+
+    #[ORM\OneToMany(mappedBy: 'company', targetEntity: ProductCategory::class)]
+    private Collection $productCategories;
+
     public function __construct()
     {
         $this->customers = new ArrayCollection();
         $this->users = new ArrayCollection();
         $this->emailTemplates = new ArrayCollection();
+        $this->invoiceStatuses = new ArrayCollection();
+        $this->quoteStatuses = new ArrayCollection();
+        $this->productCategories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -256,6 +268,96 @@ class Company
             // set the owning side to null (unless already changed)
             if ($emailTemplate->getCompany() === $this) {
                 $emailTemplate->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InvoiceStatus>
+     */
+    public function getInvoiceStatuses(): Collection
+    {
+        return $this->invoiceStatuses;
+    }
+
+    public function addInvoiceStatus(InvoiceStatus $invoiceStatus): static
+    {
+        if (!$this->invoiceStatuses->contains($invoiceStatus)) {
+            $this->invoiceStatuses->add($invoiceStatus);
+            $invoiceStatus->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvoiceStatus(InvoiceStatus $invoiceStatus): static
+    {
+        if ($this->invoiceStatuses->removeElement($invoiceStatus)) {
+            // set the owning side to null (unless already changed)
+            if ($invoiceStatus->getCompany() === $this) {
+                $invoiceStatus->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QuoteStatus>
+     */
+    public function getQuoteStatuses(): Collection
+    {
+        return $this->quoteStatuses;
+    }
+
+    public function addQuoteStatus(QuoteStatus $quoteStatus): static
+    {
+        if (!$this->quoteStatuses->contains($quoteStatus)) {
+            $this->quoteStatuses->add($quoteStatus);
+            $quoteStatus->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuoteStatus(QuoteStatus $quoteStatus): static
+    {
+        if ($this->quoteStatuses->removeElement($quoteStatus)) {
+            // set the owning side to null (unless already changed)
+            if ($quoteStatus->getCompany() === $this) {
+                $quoteStatus->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductCategory>
+     */
+    public function getProductCategories(): Collection
+    {
+        return $this->productCategories;
+    }
+
+    public function addProductCategory(ProductCategory $productCategory): static
+    {
+        if (!$this->productCategories->contains($productCategory)) {
+            $this->productCategories->add($productCategory);
+            $productCategory->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductCategory(ProductCategory $productCategory): static
+    {
+        if ($this->productCategories->removeElement($productCategory)) {
+            // set the owning side to null (unless already changed)
+            if ($productCategory->getCompany() === $this) {
+                $productCategory->setCompany(null);
             }
         }
 

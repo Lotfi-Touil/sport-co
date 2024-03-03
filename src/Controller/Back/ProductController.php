@@ -13,19 +13,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\StripeService;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 #[Route('/platform/product')]
 class ProductController extends AbstractController
 {
     private $pageAccessService;
-
     private $stripeService;
+    private $security;
+    private $authorizationChecker;
 
-    public function __construct(PageAccessService $pageAccessService, StripeService $stripeService)
+    public function __construct(AuthorizationCheckerInterface $authorizationChecker, Security $security, PageAccessService $pageAccessService, StripeService $stripeService)
     {
         $this->pageAccessService = $pageAccessService;
-
         $this->stripeService = $stripeService;
+        $this->security = $security;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     #[Route('/', name: 'platform_product_index', methods: ['GET'])]
@@ -139,4 +144,21 @@ class ProductController extends AbstractController
             'product' => $product,
         ]);
     }
+
+    // TODO Lotfi : vérifier avec annael si danger avec stripe avant d'ajouter un lien vers une company
+    private function checkConfidentiality(Product $product): ?Response
+    {
+        if ($this->authorizationChecker->isGranted("ROLE_ADMIN")) {
+            return null; // L'admin a accès à tout, donc pas de redirection
+        }
+    
+        if ($this->security->getUser()->getCompany() == $customer->getCompany()) {
+            return null; // L'utilisateur a le droit d'accéder à cette ressource
+        }
+    
+        // L'utilisateur n'a pas le droit d'accéder à cette ressource
+        $this->addFlash('error', "Accès non autorisé à la ressource demandée.");
+        return new RedirectResponse($this->generateUrl('platform_customer_index'));
+    }
+
 }

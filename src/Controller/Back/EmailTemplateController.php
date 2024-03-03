@@ -13,6 +13,7 @@ use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,11 +24,13 @@ class EmailTemplateController extends AbstractController
 {
     private $pageAccessService;
     private $security;
+    private $authorizationChecker;
 
-    public function __construct(Security $security, PageAccessService $pageAccessService)
+    public function __construct(Security $security, PageAccessService $pageAccessService, AuthorizationCheckerInterface $authorizationChecker)
     {
         $this->pageAccessService = $pageAccessService;
         $this->security = $security;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     #[Route('/', name: 'platform_email_template_index', methods: ['GET'])]
@@ -56,6 +59,11 @@ class EmailTemplateController extends AbstractController
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
+        $response = $this->checkConfidentiality($emailTemplate);
+        if ($response !== null) {
+            return $response; // Redirection si l'utilisateur n'a pas accès
+        }
+    
         return $this->render('back/email_template/show.html.twig', [
             'email_template' => $emailTemplate,
         ]);
@@ -65,6 +73,11 @@ class EmailTemplateController extends AbstractController
     public function edit(Request $request, EmailTemplate $emailTemplate, EntityManagerInterface $entityManager): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
+        $response = $this->checkConfidentiality($emailTemplate);
+        if ($response !== null) {
+            return $response; // Redirection si l'utilisateur n'a pas accès
+        }
 
         $form = $this->createForm(EmailTemplateType::class, $emailTemplate);
         $form->handleRequest($request);
@@ -100,4 +113,18 @@ class EmailTemplateController extends AbstractController
         return $this->redirectToRoute("platform_email_template_index");
     }
 
+    private function checkConfidentiality(EmailTemplate $emailTemplate): ?Response
+    {
+        if ($this->authorizationChecker->isGranted("ROLE_ADMIN")) {
+            return null; // L'admin a accès à tout, donc pas de redirection
+        }
+    
+        if ($user->getCompany() === $emailTemplate->getCompany()) {
+            return null; // L'utilisateur a le droit d'accéder à cette ressource
+        }
+    
+        // L'utilisateur n'a pas le droit d'accéder à cette ressource
+        $this->addFlash('error', "Accès non autorisé à la ressource demandée.");
+        return new RedirectResponse($this->generateUrl('platform_email_template_index'));
+    }
 }

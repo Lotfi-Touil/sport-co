@@ -21,6 +21,17 @@ class InvoiceStatusRepository extends ServiceEntityRepository
         parent::__construct($registry, InvoiceStatus::class);
     }
 
+    public function findAllByCompanyId($companyId): array
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.company = :val')
+            ->setParameter('val', $companyId)
+            ->orderBy('i.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return InvoiceStatus[] Returns an array of InvoiceStatus objects
 //     */

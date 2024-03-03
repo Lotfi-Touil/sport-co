@@ -21,6 +21,17 @@ class QuoteStatusRepository extends ServiceEntityRepository
         parent::__construct($registry, QuoteStatus::class);
     }
 
+    public function findAllByCompanyId($companyId): array
+    {
+        return $this->createQueryBuilder('q')
+            ->andWhere('q.company = :val')
+            ->setParameter('val', $companyId)
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return QuoteStatus[] Returns an array of QuoteStatus objects
 //     */

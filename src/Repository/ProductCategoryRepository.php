@@ -21,6 +21,17 @@ class ProductCategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, ProductCategory::class);
     }
 
+    public function findAllByCompanyId($companyId): array
+    {
+        return $this->createQueryBuilder('pc')
+            ->andWhere('pc.company = :val')
+            ->setParameter('val', $companyId)
+            ->orderBy('pc.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return ProductCategory[] Returns an array of ProductCategory objects
 //     */
