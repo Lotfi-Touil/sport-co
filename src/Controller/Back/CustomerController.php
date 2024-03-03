@@ -8,7 +8,6 @@ use App\Repository\CustomerRepository;
 use App\Service\PageAccessService;
 use App\Service\StripeService;
 use Doctrine\ORM\EntityManagerInterface;
-use Stripe\Exception\ApiErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;

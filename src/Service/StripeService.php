@@ -3,17 +3,26 @@
 namespace App\Service;
 
 use App\Entity\Customer;
+use App\Entity\Payment;
+use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Exception\ApiErrorException;
 use Stripe\StripeClient;
 use App\Entity\Product;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class StripeService
 {
     private $stripeClient;
+    private $entityManager;
+    private $urlGenerator;
 
-    public function __construct(string $stripeApiKey)
+    public function __construct(string $stripeApiKey, EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator)
     {
         $this->stripeClient = new StripeClient($stripeApiKey);
+        $this->entityManager = $entityManager;
+        $this->urlGenerator = $urlGenerator;
+
     }
 
     public function createStripeCustomer(Customer $customer): ?string
@@ -28,6 +37,55 @@ class StripeService
         } catch (ApiErrorException $e) {
             return null;
         }
+    }
+
+    /**
+     * @throws ApiErrorException
+     * @throws \Exception
+     */
+    public function createPaymentSession(int $paymentId): string
+    {
+        $payment = $this->entityManager->getRepository(Payment::class)->find($paymentId);
+        if (!$payment) {
+            throw new \Exception('Paiement non trouvé.');
+        }
+
+        $paymentMethodType = $this->determineStripePaymentMethodType($payment);
+        $invoice = $payment->getInvoice();
+        $amount = $payment->getAmount();
+
+        $session = $this->stripeClient->checkout->sessions->create([
+            'payment_method_types' => [$paymentMethodType],
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'eur',
+                    'product_data' => [
+                        'name' => 'Paiement pour Facture #' . $invoice->getId(),
+                    ],
+                    'unit_amount' => $amount * 100,
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => $this->urlGenerator->generate('payment_success', ['paymentId' => $paymentId], UrlGeneratorInterface::ABSOLUTE_URL),
+            'cancel_url' => $this->urlGenerator->generate('payment_failed', ['paymentId' => $paymentId], UrlGeneratorInterface::ABSOLUTE_URL),
+            'metadata' => ['payment_id' => $paymentId],
+        ]);
+
+        return $session->url;
+    }
+
+    private function determineStripePaymentMethodType(Payment $payment): string
+    {
+        $typeMapping = [
+            'Carte de crédit' => 'card',
+            'PayPal' => 'paypal',
+            'Virement bancaire' => 'sepa_debit',
+        ];
+
+        $paymentMethodName = $payment->getPaymentMethod()->getName();
+
+        return $typeMapping[$paymentMethodName] ?? 'card';
     }
 
     public function deleteStripeCustomer(Customer $customer): bool
