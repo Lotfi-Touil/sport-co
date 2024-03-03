@@ -21,15 +21,20 @@ class QuoteStatusRepository extends ServiceEntityRepository
         parent::__construct($registry, QuoteStatus::class);
     }
 
-    public function findAllByCompanyId($companyId): array
+    public function findAllByCompanyId($companyId, $includeNullCompany = false): array
     {
-        return $this->createQueryBuilder('q')
-            ->andWhere('q.company = :val')
-            ->setParameter('val', $companyId)
-            ->orderBy('q.id', 'ASC')
-            ->getQuery()
-            ->getResult()
-        ;
+        $qb = $this->createQueryBuilder('q');
+
+        if ($includeNullCompany) {
+            $qb->where('q.company = :val OR q.company IS NULL');
+        } else {
+            $qb->where('q.company = :val');
+        }
+
+        $qb->setParameter('val', $companyId)
+           ->orderBy('q.id', 'ASC');
+
+        return $qb->getQuery()->getResult();
     }
 
 //    /**

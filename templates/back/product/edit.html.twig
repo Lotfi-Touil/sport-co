@@ -53,13 +53,15 @@
                     {{ form_widget(form.category, {'attr': {'class': 'block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring'}}) }}
                     {{ form_errors(form.category) }}
                 </div>
+                <div>
+                    {{ form_label(form.isRecurring, null, {'label_attr': {'class': 'text-gray-700 dark:text-gray-200'}}) }}
+                    {{ form_widget(form.isRecurring, {'attr': {'class': 'form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out bg-white border border-gray-200 rounded dark:bg-gray-800 dark:text-blue-400 dark:border-gray-600 focus:border-blue-400 focus:ring focus:ring-blue-300 focus:ring-opacity-50 hover:border-blue-300 dark:hover:border-blue-500 focus:outline-none'}}) }}
+                    {{ form_errors(form.isRecurring) }}
+                </div>
             </div>
             <div class="flex justify-start mt-6">
                 <button class="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600" type="submit">Modifier</button>
             </div>
-            {#            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">#}
-            {#                {{ button_label|default('Enregistrer') }}#}
-            {#            </button>#}
 
             {{ form_end(form) }}
         </div>

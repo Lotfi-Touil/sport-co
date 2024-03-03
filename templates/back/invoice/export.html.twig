@@ -9,51 +9,47 @@
       <p>Date de délivrance: {{ (invoice.submittedAt ? invoice.submittedAt : 'now')|date('d/m/Y') }}</p>
   </div>
 
+  {% if invoice.invoiceUsers is not empty %}
+      {% set customer = invoice.invoiceUsers.first().customer %}
+  {% else %}
+      {% set customer = false %}
+  {% endif %}
+
+  {% if invoice.invoiceUsers is not empty %}
+      {% set creator = invoice.invoiceUsers.first().creator %}
+  {% else %}
+      {% set creator = false %}
+  {% endif %}
+
   <h3 class="mb-20">Société</h3>
   <table class="invoice-info">
     <tbody>
       <tr>
         <th>Nom:</th>
         <td>
-          {% if invoice.invoiceUsers|length > 0 %}
-            {{ invoice.invoiceUsers.first().creator.company.name }}
-          {% else %}
-            Pas de client associé
-          {% endif %}
+          {{ creator ? creator.company.name : '------------' }}
         </td>
       </tr>
       <tr>
         <th>Adresse:</th>
         <td>
-          {% if invoice.invoiceUsers|length > 0 %}
-            {{ invoice.invoiceUsers.first().creator.company.address }}
-          {% else %}
-            Pas d'adresse associée
-          {% endif %}
+          {{ creator ? creator.company.address : '------------' }}
         </td>
       </tr>
       <tr>
         <th>Email:</th>
         <td>
-          {% if invoice.invoiceUsers|length > 0 %}
-            {{ invoice.invoiceUsers.first().creator.company.email }}
-          {% else %}
-            Pas d'email associé
-          {% endif %}
+          {{ creator ? creator.company.email : '------------' }}
         </td>
       </tr>
       <tr>
         <th>Téléphone:</th>
         <td>
-          {% if invoice.invoiceUsers|length > 0 %}
-            {{ invoice.invoiceUsers.first().creator.company.phone }}
-          {% else %}
-            Pas d'email associé
-          {% endif %}
+          {{ creator ? creator.company.phone : '------------' }}
         </td>
       </tr>
       <tr>
-        <th>Numéro de devis:</th>
+        <th>Numéro de facture:</th>
         <td>{{ invoice.id }}</td>
       </tr>
       <tr>
@@ -67,42 +63,22 @@
   <table class="invoice-info">
     <tbody>
       <tr>
-        <th>Destinataire:</th>
+        <th>Nom:</th>
         <td>
-          {% if invoice.invoiceUsers|length > 0 %}
-            {{ invoice.invoiceUsers.first().customer.firstName }} {{ invoice.invoiceUsers.first().customer.lastName }}
-          {% else %}
-            Pas de client associé
-          {% endif %}
+          {{ customer ? customer.firstName ~ ' ' ~ customer.lastName : "Aucun destinataire pour le moment"}}
         </td>
       </tr>
       <tr>
         <th>Email:</th>
         <td>
-          {% if invoice.invoiceUsers|length > 0 %}
-            {{ invoice.invoiceUsers.first().customer.email }}
-          {% else %}
-            Pas d'email associé
-          {% endif %}
+          {{ customer ? customer.email : "Aucun destinataire pour le moment"}}
         </td>
       </tr>
       <tr>
         <th>Adresse:</th>
         <td>
-          {% if invoice.invoiceUsers|length > 0 %}
-            {{ invoice.invoiceUsers.first().customer.address }}
-          {% else %}
-            Pas d'adresse associée
-          {% endif %}
+          {{ customer ? customer.address : "Aucun destinataire pour le moment"}}
         </td>
-      </tr>
-      <tr>
-        <th>Numéro de facture:</th>
-        <td>{{ invoice.id }}</td>
-      </tr>
-      <tr>
-        <th>Date de délivrance:</th>
-        <td>{{ invoice.submittedAt|default('now')|date('d/m/Y') }}</td>
       </tr>
     </tbody>
   </table>

@@ -60,19 +60,23 @@
                                         <p>-</p>
                                     {% endif %}
                                 </div>
+                                {% if quote.quoteUsers is not empty %}
+                                    {% set client = quote.quoteUsers[0].customer %}
+                                {% else %}
+                                    {% set client = false %}
+                                {% endif %}
                                 <div id="bloc-destinataire" class="text-sm font-light text-slate-500">
                                     <p class="text-sm font-normal text-slate-700">Destinataire</p>
-                                    {% set hiddenClass = quote.quoteUsers.isEmpty() ? 'hidden' : '' %}
+                                    {% set hiddenClass = client ? '' : 'hidden' %}
                                     <button id="remove-customer" class="bg-red-500 hover:bg-red-700 text-white font-bold px-2 my-1 rounded {{ hiddenClass }}">
                                         Retirer
                                     </button>
                                     <div class="zone-info-dest">
-                                    {% if quote.quoteUsers is not empty %}
-                                        {% set quoteUser = quote.quoteUsers[0] %}
-                                        <input id="user-dest-id" type="hidden" value="{{ quoteUser.customer.id }}" class="hidden"/>
-                                        <p class="user-dest-intitule disabled">{{ quoteUser.customer.firstName }} {{ quoteUser.customer.lastName }}</p>
-                                        <p class="user-dest-email disabled">{{ quoteUser.customer.email }}</p>
-                                        <p class="user-dest-address-street disabled">{{ quoteUser.customer.address ?? '-' }}</p>
+                                    {% if client %}
+                                        <input id="user-dest-id" type="hidden" value="{{ client.id }}" class="hidden"/>
+                                        <p class="user-dest-intitule disabled">{{ client.firstName }} {{ client.lastName }}</p>
+                                        <p class="user-dest-email disabled">{{ client.email }}</p>
+                                        <p class="user-dest-address-street disabled">{{ client.address ?? '-' }}</p>
                                     {% else %}
                                         <p>-</p>
                                         <p>-</p>

@@ -9,6 +9,18 @@
       <p>Date de délivrance: {{ (quote.submittedAt ? quote.submittedAt : 'now')|date('d/m/Y') }}</p>
   </div>
 
+  {% if quote.quoteUsers is not empty %}
+      {% set customer = quote.quoteUsers.first().customer %}
+  {% else %}
+      {% set customer = false %}
+  {% endif %}
+
+  {% if quote.quoteUsers is not empty %}
+      {% set creator = quote.quoteUsers.first().creator %}
+  {% else %}
+      {% set creator = false %}
+  {% endif %}
+
   <h3 class="mb-20">Société</h3>
   <table class="invoice-info">
     <tbody>
@@ -16,9 +28,9 @@
         <th>Nom:</th>
         <td>
           {% if quote.quoteUsers|length > 0 %}
-            {{ quote.quoteUsers.first().creator.company.name }}
+            {{ creator.company.name }}
           {% else %}
-            Pas de client associé
+            Pas de customer associé
           {% endif %}
         </td>
       </tr>
@@ -26,7 +38,7 @@
         <th>Adresse:</th>
         <td>
           {% if quote.quoteUsers|length > 0 %}
-            {{ quote.quoteUsers.first().creator.company.address }}
+            {{ creator.company.address }}
           {% else %}
             Pas d'adresse associée
           {% endif %}
@@ -36,7 +48,7 @@
         <th>Email:</th>
         <td>
           {% if quote.quoteUsers|length > 0 %}
-            {{ quote.quoteUsers.first().creator.company.email }}
+            {{ creator.company.email }}
           {% else %}
             Pas d'email associé
           {% endif %}
@@ -46,7 +58,7 @@
         <th>Téléphone:</th>
         <td>
           {% if quote.quoteUsers|length > 0 %}
-            {{ quote.quoteUsers.first().creator.company.phone }}
+            {{ creator.company.phone }}
           {% else %}
             Pas d'email associé
           {% endif %}
@@ -69,31 +81,19 @@
       <tr>
         <th>Nom:</th>
         <td>
-          {% if quote.quoteUsers|length > 0 %}
-            {{ quote.quoteUsers.first().customer.firstName }} {{ quote.quoteUsers.first().customer.lastName }}
-          {% else %}
-            Pas de client associé
-          {% endif %}
+          {{ customer ? customer.firstName ~ ' ' ~ customer.firstName : "Aucun destinataire pour le moment" }}
         </td>
       </tr>
       <tr>
         <th>Email:</th>
         <td>
-          {% if quote.quoteUsers|length > 0 %}
-            {{ quote.quoteUsers.first().customer.email }}
-          {% else %}
-            Pas d'email associé
-          {% endif %}
+        {{ customer ? customer.email : "Aucun destinataire pour le moment" }}
         </td>
       </tr>
       <tr>
         <th>Adresse:</th>
         <td>
-          {% if quote.quoteUsers|length > 0 %}
-            {{ quote.quoteUsers.first().customer.address }}
-          {% else %}
-            Pas d'adresse associée
-          {% endif %}
+        {{ customer ? customer.address : "Aucun destinataire pour le moment" }}
         </td>
       </tr>
     </tbody>

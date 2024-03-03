@@ -21,6 +21,19 @@ class QuoteRepository extends ServiceEntityRepository
         parent::__construct($registry, Quote::class);
     }
 
+    public function findAllByCompanyId($companyId): array
+    {
+        return $this->createQueryBuilder('q')
+            ->join('q.quoteUsers', 'qu')
+            ->join('qu.creator', 'c')
+            ->where('c.company = :company')
+            ->setParameter('company', $companyId)
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return Quote[] Returns an array of Quote objects
 //     */

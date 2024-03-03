@@ -13,41 +13,61 @@ use App\Service\PageAccessService;
 use App\Service\QuoteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 #[Route('/platform/quote')]
 class QuoteController extends AbstractController
 {
     private $pageAccessService;
-
     private $quoteService;
+    private $security;
 
-    public function __construct(PageAccessService $pageAccessService, QuoteService $quoteService)
+    public function __construct(PageAccessService $pageAccessService, QuoteService $quoteService, Security $security)
     {
         $this->pageAccessService = $pageAccessService;
-
         $this->quoteService = $quoteService;
+        $this->security = $security;
     }
 
     #[Route('/', name: 'platform_quote_index', methods: ['GET'])]
-    public function index(Request $request, QuoteRepository $quoteRepository, QuoteStatusRepository $quoteStatusRepository): Response
+    public function index(Request $request, AuthorizationCheckerInterface $authorizationChecker, QuoteRepository $quoteRepository, QuoteStatusRepository $quoteStatusRepository): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
+        if ($authorizationChecker->isGranted("ROLE_ADMIN")) {
+            $quotes = $quoteRepository->findAll();
+            $quote_status = $quoteStatusRepository->findAll();
+        } else {
+            $company = $this->security->getUser()->getCompany();
+            if ($company) {
+                $quotes = $quoteRepository->findAllByCompanyId($company->getId());
+                $quote_status = $quoteStatusRepository->findAllByCompanyId($company->getId());
+            }
+        }
+
         return $this->render('back/quote/index.html.twig', [
-            'quotes' => $quoteRepository->findAll(),
-            'quote_status' => $quoteStatusRepository->findAll(),
+            'quotes' => $quotes,
+            'quote_status' => $quote_status,
         ]);
     }
 
     #[Route('/new', name: 'platform_quote_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
-        $statusList = $entityManager->getRepository(QuoteStatus::class)->findAll();
+        if ($authorizationChecker->isGranted("ROLE_ADMIN")) {
+            $statusList = $entityManager->getRepository(QuoteStatus::class)->findAll();
+        } else {
+            $company = $this->security->getUser()->getCompany();
+            if ($company) {
+                $statusList = $entityManager->getRepository(QuoteStatus::class)->findAllByCompanyId($company->getId());
+            }
+        }
 
         $quote = new Quote();
         $form = $this->createForm(QuoteType::class, $quote, ['status_choices' => $statusList]);
@@ -141,7 +161,6 @@ class QuoteController extends AbstractController
             return $this->redirectToRoute('platform_quote_index');
         }
 
-        // TODO Lotfi : permettre au super admin + compte company de supprimer tt de meme
         if ($quote->getSubmittedAt()) {
             $this->addFlash('error', 'Suppression impossible ! le devis a été soumis au client.');
             return $this->redirectToRoute('platform_invoice_index');

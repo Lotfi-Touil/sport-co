@@ -21,13 +21,26 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    public function findBySearchTerm($searchTerm)
+    public function findAllByCompanyId($companyId): array
     {
-        $searchTerm = strtolower($searchTerm);
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.company = :val')
+            ->setParameter('val', $companyId)
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findByTermAndCompany($term, $company)
+    {
+        $term = strtolower($term);
 
         return $this->createQueryBuilder('p')
             ->where('LOWER(p.name) LIKE :term')
-            ->setParameter('term', '%'.$searchTerm.'%')
+            ->andWhere('p.company = :company')
+            ->setParameter('term', '%'.$term.'%')
+            ->setParameter('company', $company)
             ->getQuery()
             ->getResult();
     }

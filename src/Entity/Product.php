@@ -46,6 +46,9 @@ class Product
     #[ORM\Column(type: Types::BOOLEAN, options: ["default" => false])]
     private ?bool $isRecurring = false;
 
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Company $company = null;
+
     public function __construct()
     {
         $this->quoteProducts = new ArrayCollection();
@@ -226,6 +229,18 @@ class Product
     public function setIsRecurring(bool $isRecurring): self
     {
         $this->isRecurring = $isRecurring;
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
+
         return $this;
     }
 

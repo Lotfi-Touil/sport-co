@@ -22,7 +22,6 @@ class InvoiceService
 
     private $error;
 
-    // TODO Lotfi : associer le creator lors de la création ici + devis
     public function __construct(Environment $twig, Security $security, EntityManagerInterface $entityManager)
     {
         $this->security = $security;
@@ -100,8 +99,9 @@ class InvoiceService
 
         if (!$customerId) { // Facture soumise sans destinataire
             if ($existingInvoiceUser) {
-                $this->entityManager->remove($existingInvoiceUser);
+                $existingInvoiceUser->setCustomer(null);
             }
+            $this->updateOrCreateInvoiceUser($invoice, null, $existingInvoiceUser);
             return true;
         }
 
@@ -123,7 +123,7 @@ class InvoiceService
         return true;
     }
 
-    private function updateOrCreateInvoiceUser(Invoice $invoice, Customer $customer, ?InvoiceUser &$existingInvoiceUser): InvoiceUser
+    private function updateOrCreateInvoiceUser(Invoice $invoice, ?Customer $customer, ?InvoiceUser &$existingInvoiceUser): InvoiceUser
     {
         $creator = $this->security->getUser();
 

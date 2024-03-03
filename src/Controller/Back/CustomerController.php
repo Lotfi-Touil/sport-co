@@ -3,6 +3,7 @@
 namespace App\Controller\Back;
 
 use App\Entity\Customer;
+use App\Entity\User;
 use App\Form\CustomerType;
 use App\Repository\CustomerRepository;
 use App\Service\PageAccessService;
@@ -51,10 +52,8 @@ class CustomerController extends AbstractController
         ]);
     }
 
-    /**
-     */
     #[Route('/new', name: 'platform_customer_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
@@ -65,6 +64,14 @@ class CustomerController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $stripeCustomerId = $this->stripeService->createStripeCustomer($customer);
             $customer->setStripeCustomerId($stripeCustomerId);
+
+            if (!$authorizationChecker->isGranted("ROLE_ADMIN")) {
+                $user = $this->security->getUser();
+                if ($user instanceof User) {
+                    $customer->setCompany($user->getCompany());
+                }
+            }
+
             $entityManager->persist($customer);
             $entityManager->flush();
 
@@ -146,12 +153,13 @@ class CustomerController extends AbstractController
     }
 
     #[Route('/search/customers', name: 'customer_search', methods: ['GET'])]
-    public function customerSearch(Request $request, CustomerRepository $customerRepository): Response
+    public function customerSearch(Request $request, CustomerRepository $customerRepository, Security $security): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
         $term = $request->query->get('term');
-        $customers = $customerRepository->findByTerm($term);
+        $company = $security->getUser()->getCompany();
+        $customers = $customerRepository->findByTermAndCompany($term, $company);
 
         return $this->render('back/customer/_search_results.html.twig', [
             'customers' => $customers,

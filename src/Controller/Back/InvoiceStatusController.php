@@ -39,7 +39,7 @@ class InvoiceStatusController extends AbstractController
         } else {
             $company = $this->security->getUser()->getCompany();
             if ($company) {
-                $invoice_statuses = $invoiceStatusRepository->findAllByCompanyId($company->getId());
+                $invoice_statuses = $invoiceStatusRepository->findAllByCompanyId($company->getId(), true);
             }
         }
 

@@ -7,6 +7,12 @@
 
     <section class="p-4 mt-14 w-full">
         <div class="actions flex justify-end">
+            {% if invoice.invoiceUsers is not empty %}
+                {% set customer = invoice.invoiceUsers.first().customer %}
+            {% else %}
+                {% set customer = false %}
+            {% endif %}
+
             {% if can_access('platform_invoice_index') %}
                 <a href="{{ path('platform_invoice_index') }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
                     Revenir à la liste
@@ -14,11 +20,10 @@
             {% endif %}
 
             {% if can_access('platform_invoice_send') %}
-                {% if invoice.invoiceUsers is not empty %}
-                    {% set client = invoice.invoiceUsers[0].customer %}
-                    <a href="{{ path('platform_invoice_send', {'id': invoice.id}) }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 me-2 mb-2">
-                        Envoyer à {{ client.firstName }} {{ client.lastName|upper|slice(0, 1) }}.
-                    </a>
+                {% if customer %}
+                <a href="{{ path('platform_invoice_send', {'id': invoice.id}) }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 me-2 mb-2">
+                    Envoyer à {{ customer.firstName }} {{ customer.lastName|upper|slice(0, 1) }}.
+                </a>
                 {% endif %}
             {% endif %}
 
@@ -89,12 +94,11 @@
                                 <div id="bloc-destinataire" class="text-sm font-light text-slate-500">
                                     <p class="text-sm font-normal text-slate-700">Destinataire</p>
                                     <div class="zone-info-dest">
-                                    {% if invoice.invoiceUsers is not empty %}
-                                        {% set invoiceUser = invoice.invoiceUsers[0] %}
-                                        <input id="user-dest-id" type="hidden" value="{{ invoiceUser.customer.id }}" class="hidden"/>
-                                        <p class="user-dest-intitule disabled">{{ invoiceUser.customer.firstName }} {{ invoiceUser.customer.lastName }}</p>
-                                        <p class="user-dest-email disabled">{{ invoiceUser.customer.email }}</p>
-                                        <p class="user-dest-address-street disabled">{{ invoiceUser.customer.address ?? '-' }}</p>
+                                    {% if customer %}
+                                        <input id="user-dest-id" type="hidden" value="{{ customer.id }}" class="hidden"/>
+                                        <p class="user-dest-intitule disabled">{{ customer.firstName }} {{ customer.lastName }}</p>
+                                        <p class="user-dest-email disabled">{{ customer.email }}</p>
+                                        <p class="user-dest-address-street disabled">{{ customer.address ?? '-' }}</p>
                                     {% else %}
                                         <p>-</p>
                                         <p>-</p>

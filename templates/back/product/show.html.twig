@@ -53,9 +53,13 @@
                         <th class="py-2 px-4 text-left font-semibold text-gray-800 dark:text-white">Price</th>
                         <td class="py-2 px-4 text-gray-800 dark:text-white">{{ product.price }}</td>
                     </tr>
-                    <tr>
+                    <tr class="border-b">
                         <th class="py-2 px-4 text-left font-semibold text-gray-800 dark:text-white">Tax Rate</th>
                         <td class="py-2 px-4 text-gray-800 dark:text-white">{{ product.taxRate }}</td>
+                    </tr>
+                    <tr>
+                        <th class="py-2 px-4 text-left font-semibold text-gray-800 dark:text-white">Paiement récurrant ?</th>
+                        <td class="py-2 px-4 text-gray-800 dark:text-white">{{ product.isRecurring ? 'OUI' : 'NON' }}</td>
                     </tr>
                 </tbody>
             </table>

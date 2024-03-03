@@ -99,8 +99,9 @@ class QuoteService
 
         if (!$customerId) { // Devis soumis sans destinataire
             if ($existingQuoteUser) {
-                $this->entityManager->remove($existingQuoteUser);
+                $existingQuoteUser->setCustomer(null);
             }
+            $this->updateOrCreateQuoteUser($quote, null, $existingQuoteUser);
             return true;
         }
 
@@ -122,7 +123,7 @@ class QuoteService
         return true;
     }
 
-    private function updateOrCreateQuoteUser(Quote $quote, Customer $customer, ?QuoteUser &$existingQuoteUser): QuoteUser
+    private function updateOrCreateQuoteUser(Quote $quote, ?Customer $customer, ?QuoteUser &$existingQuoteUser): QuoteUser
     {
         $creator = $this->security->getUser();
 

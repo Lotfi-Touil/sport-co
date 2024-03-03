@@ -21,15 +21,20 @@ class InvoiceStatusRepository extends ServiceEntityRepository
         parent::__construct($registry, InvoiceStatus::class);
     }
 
-    public function findAllByCompanyId($companyId): array
+    public function findAllByCompanyId($companyId, $includeNullCompany = false): array
     {
-        return $this->createQueryBuilder('i')
-            ->andWhere('i.company = :val')
-            ->setParameter('val', $companyId)
-            ->orderBy('i.id', 'ASC')
-            ->getQuery()
-            ->getResult()
-        ;
+        $qb = $this->createQueryBuilder('i');
+
+        if ($includeNullCompany) {
+            $qb->where('i.company = :val OR i.company IS NULL');
+        } else {
+            $qb->where('i.company = :val');
+        }
+
+        $qb->setParameter('val', $companyId)
+           ->orderBy('i.id', 'ASC');
+
+        return $qb->getQuery()->getResult();
     }
 
 //    /**

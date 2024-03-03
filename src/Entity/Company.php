@@ -61,6 +61,9 @@ class Company
     #[ORM\OneToMany(mappedBy: 'company', targetEntity: ProductCategory::class)]
     private Collection $productCategories;
 
+    #[ORM\OneToMany(mappedBy: 'company', targetEntity: Product::class)]
+    private Collection $products;
+
     public function __construct()
     {
         $this->customers = new ArrayCollection();
@@ -69,6 +72,7 @@ class Company
         $this->invoiceStatuses = new ArrayCollection();
         $this->quoteStatuses = new ArrayCollection();
         $this->productCategories = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -358,6 +362,36 @@ class Company
             // set the owning side to null (unless already changed)
             if ($productCategory->getCompany() === $this) {
                 $productCategory->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getCompany() === $this) {
+                $product->setCompany(null);
             }
         }
 

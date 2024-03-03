@@ -22,6 +22,7 @@ class CustomerType extends AbstractType
             ->add('company', EntityType::class, [
                 'class' => Company::class,
                 'choice_label' => 'name',
+                'required' => false
             ])
         ;
     }

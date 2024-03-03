@@ -24,8 +24,10 @@ use App\Entity\Payment;
 use App\Entity\Invoice;
 use App\Entity\PaymentStatus;
 use App\Entity\PaymentMethod;
+use App\Repository\InvoiceRepository;
 use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -42,10 +44,11 @@ class PaymentController extends AbstractController
     private $stripeSecretKey;
     private $stripeWebhookSecret;
     private $authorizationChecker;
+    private $security;
 
     private $stripeService;
 
-    public function __construct(PageAccessService $pageAccessService, string $stripeSecretKey, string $stripeWebhookSecret,  EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker, StripeService $stripeService)
+    public function __construct(Security $security, PageAccessService $pageAccessService, string $stripeSecretKey, string $stripeWebhookSecret,  EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker, StripeService $stripeService)
     {
         $this->pageAccessService = $pageAccessService;
 
@@ -55,6 +58,7 @@ class PaymentController extends AbstractController
         $this->entityManager = $entityManager;
         $this->authorizationChecker = $authorizationChecker;
         $this->stripeService = $stripeService;
+        $this->security = $security;
     }
 
 
@@ -189,6 +193,8 @@ class PaymentController extends AbstractController
     #[Route('/payment/send-email/{paymentId}', name: 'payment_send_email')]
     public function sendPaymentEmail(MailerInterface $mailer, int $paymentId): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $payment = $this->entityManager->getRepository(Payment::class)->find($paymentId);
         if (!$payment) {
             return new Response('Paiement non trouvé.', Response::HTTP_NOT_FOUND);
@@ -218,8 +224,10 @@ class PaymentController extends AbstractController
      * @throws TransportExceptionInterface
      */
     #[Route('/send-overdue-payment-reminders', name: 'send_overdue_payment_reminders')]
-    public function sendOverduePaymentReminders(PaymentRepository $paymentRepository, MailerInterface $mailer, UrlGeneratorInterface $urlGenerator): Response
+    public function sendOverduePaymentReminders(Request $request, PaymentRepository $paymentRepository, MailerInterface $mailer, UrlGeneratorInterface $urlGenerator): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $paymentStatus = $this->entityManager->getRepository(PaymentStatus::class);
         $overduePayments = $paymentRepository->findOverduePayments($paymentStatus);
 
@@ -243,8 +251,10 @@ class PaymentController extends AbstractController
     }
 
     #[Route('/payment/checkout/{paymentId}', name: 'payment_checkout')]
-    public function checkout(int $paymentId, StripeService $stripeService): Response
+    public function checkout(Request $request, int $paymentId, StripeService $stripeService): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         try {
             $paymentSessionUrl = $stripeService->createPaymentSession($paymentId);
             return $this->redirect($paymentSessionUrl);
@@ -258,6 +268,8 @@ class PaymentController extends AbstractController
     #[Route('/payment/webhook', name: 'payment_webhook', methods: ['POST'])]
     public function stripeWebhook(Request $request, LoggerInterface $logger, EntityManagerInterface $entityManager): JsonResponse
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $logger->info('Webhook received');
         $endpoint_secret = $this->stripeWebhookSecret;
         $payload = $request->getContent();
@@ -341,8 +353,6 @@ class PaymentController extends AbstractController
         return $this->redirectToRoute('app_payment');
     }
 
-
-
     #[Route('/payment/success', name: 'payment_success')]
     public function success(Request $request): Response
     {
@@ -350,7 +360,6 @@ class PaymentController extends AbstractController
 
         return $this->render('back/payment/success.html.twig');
     }
-
 
     #[Route('/payment/failed', name: 'payment_failed')]
     public function failed(Request $request): Response
@@ -361,19 +370,28 @@ class PaymentController extends AbstractController
     }
 
     #[Route('/payment', name: 'app_payment')]
-    public function index(Request $request): Response
+    public function index(Request $request, PaymentRepository $paymentRepository, InvoiceRepository $invoiceRepository): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
-        $payments = $this->entityManager->getRepository(Payment::class)->findAll();
-        $allInvoices = $this->entityManager->getRepository(Invoice::class)->findAll();
+        if ($this->authorizationChecker->isGranted("ROLE_ADMIN")) {
+            $payments = $paymentRepository->findAll();
+            $allInvoices = $invoiceRepository->findAll();
+        } else {
+            $company = $this->security->getUser()->getCompany();
+            if ($company) {
+                $payments = $paymentRepository->findAllByCompanyId($company->getId());
+                $allInvoices = $invoiceRepository->findAllByCompanyId($company->getId());
+            }
+        }
 
         $invoicesWithoutPayments = array_filter($allInvoices, function ($invoice) {
             return $invoice->getPayments()->isEmpty();
         });
+
         return $this->render('back/payment/index.html.twig', [
-            'payments' => $payments,
-            'invoices' => $invoicesWithoutPayments,
+            'payments' => $payments ?? [],
+            'invoices' => $invoicesWithoutPayments ?? [],
         ]);
     }
 }

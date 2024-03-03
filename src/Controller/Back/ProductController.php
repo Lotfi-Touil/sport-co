@@ -38,8 +38,17 @@ class ProductController extends AbstractController
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
+        if ($this->authorizationChecker->isGranted("ROLE_ADMIN")) {
+            $products = $productRepository->findAll();
+        } else {
+            $company = $this->security->getUser()->getCompany();
+            if ($company) {
+                $products = $productRepository->findAllByCompanyId($company->getId());
+            }
+        }
+
         return $this->render('back/product/index.html.twig', [
-            'products' => $productRepository->findAll(),
+            'products' => $products,
         ]);
     }
 
@@ -47,15 +56,19 @@ class ProductController extends AbstractController
      * @throws ApiErrorException
      */
     #[Route('/new', name: 'platform_product_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, Security $security): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
         $product = new Product();
-        $form = $this->createForm(ProductType::class, $product);
+        $companyId = $security->getUser()->getCompany()->getId();
+        $form = $this->createForm(ProductType::class, $product, [
+            'company_id' => $companyId, // Passer l'ID de la compagnie comme option
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $product->setCompany($security->getUser()->getCompany());
             $entityManager->persist($product);
             $entityManager->flush();
 
@@ -135,12 +148,13 @@ class ProductController extends AbstractController
     }
 
     #[Route('/search/products', name: 'product_search', methods: ['GET'])]
-    public function searchProducts(Request $request, ProductRepository $productRepository): Response
+    public function searchProducts(Request $request, ProductRepository $productRepository, Security $security): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
-        $searchTerm = $request->query->get('term');
-        $products = $productRepository->findBySearchTerm($searchTerm);
+        $term = $request->query->get('term');
+        $company = $security->getUser()->getCompany();
+        $products = $productRepository->findByTermAndCompany($term, $company);
 
         return $this->render('back/product/_search_results.html.twig', [
             'products' => $products,
@@ -158,22 +172,6 @@ class ProductController extends AbstractController
         return $this->render('back/product/_product_row.html.twig', [
             'product' => $product,
         ]);
-    }
-
-    // TODO Lotfi : vérifier avec annael si danger avec stripe avant d'ajouter un lien vers une company
-    private function checkConfidentiality(Product $product): ?Response
-    {
-        if ($this->authorizationChecker->isGranted("ROLE_ADMIN")) {
-            return null; // L'admin a accès à tout, donc pas de redirection
-        }
-    
-        if ($this->security->getUser()->getCompany() == $customer->getCompany()) {
-            return null; // L'utilisateur a le droit d'accéder à cette ressource
-        }
-    
-        // L'utilisateur n'a pas le droit d'accéder à cette ressource
-        $this->addFlash('error', "Accès non autorisé à la ressource demandée.");
-        return new RedirectResponse($this->generateUrl('platform_customer_index'));
     }
 
 }

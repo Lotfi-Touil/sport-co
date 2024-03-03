@@ -33,17 +33,20 @@ class CustomerRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findByTerm($term)
+    public function findByTermAndCompany($term, $company)
     {
-        $searchTerms = explode(' ', $term); // Sépare le terme en mots-clés individuels
-        $qb = $this->createQueryBuilder('u');
+        $terms = explode(' ', $term); // Sépare le terme en mots-clés individuels
+        $qb = $this->createQueryBuilder('c');
 
-        foreach ($searchTerms as $key => $searchTerm) {
+        $qb->andWhere('c.company = :company')
+        ->setParameter('company', $company);
+
+        foreach ($terms as $key => $term) {
             $parameter = 'searchTerm' . $key;
             $qb->andWhere($qb->expr()->orX(
-                $qb->expr()->like('LOWER(u.firstName)', ':' . $parameter),
-                $qb->expr()->like('LOWER(u.lastName)', ':' . $parameter)
-            ))->setParameter($parameter, '%' . strtolower($searchTerm) . '%');
+                $qb->expr()->like('LOWER(c.firstName)', ':' . $parameter),
+                $qb->expr()->like('LOWER(c.lastName)', ':' . $parameter)
+            ))->setParameter($parameter, '%' . strtolower($term) . '%');
         }
 
         return $qb->getQuery()->getResult();

@@ -49,7 +49,7 @@ class ProductCategoryController extends AbstractController
     }
 
     #[Route('/new', name: 'platform_product_category_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, Security $security): Response
     {
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
@@ -58,6 +58,7 @@ class ProductCategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $productCategory->setCompany($security->getUser()->getCompany());
             $entityManager->persist($productCategory);
             $entityManager->flush();
 

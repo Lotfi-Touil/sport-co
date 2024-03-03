@@ -131,6 +131,7 @@ class UserController extends AbstractController
     
             $this->addFlash('success', 'Enregistré avec succès.');
 
+            $entityManager->persist($user);
             $entityManager->flush();
 
             return $this->redirectToRoute('platform_user_index', [], Response::HTTP_SEE_OTHER);

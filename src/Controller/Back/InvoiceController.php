@@ -46,7 +46,7 @@ class InvoiceController extends AbstractController
             $company = $this->security->getUser()->getCompany();
             if ($company) {
                 $invoices = $invoiceRepository->findAllByCompanyId($company->getId());
-                $invoice_status = $invoiceStatusRepository->findAllByCompanyId($company->getId());
+                $invoice_status = $invoiceStatusRepository->findAllByCompanyId($company->getId(), true);
             }
         }
 
@@ -66,11 +66,9 @@ class InvoiceController extends AbstractController
         } else {
             $company = $this->security->getUser()->getCompany();
             if ($company) {
-                $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAllByCompanyId($company->getId());
+                $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAllByCompanyId($company->getId(), true);
             }
         }
-
-        $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAll();
 
         $invoice = new Invoice();
         $form = $this->createForm(InvoiceType::class, $invoice, ['status_choices' => $statusList]);
@@ -136,7 +134,7 @@ class InvoiceController extends AbstractController
         } else {
             $company = $this->security->getUser()->getCompany();
             if ($company) {
-                $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAllByCompanyId($company->getId());
+                $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAllByCompanyId($company->getId(), true);
             }
         }
 
