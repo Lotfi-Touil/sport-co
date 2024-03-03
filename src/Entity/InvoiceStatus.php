@@ -21,6 +21,9 @@ class InvoiceStatus
     #[ORM\OneToMany(mappedBy: 'invoiceStatus', targetEntity: Invoice::class)]
     private Collection $invoices;
 
+    #[ORM\ManyToOne(inversedBy: 'invoiceStatuses')]
+    private ?Company $company = null;
+
     public function __construct()
     {
         $this->invoices = new ArrayCollection();
@@ -69,6 +72,18 @@ class InvoiceStatus
                 $invoice->setInvoiceStatus(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
 
         return $this;
     }

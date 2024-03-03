@@ -7,7 +7,7 @@
 
     <div class="flex justify-between lg:justify-center">
         <a href="#" class="text-xl font-bold text-black dark:text-white">
-            .sportCo
+            sportCo
         </a>
         <div id="closeMenu" class="lg:hidden text-black dark:text-white">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
@@ -16,6 +16,7 @@
             </svg>
         </div>
     </div>
+
     <hr class="my-6 border-gray-200 dark:border-gray-600" />
 
     <a href="#" class="flex items-center px-4 -mx-2">
@@ -39,8 +40,47 @@
     </div>
     <hr class="my-6 border-gray-200 dark:border-gray-600" />
 
-    <div class="flex flex-col justify-between flex-1 mt-6">
+    <div class="flex flex-col justify-between flex-1">
         <nav>
+            {# ADMIN #}
+            {% if is_granted("ROLE_ADMIN") %}
+            <h1 class="font-bold mb-5">Administration</h1>
+
+            <a href="{{ path('platform_company_index') }}"
+                class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'platform_company_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
+                </svg>
+                <span class="mx-4 font-medium">Entreprises</span>
+            </a>
+
+            <a href="{{ path('platform_page_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'platform_page_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
+                </svg>
+                <span class="mx-4 font-medium">Pages</span>
+            </a>
+
+            <a href="{{ path('admin_email_type_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'admin_email_type_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
+                </svg>
+                <span class="mx-4 font-medium">Types de mails</span>
+            </a>
+
+            <a href="{{ path('admin_basic_email_template_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'admin_basic_email_template_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
+                </svg>
+                <span class="mx-4 font-medium">Mails par défauts</span>
+            </a>
+            <h1 class="my-6 font-bold mb-5">Platforme</h1>
+            {% endif %}
+            {# PLATFORME #}
             {% if can_access('platform_dashboard') %}
             <a href="{{ path('platform_dashboard') }}"
                 class="flex items-center px-4 py-2 text-gray-700 {{ currentRoute == 'platform_dashboard' ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200' : '' }} hover:bg-gray-100 rounded-md  dark:text-gray-200">
@@ -63,16 +103,6 @@
             </a>
             {% endif %}
 
-            {% if can_access('platform_company_index') %}
-            <a href="{{ path('platform_company_index') }}"
-                class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'platform_company_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
-                </svg>
-                <span class="mx-4 font-medium">Entreprises</span>
-            </a>
-            {% endif %}
 
             {% if can_access('platform_customer_index') %}
             <a href="{{ path('platform_customer_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'platform_customer_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
@@ -93,7 +123,15 @@
                 <span class="mx-4 font-medium">Produits</span>
             </a>
             {% endif %}
-
+            {% if can_access('platform_product_category_index') %}
+            <a href="{{ path('platform_product_category_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'platform_product_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
+                </svg>
+                <span class="mx-4 font-medium">Categories Produits</span>
+            </a>
+            {% endif %}
             {% if can_access('platform_invoice_index') %}
             <a href="{{ path('platform_invoice_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'platform_invoice_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -151,32 +189,6 @@
                     <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
                 </svg>
                 <span class="mx-4 font-medium">Rapports Financiers</span>
-            </a>
-            {% endif %}
-
-            {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('platform_page_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'platform_page_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
-                </svg>
-                <span class="mx-4 font-medium">Pages</span>
-            </a>
-
-            <a href="{{ path('admin_email_type_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'admin_email_type_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
-                </svg>
-                <span class="mx-4 font-medium">Types de mails</span>
-            </a>
-
-            <a href="{{ path('admin_basic_email_template_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'admin_basic_email_template_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <path d="M12 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z"></path>
-                </svg>
-                <span class="mx-4 font-medium">Mails par défauts</span>
             </a>
             {% endif %}
 

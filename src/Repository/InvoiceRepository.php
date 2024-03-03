@@ -24,6 +24,19 @@ class InvoiceRepository extends ServiceEntityRepository
         parent::__construct($registry, Invoice::class);
     }
 
+    public function findAllByCompanyId($companyId): array
+    {
+        return $this->createQueryBuilder('i')
+            ->join('i.invoiceUsers', 'iu')
+            ->join('iu.customer', 'c')
+            ->where('c.company = :company')
+            ->setParameter('company', $companyId)
+            ->orderBy('i.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     /**
      * Calcule le revenu total pour une entreprise spécifique.
      *

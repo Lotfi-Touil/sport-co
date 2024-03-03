@@ -21,6 +21,9 @@ class QuoteStatus
     #[ORM\OneToMany(mappedBy: 'quoteStatus', targetEntity: Quote::class)]
     private Collection $quotes;
 
+    #[ORM\ManyToOne(inversedBy: 'quoteStatuses')]
+    private ?Company $company = null;
+
     public function __construct()
     {
         $this->quotes = new ArrayCollection();
@@ -69,6 +72,18 @@ class QuoteStatus
                 $quote->setQuoteStatus(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
 
         return $this;
     }
