@@ -1,22 +1,52 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reset your password{% endblock %}
+{% block title %}Reinitialisation de mot de passe{% endblock %}
 
 {% block body %}
-    {% for flash_error in app.flashes('reset_password_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
-    <h1>Reset your password</h1>
-
-    {{ form_start(requestForm) }}
-        {{ form_row(requestForm.email) }}
-        <div>
-            <small>
-                Enter your email address, and we will send you a
-                link to reset your password.
-            </small>
+    <main class="w-full flex">
+        <div class="relative flex-1 hidden items-center justify-center h-screen bg-gray-900 lg:flex">
+            <div class="relative z-10 w-full max-w-md">
+                <div class="mt-16 space-y-3">
+                    <h3 class="text-white text-3xl font-bold">
+                        Mot de passe oublié ?
+                    </h3>
+                    <p class="text-gray-300">
+                        Mot de passe oublié ? Pas de soucis, on s'occupe de vous !
+                    </p>
+                </div>
+            </div>
+            <div class="absolute inset-0 my-auto h-[500px]" style="
+        background: linear-gradient(
+          152.92deg,
+          rgba(192, 132, 252, 0.2) 4.54%,
+          rgba(232, 121, 249, 0.26) 34.2%,
+          rgba(192, 132, 252, 0.1) 77.55%
+        );
+        filter: blur(118px);
+      "></div>
         </div>
+        <div class="flex-1 flex items-center justify-center h-screen">
+            <div class="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0">
 
-        <button class="btn btn-primary">Send password reset email</button>
-    {{ form_end(requestForm) }}
+                <div class="">
+                    <div class="mt-5 space-y-2">
+                        <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">
+                            Retrouver mon mot de passe
+                        </h3>
+                    </div>
+                </div>
+                {{ form_start(requestForm) }}
+                {{ form_row(requestForm.email) }}
+                <div>
+                    <small>
+                        Entrer votre email, afin de reinitialiser votre mot de passe
+                    </small>
+                </div>
+
+                <button class="btn btn-primary">Envoyer le mail de reinitialisation</button>
+                {{ form_end(requestForm) }}
+            </div>
+        </div>
+    </main>
 {% endblock %}
+
