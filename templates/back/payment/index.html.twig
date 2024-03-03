@@ -116,6 +116,13 @@
                                         {% endfor %}
                                     </ul>
                                     <div class="mb-4">
+                                        <label for="payment-method"
+                                               class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Mode de Paiement :</label>
+                                        <select id="payment-method" name="payment_method"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                        </select>
+                                    </div>
+                                    <div class="mb-4">
                                         <label for="payment-type"
                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Type
                                             de Paiement :</label>
@@ -181,6 +188,7 @@
         function submitPaymentForm() {
             var selectedInvoiceId = $('input[name="invoice"]:checked').val();
             var paymentType = $('#payment-type').val();
+            var paymentMethodId = $('#payment-method').val();
             var errorMessage = $('#error-message');
 
             errorMessage.addClass('hidden').text('');
@@ -194,10 +202,12 @@
                 url: '/platform/payment/create/' + selectedInvoiceId,
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({payment_type: paymentType}),
+                data: JSON.stringify({
+                    payment_type: paymentType,
+                    payment_method_id: paymentMethodId
+                }),
                 success: function(data) {
                     console.log('Paiement créé', data);
-                    // Gérer différemment en fonction de si une URL de paiement est fournie
                     if(data.url) {
                         window.location.href = data.url; // Redirection vers la page de paiement Stripe Checkout si URL présente
                     } else if(data.clientSecret) {
@@ -214,6 +224,24 @@
                 }
             });
         }
+
+        function loadPaymentMethods() {
+            $.ajax({
+                url: '/payment-methods',
+                type: 'GET',
+                success: function(data) {
+                    const paymentMethodSelect = $('#payment-method');
+                    data.forEach(method => {
+                        paymentMethodSelect.append(new Option(method.name, method.id));
+                    });
+                },
+                error: function() {
+                    alert('Erreur lors du chargement des modes de paiement.');
+                }
+            });
+        }
+
+        loadPaymentMethods();
 
 
         $(document).ready(function() {

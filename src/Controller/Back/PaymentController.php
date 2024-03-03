@@ -3,9 +3,13 @@
 namespace App\Controller\Back;
 
 
+use App\Entity\InvoiceStatus;
 use App\Repository\PaymentRepository;
+use Psr\Log\LoggerInterface;
+use Stripe\Webhook;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -80,11 +84,18 @@ class PaymentController extends AbstractController
                 throw new \Exception("Un paiement a déjà été initié pour cette facture.");
             }
 
+
+
             $amount = $invoice->getTotalAmount();
 
             $content = json_decode($request->getContent(), true);
             $paymentType = $content['payment_type'] ?? 'unique'; // Remplacer ici
             $isRecurring = $paymentType === 'recurring';
+
+            $paymentMethodId = $content['payment_method_id'] ?? null;
+            if (!$paymentMethodId) {
+                throw new \Exception("Méthode de paiement non trouvée.");
+            }
 
             $payment = new Payment();
             $payment->setAmount($amount);
@@ -96,19 +107,43 @@ class PaymentController extends AbstractController
                 throw new \Exception("Statut de paiement par défaut introuvable.");
             }
             $payment->setPaymentStatus($defaultPaymentStatus);
-            $defaultPaymentMethod = $this->entityManager->getRepository(PaymentMethod::class)->findOneBy(['name' => 'Carte de crédit']);
-            if (!$defaultPaymentMethod) {
-                throw new \Exception("Méthode de paiement par défaut introuvable.");
+            $paymentMethod = $this->entityManager->getRepository(PaymentMethod::class)->find($paymentMethodId);
+            if (!$paymentMethod) {
+                throw new \Exception("Méthode de paiement non trouvée.");
             }
-            $payment->setPaymentMethod($defaultPaymentMethod);
+            $payment->setPaymentMethod($paymentMethod);
+            dump($paymentMethod->getName());
 
 
             if (!$isRecurring) {
-                $paymentIntent = $this->stripeClient->paymentIntents->create([
-                    'amount' => $amount * 100,
-                    'currency' => 'eur',
-                    'payment_method_types' => ['card'],
-                ]);
+                if ($paymentMethod->getName() == 'Carte de crédit') {
+                    // Initiation d'un paiement par carte de crédit avec Stripe
+                    $paymentIntent = $this->stripeClient->paymentIntents->create([
+                        'amount' => $amount * 100, // montant en centimes
+                        'currency' => 'eur',
+                        'payment_method_types' => ['card'],
+                    ]);
+                } elseif ($paymentMethod->getName() == 'PayPal') {
+                    $paymentIntent = $this->stripeClient->paymentIntents->create([
+                        'amount' => $amount * 100, // montant en centimes
+                        'currency' => 'eur',
+                        'payment_method_types' => ['paypal'],
+                    ]);
+                } elseif ($paymentMethod->getName() == 'Virement bancaire') {
+                    $paymentIntent = $this->stripeClient->paymentIntents->create([
+                        'amount' => $amount * 100, // montant en centimes
+                        'currency' => 'eur',
+                        'payment_method_types' => ['sepa_debit'],
+                    ]);
+                } else {
+                    return new Response('Erreur: Méthode de paiement non reconnue.', Response::HTTP_BAD_REQUEST);
+                }
+
+//                $paymentIntent = $this->stripeClient->paymentIntents->create([
+//                    'amount' => $amount * 100,
+//                    'currency' => 'eur',
+//                    'payment_method_types' => ['card'],
+//                ]);
                 $payment->setStripePaymentIntentId($paymentIntent->id);
                 $this->entityManager->persist($payment);
                 $this->entityManager->flush();
@@ -206,11 +241,13 @@ class PaymentController extends AbstractController
             throw $this->createNotFoundException('Paiement non trouvé.');
         }
 
+        $paymentMethodType = $this->determineStripePaymentMethodType($payment);
+
         $invoice = $payment->getInvoice();
         $amount = $payment->getAmount();
 
         $session = $this->stripeClient->checkout->sessions->create([
-            'payment_method_types' => ['card'],
+            'payment_method_types' => [$paymentMethodType],
             'line_items' => [[
                 'price_data' => [
                     'currency' => 'eur',
@@ -230,43 +267,86 @@ class PaymentController extends AbstractController
         return $this->redirect($session->url);
     }
 
-    #[Route('/payment/webhook', name: 'payment_webhook')]
-    public function stripeWebhook(Request $request): Response
+    private function determineStripePaymentMethodType(Payment $payment): string
     {
-        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+        // Exemple de correspondance entre le nom du PaymentMethod et les types Stripe
+        $typeMapping = [
+            'Carte de crédit' => 'card',
+            'PayPal' => 'paypal',
+            'Virement bancaire' => 'sepa_debit', // Vérifiez la documentation Stripe pour le type exact
+            // Ajoutez d'autres mappings si nécessaire
+        ];
 
+        // Obtenez le nom ou l'identifiant du type de paiement depuis $payment
+        // Assurez-vous d'adapter cette partie en fonction de votre modèle de données
+        $paymentMethodName = $payment->getPaymentMethod()->getName();
+
+        // Retourner le type de paiement Stripe correspondant ou un type par défaut
+        return $typeMapping[$paymentMethodName] ?? 'card'; // 'card' comme fallback par défaut
+    }
+
+    #[Route('/payment/webhook', name: 'payment_webhook')]
+    public function stripeWebhook(Request $request, LoggerInterface $logger, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $logger->info('Webhook received');
         $endpoint_secret = $this->stripeWebhookSecret;
         $payload = $request->getContent();
         $sig_header = $request->headers->get('Stripe-Signature');
 
         try {
-            $event = \Stripe\Webhook::constructEvent(
+            $event = Webhook::constructEvent(
                 $payload,
                 $sig_header,
                 $endpoint_secret
             );
 
-            if ($event->type === 'checkout.session.completed') {
-                $session = $event->data->object;
+            $logger->info('Stripe webhook received', ['event_type' => $event->type]);
 
-                $paymentId = $session->metadata->payment_id;
-                $payment = $this->entityManager->getRepository(Payment::class)->find($paymentId);
+            switch ($event->type) {
+                case 'checkout.session.completed':
+                    $session = $event->data->object;
+                    $paymentId = $session->metadata['payment_id'];
+                    $logger->info('Processing checkout.session.completed', ['payment_id' => $paymentId]);
 
-                if ($payment) {
-                    $payment->setPaymentStatus('Paid');
-                    $this->entityManager->flush();
-                }
+                    $payment = $entityManager->getRepository(Payment::class)->find($paymentId);
+                    if (!$payment) {
+                        $logger->error('Payment not found', ['payment_id' => $paymentId]);
+                        return new JsonResponse(['error' => 'Payment not found', 'status' => Response::HTTP_NOT_FOUND]);
+                    }
+
+                    $completedPaymentStatus = $entityManager->getRepository(PaymentStatus::class)->findOneBy(['name' => 'Complété']);
+                    $completedInvoiceStatus = $entityManager->getRepository(InvoiceStatus::class)->findOneBy(['title' => 'Payée']);
+
+                    if (!$completedPaymentStatus || !$completedInvoiceStatus) {
+                        $logger->error('Completed status not found', ['payment_status' => $completedPaymentStatus, 'invoice_status' => $completedInvoiceStatus]);
+                        return new JsonResponse(['error' => 'Status not found', 'status' => Response::HTTP_OK]);
+                    }
+
+                    $payment->setPaymentStatus($completedPaymentStatus);
+                    $invoice = $payment->getInvoice();
+                    $invoice->setInvoiceStatus($completedInvoiceStatus);
+                    $entityManager->flush();
+
+                    $logger->info('Payment and invoice status updated to completed', ['payment_id' => $paymentId]);
+                    return new JsonResponse(['message' => 'Webhook Handled for session completed', 'status' => Response::HTTP_OK]);
+                default:
+                    $logger->info('Received another type of event', ['event_type' => $event->type]);
+                    return new JsonResponse(['message' => 'Received another type of event', 'status' => Response::HTTP_OK]);
             }
-
-            return new Response('Webhook Handled', Response::HTTP_OK);
         } catch (\UnexpectedValueException $e) {
-            return new Response('Invalid payload', Response::HTTP_BAD_REQUEST);
+            $logger->error('Invalid payload', ['exception' => $e->getMessage()]);
+            return new JsonResponse(['error' => 'Invalid payload', 'status' => Response::HTTP_BAD_REQUEST]);
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
-            return new Response('Invalid signature', Response::HTTP_BAD_REQUEST);
+            $logger->error('Invalid signature', ['exception' => $e->getMessage()]);
+            return new JsonResponse(['error' => 'Invalid signature', 'status' => Response::HTTP_BAD_REQUEST]);
         } catch (\Exception $e) {
-            return new Response('Internal error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            $logger->error('Internal error', ['exception' => $e->getMessage()]);
+            return new JsonResponse(['error' => 'Internal error: ' . $e->getMessage(), 'status' => Response::HTTP_INTERNAL_SERVER_ERROR]);
         }
     }
+
+
+
 
 
     #[Route('/payment/success', name: 'payment_success')]

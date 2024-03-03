@@ -81,6 +81,12 @@ class ProductController extends AbstractController
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @param Product $product
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
     #[Route('/{id}/edit', name: 'platform_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
@@ -90,6 +96,14 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $newBillingType = $product->getIsRecurring() ? 'recurring' : 'one_time';
+            $stripeData = $this->stripeService->updateStripeProduct($product, $newBillingType);
+
+            if (!empty($stripeData)) {
+                $product->setStripeProductId($stripeData['stripeProductId'] ?? $product->getStripeProductId());
+                $product->setStripePriceId($stripeData['stripePriceId'] ?? $product->getStripePriceId());
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('platform_product_index', [], Response::HTTP_SEE_OTHER);
@@ -107,6 +121,7 @@ class ProductController extends AbstractController
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
         if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
+            $this->stripeService->deleteStripeProduct($product);
             $entityManager->remove($product);
             $entityManager->flush();
         }
