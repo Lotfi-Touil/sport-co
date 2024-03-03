@@ -112,6 +112,13 @@ class Invoice
         return $this;
     }
 
+    public function getCustomerName(): ?string
+    {
+        $invoiceUser = $this->invoiceUsers->first();
+        return $invoiceUser ? $invoiceUser->getCustomer()->getFirstName() . ' ' . $invoiceUser->getCustomer()->getLastName() : null;
+    }
+
+
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
