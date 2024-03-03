@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/platform/email/template')]
+#[Route('/platform/basic-email-template/template')]
 class BasicEmailTemplateController extends AbstractController
 {
     #[Route('/', name: 'admin_basic_email_template_index', methods: ['GET'])]
@@ -26,8 +26,6 @@ class BasicEmailTemplateController extends AbstractController
     #[Route('/new', name: 'admin_basic_email_template_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-
-
         $emailTypeCount = $entityManager->getRepository(EmailType::class)->count([]);
         $basicEmailTemplateCount = $entityManager->getRepository(BasicEmailTemplate::class)->count([]);
 

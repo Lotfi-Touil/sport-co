@@ -6,6 +6,18 @@
     {% include '_partials/back/_platform_nav.html.twig' %}
 
     <section class="p-4 mt-14 w-full">
+        <div id="flash-messages" class="fixed bottom-4 mb-4 right-4 z-50 flex flex-col space-y-2">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash-message {{ label == 'success' ? 'bg-green-500 text-white' : '' }}
+                                {{ label == 'error' ? 'bg-red-500 text-white' : '' }}
+                                px-4 py-2 rounded shadow-md relative" role="alert">
+                        <span class="block sm:inline">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-lg font-bold">Liste template d'email</h1>
         </div>
@@ -44,6 +56,7 @@
                             <a href="{{ path('platform_email_template_edit', {'id': template.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
                                 Modifier
                             </a>
+                            <a href="{{ path('platform_email_template_test', {'type': template.type.id}) }}">Tester</a>
                         </td>
                     </tr>
                 {% endfor %}

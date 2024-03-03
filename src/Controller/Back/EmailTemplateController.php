@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('platform/email/template')]
+#[Route('platform/email-template/template')]
 class EmailTemplateController extends AbstractController
 {
     #[Route('/', name: 'platform_email_template_index', methods: ['GET'])]
@@ -51,4 +51,22 @@ class EmailTemplateController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/test-send-mail/{type}', name: 'platform_email_template_test', methods: ['GET', 'POST'])]
+    public function testSendMail(Request $request, MailService $mailService, EmailTypeRepository $emailTypeRepository): Response
+    {
+        $user = $this->getUser();
+
+        $emailTypeId = $request->get('type');
+        $EmailType = $emailTypeRepository->find($emailTypeId);
+
+        if (!$mailService->sendTestMail($user, $EmailType)) {
+            $this->addFlash('error', $mailService->getError());
+            return $this->redirectToRoute("platform_email_template_index");
+        }
+
+        $this->addFlash('success', 'Le Mail a été envoyé avec succès.');
+        return $this->redirectToRoute("platform_email_template_index");
+    }
+
 }

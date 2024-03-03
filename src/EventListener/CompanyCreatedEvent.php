@@ -18,14 +18,13 @@ class CompanyCreatedEvent
     private BasicEmailTemplateRepository $basicEmailTemplateRepository;
     public function __construct(EmailTypeRepository $emailTypeRepository,EntityManagerInterface $entityManager,BasicEmailTemplateRepository $basicEmailTemplateRepository)
     {
-
         $this->emailTypeRepository = $emailTypeRepository;
         $this->basicEmailTemplateRepository = $basicEmailTemplateRepository;
 
     }
+
     public function postPersist(Company $company,PostPersistEventArgs $event) : void
     {
-
         $emailTypes = $this -> getDefaultEmailType();
         $baseEmailTemplates = $this->getDefaultTemplate();
 
