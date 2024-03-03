@@ -16,17 +16,49 @@ class StripeService
         $this->stripeClient = new StripeClient($stripeApiKey);
     }
 
-    /**
-     * @throws ApiErrorException
-     */
-    public function createStripeCustomer(Customer $customer): string
+    public function createStripeCustomer(Customer $customer): ?string
     {
-        $stripeCustomer = $this->stripeClient->customers->create([
-            'email' => $customer->getEmail(),
-            'name' => $customer->getFirstName() . ' ' . $customer->getLastName(),
-        ]);
+        try {
+            $stripeCustomer = $this->stripeClient->customers->create([
+                'email' => $customer->getEmail(),
+                'name' => $customer->getFirstName() . ' ' . $customer->getLastName(),
+            ]);
 
-        return $stripeCustomer->id;
+            return $stripeCustomer->id;
+        } catch (ApiErrorException $e) {
+            return null;
+        }
+    }
+
+    public function deleteStripeCustomer(Customer $customer): bool
+    {
+        if (empty($customer->getStripeCustomerId())) {
+            return false;
+        }
+
+        try {
+            $this->stripeClient->customers->delete($customer->getStripeCustomerId());
+            return true;
+        } catch (ApiErrorException $e) {
+            return false;
+        }
+    }
+
+    public function updateStripeCustomer(Customer $customer): bool
+    {
+        if (empty($customer->getStripeCustomerId())) {
+            return false;
+        }
+
+        try {
+            $this->stripeClient->customers->update($customer->getStripeCustomerId(), [
+                'email' => $customer->getEmail(),
+                'name' => $customer->getFirstName() . ' ' . $customer->getLastName(),
+            ]);
+            return true;
+        } catch (ApiErrorException $e) {
+            return false;
+        }
     }
 
     public function deleteStripeProduct($stripeProductId)
