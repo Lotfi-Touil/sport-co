@@ -42,6 +42,7 @@ class ProductCategoryController extends AbstractController
                 $productCategories = $productCategoryRepository->findAllByCompanyId($company->getId());
             }
         }
+
         return $this->render('back/product_category/index.html.twig', [
             'product_categories' => $productCategories,
         ]);

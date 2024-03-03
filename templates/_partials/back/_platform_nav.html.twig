@@ -7,7 +7,7 @@
 
     <div class="flex justify-between lg:justify-center">
         <a href="#" class="text-xl font-bold text-black dark:text-white">
-            sportCo
+            .sportCo
         </a>
         <div id="closeMenu" class="lg:hidden text-black dark:text-white">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
@@ -54,6 +54,7 @@
                 </svg>
                 <span class="mx-4 font-medium">Entreprises</span>
             </a>
+            {% endif %}
 
             <a href="{{ path('platform_page_index') }}" class="flex items-center px-4 py-2 mt-5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 {{ currentRoute == 'platform_page_index' ? 'bg-gray-100 dark:bg-gray-800' : '' }}">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
