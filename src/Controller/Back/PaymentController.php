@@ -285,7 +285,7 @@ class PaymentController extends AbstractController
         return $typeMapping[$paymentMethodName] ?? 'card'; // 'card' comme fallback par défaut
     }
 
-    #[Route('/payment/webhook', name: 'payment_webhook')]
+    #[Route('/payment/webhook', name: 'payment_webhook', methods: ['POST'])]
     public function stripeWebhook(Request $request, LoggerInterface $logger, EntityManagerInterface $entityManager): JsonResponse
     {
         $logger->info('Webhook received');
@@ -345,7 +345,31 @@ class PaymentController extends AbstractController
         }
     }
 
+    #[Route('/payment/delete/{paymentId}', name: 'payment_delete')]
+    public function delete(Request $request, int $paymentId): Response
+    {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
+        if (!$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            throw new AccessDeniedException('Accès refusé.');
+        }
+
+        $payment = $this->entityManager->getRepository(Payment::class)->find($paymentId);
+        if (!$payment) {
+            $this->addFlash('error', 'Paiement non trouvé.');
+            return $this->redirectToRoute('app_payment');
+        }
+
+        try {
+            $this->entityManager->remove($payment);
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Le paiement a été supprimé avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de la suppression du paiement: ' . $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_payment');
+    }
 
 
 

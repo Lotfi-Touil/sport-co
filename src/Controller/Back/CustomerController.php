@@ -37,7 +37,6 @@ class CustomerController extends AbstractController
     }
 
     /**
-     * @throws ApiErrorException
      */
     #[Route('/new', name: 'platform_customer_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -53,6 +52,10 @@ class CustomerController extends AbstractController
             $customer->setStripeCustomerId($stripeCustomerId);
             $entityManager->persist($customer);
             $entityManager->flush();
+
+            if ($stripeCustomerId === null) {
+                $this->addFlash('warning', 'Le client a été créé, mais l\'enregistrement sur Stripe a échoué.');
+            }
 
             return $this->redirectToRoute('platform_customer_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -82,6 +85,7 @@ class CustomerController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->stripeService->updateStripeCustomer($customer);
             $entityManager->flush();
 
             return $this->redirectToRoute('platform_customer_index', [], Response::HTTP_SEE_OTHER);
@@ -99,8 +103,16 @@ class CustomerController extends AbstractController
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
         if ($this->isCsrfTokenValid('delete'.$customer->getId(), $request->request->get('_token'))) {
+            $stripeDeletionSuccess = $this->stripeService->deleteStripeCustomer($customer);
+
             $entityManager->remove($customer);
             $entityManager->flush();
+
+            if ($stripeDeletionSuccess) {
+                $this->addFlash('success', 'Le client a été supprimé avec succès de la base de données et de Stripe.');
+            } else {
+                $this->addFlash('warning', 'Le client a été supprimé de la base de données, mais la suppression sur Stripe a échoué.');
+            }
         }
 
         return $this->redirectToRoute('platform_customer_index', [], Response::HTTP_SEE_OTHER);
