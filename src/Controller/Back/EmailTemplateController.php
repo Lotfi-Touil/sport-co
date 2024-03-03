@@ -31,8 +31,10 @@ class EmailTemplateController extends AbstractController
     }
 
     #[Route('/', name: 'platform_email_template_index', methods: ['GET'])]
-    public function index(EmailTemplateRepository $emailTemplateRepository, AuthorizationCheckerInterface $authorizationChecker): Response
+    public function index(Request $request, EmailTemplateRepository $emailTemplateRepository, AuthorizationCheckerInterface $authorizationChecker): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         if ($authorizationChecker->isGranted("ROLE_ADMIN")) {
             $emailTemplates = $emailTemplateRepository->findAll();
         } else {
@@ -50,8 +52,10 @@ class EmailTemplateController extends AbstractController
     }
 
     #[Route('/{id}', name: 'platform_email_template_show', methods: ['GET'])]
-    public function show(EmailTemplate $emailTemplate): Response
+    public function show(Request $request, EmailTemplate $emailTemplate): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         return $this->render('back/email_template/show.html.twig', [
             'email_template' => $emailTemplate,
         ]);
@@ -60,6 +64,8 @@ class EmailTemplateController extends AbstractController
     #[Route('/{id}/edit', name: 'platform_email_template_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, EmailTemplate $emailTemplate, EntityManagerInterface $entityManager): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $form = $this->createForm(EmailTemplateType::class, $emailTemplate);
         $form->handleRequest($request);
 
@@ -78,6 +84,8 @@ class EmailTemplateController extends AbstractController
     #[Route('/test-send-mail/{type}', name: 'platform_email_template_test', methods: ['GET', 'POST'])]
     public function testSendMail(Request $request, MailService $mailService, EmailTypeRepository $emailTypeRepository): Response
     {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
         $user = $this->getUser();
 
         $emailTypeId = $request->get('type');
