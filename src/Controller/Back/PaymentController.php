@@ -5,11 +5,14 @@ namespace App\Controller\Back;
 
 use App\Entity\InvoiceStatus;
 use App\Repository\PaymentRepository;
+use App\Service\StripeService;
 use Psr\Log\LoggerInterface;
+use Stripe\Exception\ApiErrorException;
 use Stripe\Webhook;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -26,6 +29,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * @method createPaymentSession(Request $request, int $paymentId)
+ */
 #[Route('/platform')]
 class PaymentController extends AbstractController
 {
@@ -37,7 +43,9 @@ class PaymentController extends AbstractController
     private $stripeWebhookSecret;
     private $authorizationChecker;
 
-    public function __construct(PageAccessService $pageAccessService, string $stripeSecretKey, string $stripeWebhookSecret,  EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker)
+    private $stripeService;
+
+    public function __construct(PageAccessService $pageAccessService, string $stripeSecretKey, string $stripeWebhookSecret,  EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker, StripeService $stripeService)
     {
         $this->pageAccessService = $pageAccessService;
 
@@ -46,6 +54,7 @@ class PaymentController extends AbstractController
         $this->stripeClient = new StripeClient($stripeSecretKey);
         $this->entityManager = $entityManager;
         $this->authorizationChecker = $authorizationChecker;
+        $this->stripeService = $stripeService;
     }
 
 
@@ -117,21 +126,20 @@ class PaymentController extends AbstractController
 
             if (!$isRecurring) {
                 if ($paymentMethod->getName() == 'Carte de crédit') {
-                    // Initiation d'un paiement par carte de crédit avec Stripe
                     $paymentIntent = $this->stripeClient->paymentIntents->create([
-                        'amount' => $amount * 100, // montant en centimes
+                        'amount' => $amount * 100,
                         'currency' => 'eur',
                         'payment_method_types' => ['card'],
                     ]);
                 } elseif ($paymentMethod->getName() == 'PayPal') {
                     $paymentIntent = $this->stripeClient->paymentIntents->create([
-                        'amount' => $amount * 100, // montant en centimes
+                        'amount' => $amount * 100,
                         'currency' => 'eur',
                         'payment_method_types' => ['paypal'],
                     ]);
                 } elseif ($paymentMethod->getName() == 'Virement bancaire') {
                     $paymentIntent = $this->stripeClient->paymentIntents->create([
-                        'amount' => $amount * 100, // montant en centimes
+                        'amount' => $amount * 100,
                         'currency' => 'eur',
                         'payment_method_types' => ['sepa_debit'],
                     ]);
@@ -139,11 +147,6 @@ class PaymentController extends AbstractController
                     return new Response('Erreur: Méthode de paiement non reconnue.', Response::HTTP_BAD_REQUEST);
                 }
 
-//                $paymentIntent = $this->stripeClient->paymentIntents->create([
-//                    'amount' => $amount * 100,
-//                    'currency' => 'eur',
-//                    'payment_method_types' => ['card'],
-//                ]);
                 $payment->setStripePaymentIntentId($paymentIntent->id);
                 $this->entityManager->persist($payment);
                 $this->entityManager->flush();
@@ -179,6 +182,10 @@ class PaymentController extends AbstractController
         }
     }
 
+    /**
+     * @throws ApiErrorException
+     * @throws TransportExceptionInterface
+     */
     #[Route('/payment/send-email/{paymentId}', name: 'payment_send_email')]
     public function sendPaymentEmail(MailerInterface $mailer, int $paymentId): Response
     {
@@ -190,7 +197,7 @@ class PaymentController extends AbstractController
         $invoice = $payment->getInvoice();
         $customerEmail = $invoice->getInvoiceUsers()->first()->getCustomer()->getEmail();
 
-        $paymentLink = $this->generateUrl('payment_checkout', ['paymentId' => $paymentId], UrlGeneratorInterface::ABSOLUTE_URL);
+        $paymentLink = $this->stripeService->createPaymentSession($payment->getId());
 
         $email = (new TemplatedEmail())
             ->from(new Address('no.reply.sportco@gmail.com', 'SportCo Bot'))
@@ -206,6 +213,10 @@ class PaymentController extends AbstractController
         return new Response('Email envoyé avec succès.', Response::HTTP_OK);
     }
 
+    /**
+     * @throws ApiErrorException
+     * @throws TransportExceptionInterface
+     */
     #[Route('/send-overdue-payment-reminders', name: 'send_overdue_payment_reminders')]
     public function sendOverduePaymentReminders(PaymentRepository $paymentRepository, MailerInterface $mailer, UrlGeneratorInterface $urlGenerator): Response
     {
@@ -214,7 +225,7 @@ class PaymentController extends AbstractController
 
         foreach ($overduePayments as $payment) {
             $customerEmail = $payment->getInvoice()->getInvoiceUsers()->first()->getCustomer()->getEmail();
-            $paymentLink = $urlGenerator->generate('payment_checkout', ['paymentId' => $payment->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $paymentLink = $this->stripeService->createPaymentSession($payment->getId());
 
             $email = (new TemplatedEmail())
                 ->from(new Address('no.reply.sportco@gmail.com', 'SportCo Bot'))
@@ -232,58 +243,17 @@ class PaymentController extends AbstractController
     }
 
     #[Route('/payment/checkout/{paymentId}', name: 'payment_checkout')]
-    public function checkout(Request $request, int $paymentId): Response
+    public function checkout(int $paymentId, StripeService $stripeService): Response
     {
-        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
-
-        $payment = $this->entityManager->getRepository(Payment::class)->find($paymentId);
-        if (!$payment) {
-            throw $this->createNotFoundException('Paiement non trouvé.');
+        try {
+            $paymentSessionUrl = $stripeService->createPaymentSession($paymentId);
+            return $this->redirect($paymentSessionUrl);
+        } catch (\Exception $e) {
+            throw $this->createNotFoundException('Impossible de créer la session de paiement.');
         }
-
-        $paymentMethodType = $this->determineStripePaymentMethodType($payment);
-
-        $invoice = $payment->getInvoice();
-        $amount = $payment->getAmount();
-
-        $session = $this->stripeClient->checkout->sessions->create([
-            'payment_method_types' => [$paymentMethodType],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'eur',
-                    'product_data' => [
-                        'name' => 'Paiement pour Facture #' . $invoice->getId(),
-                    ],
-                    'unit_amount' => $amount * 100,
-                ],
-                'quantity' => 1,
-            ]],
-            'mode' => 'payment',
-            'success_url' => $this->generateUrl('payment_success', ['paymentId' => $paymentId], UrlGeneratorInterface::ABSOLUTE_URL),
-            'cancel_url' => $this->generateUrl('payment_failed', ['paymentId' => $paymentId], UrlGeneratorInterface::ABSOLUTE_URL),
-            'metadata' => ['payment_id' => $paymentId],
-        ]);
-
-        return $this->redirect($session->url);
     }
 
-    private function determineStripePaymentMethodType(Payment $payment): string
-    {
-        // Exemple de correspondance entre le nom du PaymentMethod et les types Stripe
-        $typeMapping = [
-            'Carte de crédit' => 'card',
-            'PayPal' => 'paypal',
-            'Virement bancaire' => 'sepa_debit', // Vérifiez la documentation Stripe pour le type exact
-            // Ajoutez d'autres mappings si nécessaire
-        ];
 
-        // Obtenez le nom ou l'identifiant du type de paiement depuis $payment
-        // Assurez-vous d'adapter cette partie en fonction de votre modèle de données
-        $paymentMethodName = $payment->getPaymentMethod()->getName();
-
-        // Retourner le type de paiement Stripe correspondant ou un type par défaut
-        return $typeMapping[$paymentMethodName] ?? 'card'; // 'card' comme fallback par défaut
-    }
 
     #[Route('/payment/webhook', name: 'payment_webhook', methods: ['POST'])]
     public function stripeWebhook(Request $request, LoggerInterface $logger, EntityManagerInterface $entityManager): JsonResponse
