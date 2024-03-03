@@ -1,134 +1,563 @@
+{#{% extends 'base.html.twig' %}#}
+
+{#{% block title %}Register{% endblock %}#}
+
+{#{% block body %}#}
+
+{#    <div class="flex items-center justify-center w-full">#}
+{#        <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">#}
+{#            <h1 class="text-xl mb-4 text-center font-semibold">Inscrivez-vous en 30 secondes !</h1>#}
+
+{#            {% if form_errors(registrationForm) %}#}
+{#                <div class="alert alert-danger">{{ form_errors(registrationForm)|trans({}, 'security') }}</div>#}
+{#            {% endif %}#}
+{#            {% for flash_error in app.flashes('verify_email_error') %}#}
+{#                <div class="alert alert-danger" role="alert">{{ flash_error }}</div>#}
+{#            {% endfor %}#}
+
+{#            {{ form_start(registrationForm) }}#}
+
+{#            <div class="flex">#}
+{#                <div id="personalInfoSection" class="left-bloc p-4">#}
+{#                    <h2 class="text-lg mb-4 font-semibold text-gray-800">Informations Personnelles</h2>#}
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Prénom</label>#}
+{#                        {{ form_widget(registrationForm.firstName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_firstName', 'required': 'required'}}) }}#}
+{#                        {{ form_errors(registrationForm.firstName) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>#}
+{#                        {{ form_widget(registrationForm.lastName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_lastName', 'required': 'required'}}) }}#}
+{#                        {{ form_errors(registrationForm.lastName) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>#}
+{#                        {{ form_widget(registrationForm.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_email', 'autocomplete': 'email', 'required': 'required'}}) }}#}
+{#                        {{ form_errors(registrationForm.email) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Téléphone</label>#}
+{#                        {{ form_widget(registrationForm.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_phone', 'autocomplete': 'tel', 'required': 'required'}}) }}#}
+{#                        {{ form_errors(registrationForm.phone) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Adresse</label>#}
+{#                        {{ form_widget(registrationForm.address, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_address', 'required': 'required'}}) }}#}
+{#                        {{ form_errors(registrationForm.address) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>#}
+{#                        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_plainPassword_first', 'required': 'required'}}) }}#}
+{#                        {{ form_errors(registrationForm.plainPassword.first) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Confirmer mot de passe</label>#}
+{#                        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_plainPassword_second', 'required': 'required'}}) }}#}
+{#                        {{ form_errors(registrationForm.plainPassword.second) }}#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div id="companyInfoSection" class="right-bloc p-4 hidden">#}
+{#                    <h2 class="text-lg mb-4 font-semibold text-gray-800">Informations entreprise</h2>#}
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>#}
+{#                        {{ form_widget(registrationForm.company.name, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}#}
+{#                        {{ form_errors(registrationForm.company.name) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>#}
+{#                        {{ form_widget(registrationForm.company.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}#}
+{#                        {{ form_errors(registrationForm.company.email) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">N° Siret</label>#}
+{#                        {{ form_widget(registrationForm.company.siret, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}#}
+{#                        {{ form_errors(registrationForm.company.siret) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Téléphone</label>#}
+{#                        {{ form_widget(registrationForm.company.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}#}
+{#                        {{ form_errors(registrationForm.company.phone) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Adresse</label>#}
+{#                        {{ form_widget(registrationForm.company.address, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}#}
+{#                        {{ form_errors(registrationForm.company.address) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Site web</label>#}
+{#                        {{ form_widget(registrationForm.company.website, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}#}
+{#                        {{ form_errors(registrationForm.company.website) }}#}
+{#                    </div>#}
+
+{#                    <div class="mb-4">#}
+{#                        <label class="block text-gray-700 text-sm font-bold mb-2">Description</label>#}
+{#                        {{ form_widget(registrationForm.company.description, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}#}
+{#                        {{ form_errors(registrationForm.company.description) }}#}
+{#                    </div>#}
+{#                </div>#}
+{#                <button type="button" id="nextButton">Suivant</button>#}
+{#            </div>#}
+
+{#            <div class="mb-6 text-center">#}
+{#                {{ form_widget(registrationForm.agreeTerms, {#}
+{#                    'attr': {#}
+{#                        'class': 'mr-2 leading-tight',#}
+{#                        'id': 'registration_form_agreeTerms',#}
+{#                        'required': 'required',#}
+{#                    }#}
+{#                }) }}#}
+{#                <label for="registration_form_agreeTerms" class="text-gray-700 font-bold cursor-pointer">J'accepte les conditions générales d’utilisation (CGU).</label>#}
+{#            </div>#}
+
+{#            <div class="flex items-center justify-center">#}
+{#                <button type="submit" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">#}
+{#                    Inscription#}
+{#                </button>#}
+{#            </div>#}
+
+{#            <input type="hidden" name="{{ csrf_token('authenticate') }}" />#}
+{#            {{ form_end(registrationForm) }}#}
+{#        </form>#}
+{#    </div>#}
+
+
+{#    <script>#}
+{#        document.addEventListener('DOMContentLoaded', () => {#}
+{#            const personalInfoSection = document.getElementById('personalInfoSection');#}
+{#            const companyInfoSection = document.getElementById('companyInfoSection');#}
+{#            const nextButton = document.getElementById('nextButton');#}
+{#            const submitButton = document.getElementById('submitButton');#}
+
+{#            nextButton.addEventListener('click', () => {#}
+{#                personalInfoSection.classList.add('hidden'); // Cacher les infos personnelles#}
+{#                companyInfoSection.classList.remove('hidden'); // Montrer les infos entreprise#}
+{#                nextButton.classList.add('hidden'); // Cacher le bouton Suivant#}
+{#                submitButton.classList.remove('hidden'); // Montrer le bouton d'Inscription#}
+{#            });#}
+{#        });#}
+{#    </script>#}
+
+{#{% endblock %}#}
+
+
+
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Register{% endblock %}
 
 {% block body %}
-
-    <div class="flex items-center justify-center w-full">
-        <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <h1 class="text-xl mb-4 text-center font-semibold">Inscrivez-vous en 30 secondes !</h1>
-
-            {% if form_errors(registrationForm) %}
-                <div class="alert alert-danger">{{ form_errors(registrationForm)|trans({}, 'security') }}</div>
-            {% endif %}
-            {% for flash_error in app.flashes('verify_email_error') %}
-                <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-            {% endfor %}
-
-            {{ form_start(registrationForm) }}
-
-            <div class="flex">
-                <div class="left-bloc p-4">
-                    <h2 class="text-lg mb-4 font-semibold text-gray-800">Informations Personnelles</h2>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Prénom</label>
-                        {{ form_widget(registrationForm.firstName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_firstName', 'required': 'required'}}) }}
-                        {{ form_errors(registrationForm.firstName) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
-                        {{ form_widget(registrationForm.lastName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_lastName', 'required': 'required'}}) }}
-                        {{ form_errors(registrationForm.lastName) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                        {{ form_widget(registrationForm.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_email', 'autocomplete': 'email', 'required': 'required'}}) }}
-                        {{ form_errors(registrationForm.email) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Téléphone</label>
-                        {{ form_widget(registrationForm.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_phone', 'autocomplete': 'tel', 'required': 'required'}}) }}
-                        {{ form_errors(registrationForm.phone) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Adresse</label>
-                        {{ form_widget(registrationForm.address, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_address', 'required': 'required'}}) }}
-                        {{ form_errors(registrationForm.address) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
-                        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_plainPassword_first', 'required': 'required'}}) }}
-                        {{ form_errors(registrationForm.plainPassword.first) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Confirmer mot de passe</label>
-                        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', 'id': 'registration_form_plainPassword_second', 'required': 'required'}}) }}
-                        {{ form_errors(registrationForm.plainPassword.second) }}
-                    </div>
-                </div>
-                <div class="right-bloc p-4">
-                    <h2 class="text-lg mb-4 font-semibold text-gray-800">Informations entreprise</h2>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
-                        {{ form_widget(registrationForm.company.name, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(registrationForm.company.name) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                        {{ form_widget(registrationForm.company.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(registrationForm.company.email) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">N° Siret</label>
-                        {{ form_widget(registrationForm.company.siret, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(registrationForm.company.siret) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Téléphone</label>
-                        {{ form_widget(registrationForm.company.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(registrationForm.company.phone) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Adresse</label>
-                        {{ form_widget(registrationForm.company.address, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(registrationForm.company.address) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Site web</label>
-                        {{ form_widget(registrationForm.company.website, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(registrationForm.company.website) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Description</label>
-                        {{ form_widget(registrationForm.company.description, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-                        {{ form_errors(registrationForm.company.description) }}
+    <main class="w-full flex">
+        <div class="relative flex-1 hidden items-center justify-center h-screen bg-gray-900 lg:flex">
+            <div class="relative z-10 w-full max-w-md">
+                {#                <img src="https://floatui.com/logo-dark.svg" width="150" />#}
+                <div class="mt-16 space-y-3">
+                    <h3 class="text-white text-3xl font-bold">
+                        Commencez à développer votre entreprise
+                    </h3>
+                    <p class="text-gray-300">
+                        Créez un compte et accédez à toutes les fonctionnalités pendant 30 jours,
+                        aucune carte de crédit requise.
+                    </p>
+                    <div class="flex items-center -space-x-2 overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/women/79.jpg" class="w-10 h-10 rounded-full border-2 border-white"/>
+                        <img src="https://api.uifaces.co/our-content/donated/xZ4wg2Xj.jpg" class="w-10 h-10 rounded-full border-2 border-white"/>
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=a72ca28288878f8404a795f39642a46f" class="w-10 h-10 rounded-full border-2 border-white"/>
+                        <img src="https://randomuser.me/api/portraits/men/86.jpg" class="w-10 h-10 rounded-full border-2 border-white"/>
+                        <img src="https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=3759e09a5b9fbe53088b23c615b6312e" class="w-10 h-10 rounded-full border-2 border-white"/>
+                        <p class="text-sm text-gray-400 font-medium translate-x-5">
+                            Rejoignez plus de 5 000 utilisateurs
+                        </p>
                     </div>
                 </div>
             </div>
+            <div class="absolute inset-0 my-auto h-[500px]" style="
+        background: linear-gradient(
+          152.92deg,
+          rgba(192, 132, 252, 0.2) 4.54%,
+          rgba(232, 121, 249, 0.26) 34.2%,
+          rgba(192, 132, 252, 0.1) 77.55%
+        );
+        filter: blur(118px);
+      "></div>
+        </div>
+        <div class="flex-1 flex items-center justify-center h-screen">
+            <div class="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0">
+                <div class="">
+                    <div class="mt-5 space-y-2">
+                        <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">
+                            Céer un compte
+                        </h3>
+                        <p class="">
+                            Vous avez déjà un compte ?
+                            <a href="{{ path("app_login") }}" class="font-medium text-indigo-600 hover:text-indigo-500">Se connecter</a>
+                        </p>
+                    </div>
+                </div>
 
-            <div class="mb-6 text-center">
-                {{ form_widget(registrationForm.agreeTerms, {
-                    'attr': {
-                        'class': 'mr-2 leading-tight',
-                        'id': 'registration_form_agreeTerms',
-                        'required': 'required',
-                    }
-                }) }}
-                <label for="registration_form_agreeTerms" class="text-gray-700 font-bold cursor-pointer">J'accepte les conditions générales d’utilisation (CGU).</label>
+                <form method="post" class="space-y-5">
+
+                    {{ form_start(registrationForm) }}
+                    <div id="personalInfoSection"class="">
+                        <h5 class="text-gray-900 mb-6 text-lg font-semibold sm:text-lg">Informations Personelles</h5>
+                        <div class="flex gap-4">
+                            <div>
+                                <div>
+                                    {{ form_label(registrationForm.firstName, 'Prenom', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.firstName, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_plainPassword_first',
+                                        'autocomplete': 'email',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.firstName.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.firstName.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+
+                                    {{ form_label(registrationForm.lastName, 'Nom', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.lastName, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_plainPassword_first',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.lastName.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.lastName.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+
+
+                                </div>
+                                <div>
+                                    {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.email, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_plainPassword_first',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.email.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.email.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {{ form_label(registrationForm.phone, 'Numéro de téléphone', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.phone, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_plainPassword_first',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.phone.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.phone.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <div>
+                                    {{ form_label(registrationForm.address, 'Adresse', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.address, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_plainPassword_first',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.address.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.address.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {{ form_label(registrationForm.plainPassword.first, 'Mot de passe', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.plainPassword.first, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_plainPassword_first',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.plainPassword.first.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.plainPassword.first.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {{ form_label(registrationForm.plainPassword.second, 'Confirmer le mot de passe', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.plainPassword.second, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_plainPassword_first',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.plainPassword.second.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.plainPassword.second.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <button type="button" id="toCompanyInfo" class="block text-white bg-primary hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm mt-8 px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Suivant</button>
+                    </div>
+
+                    <div id="companyInfoSection" class="hidden">
+                        <h5 class="text-gray-900 mb-6 text-lg font-semibold sm:text-lg">Informations Entreprise</h5>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <div>
+                                    {{ form_label(registrationForm.company.name, 'Nom de l\'entreprise', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.company.name, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_company_name',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.company.name.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.company.name.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {{ form_label(registrationForm.company.email, 'Email de l\'entreprise', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.company.email, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_company_email',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.company.email.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.company.email.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+
+
+                                </div>
+                                <div>
+                                    {{ form_label(registrationForm.company.siret, 'Siret', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.company.siret, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_company_siret',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.company.siret.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.company.siret.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {{ form_label(registrationForm.company.phone, 'Numéro de téléphone', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.company.phone, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_company_phone',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.company.phone.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.company.phone.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div>
+                                    {{ form_label(registrationForm.company.address, 'Adresse', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.company.address, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_company_address',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.company.address.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.company.address.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {{ form_label(registrationForm.company.website, 'Site web', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.company.website, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_company_website',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.company.website.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.company.website.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {{ form_label(registrationForm.company.description, 'Description', {'label_attr': {'class': 'font-medium'}}) }}
+                                    {{ form_widget(registrationForm.company.description, {'attr': {
+                                        'class': 'w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg',
+                                        'id': 'registration_form_plainPassword_first',
+                                        'required': 'required',
+                                    }}) }}
+                                    {% if registrationForm.company.description.vars.errors|length > 0 %}
+                                        <div class="error-messages">
+                                            {% for error in registrationForm.company.description.vars.errors %}
+                                                <p class="text-red-500">{{ error.message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            {{ form_widget(registrationForm.agreeTerms, {
+                                'attr': {
+                                    'class': 'mr-2 leading-tight',
+                                    'id': 'registration_form_agreeTerms',
+                                    'required': 'required',
+                                }
+                            }) }}
+                            <span class="text-gray-700 font-bold">J'accepte les conditions générales d’utilisation (CGU).</span>
+                        </div>
+                        <button type="submit" class="w-full mt-6 px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150">
+                            Créer mon compte
+                        </button>
+
+                        <button type="button" id="backToPersonalInfo" class="block text-white bg-primary hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm mt-8 px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Retour</button>
+
+                        <input type="hidden" name="{{ csrf_token('authenticate') }}" />
+                    </div>
+
+
+                    {{ form_end(registrationForm) }}
+
+
+
+                </form>
             </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const toCompanyInfoBtn = document.getElementById('toCompanyInfo');
+                const backToPersonalInfoBtn = document.getElementById('backToPersonalInfo');
+                const personalInfoSection = document.getElementById('personalInfoSection');
+                const companyInfoSection = document.getElementById('companyInfoSection');
 
-            <div class="flex items-center justify-center">
-                <button type="submit" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
-                    Inscription
-                </button>
-            </div>
+                toCompanyInfoBtn.addEventListener('click', function() {
+                    personalInfoSection.style.display = 'none';
+                    companyInfoSection.style.display = 'block';
+                });
 
-            <input type="hidden" name="{{ csrf_token('authenticate') }}" />
-            {{ form_end(registrationForm) }}
-        </form>
-    </div>
+                backToPersonalInfoBtn.addEventListener('click', function() {
+                    companyInfoSection.style.display = 'none';
+                    personalInfoSection.style.display = 'block';
+                });
+            });
+        </script>
+    </main>
+
+    {#    <div class="flex items-center justify-center h-screen">#}
+    {#        <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">#}
+    {#            <h1 class="text-xl mb-4 font-semibold">Inscrivez-vous en 30 secondes !</h1>#}
+
+    {#            {% if form_errors(registrationForm) %}#}
+    {#                <div class="alert alert-danger">{{ form_errors(registrationForm)|trans({}, 'security') }}</div>#}
+    {#            {% endif %}#}
+
+    {#            {{ form_start(registrationForm) }}#}
+
+    {#            <div class="mb-4">#}
+    {#                {{ form_row(registrationForm.email, {#}
+    {#                    'attr': {#}
+    {#                        'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',#}
+    {#                        'id': 'registration_form_email',#}
+    {#                        'autocomplete': 'email',#}
+    {#                        'required': 'required',#}
+    {#                    }#}
+    {#                }) }}#}
+    {#            </div>#}
+
+    {#            <div class="mb-4">#}
+    {#                {{ form_row(registrationForm.plainPassword.first, {#}
+    {#                    'attr': {#}
+    {#                        'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',#}
+    {#                        'id': 'registration_form_plainPassword_first',#}
+    {#                        'required': 'required',#}
+    {#                    }#}
+    {#                }) }}#}
+    {#            </div>#}
+
+    {#            <div class="mb-4">#}
+    {#                {{ form_row(registrationForm.plainPassword.second, {#}
+    {#                    'attr': {#}
+    {#                        'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',#}
+    {#                        'id': 'registration_form_plainPassword_second',#}
+    {#                        'required': 'required',#}
+    {#                    }#}
+    {#                }) }}#}
+    {#            </div>#}
+
+    {#            <div class="mb-6">#}
+    {#                {{ form_widget(registrationForm.agreeTerms, {#}
+    {#                    'attr': {#}
+    {#                        'class': 'mr-2 leading-tight',#}
+    {#                        'id': 'registration_form_agreeTerms',#}
+    {#                        'required': 'required',#}
+    {#                    }#}
+    {#                }) }}#}
+    {#                <span class="text-gray-700 font-bold">J'accepte les conditions générales d’utilisation (CGU).</span>#}
+    {#            </div>#}
+
+    {#            <div class="flex items-center justify-center">#}
+    {#                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">#}
+    {#                    Inscription#}
+    {#                </button>#}
+    {#            </div>#}
+
+    {#            <input type="hidden" name="{{ csrf_token('authenticate') }}" />#}
+    {#            {{ form_end(registrationForm) }}#}
+    {#        </form>#}
+    {#    </div>#}
 
 {% endblock %}
+
 
