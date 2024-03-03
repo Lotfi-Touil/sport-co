@@ -6,9 +6,11 @@ use App\Entity\Invoice;
 use App\Entity\InvoiceStatus;
 use App\Entity\Payment;
 use App\Form\InvoiceType;
+use App\Repository\EmailTypeRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\InvoiceStatusRepository;
 use App\Service\InvoiceService;
+use App\Service\MailService;
 use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -99,6 +101,11 @@ class InvoiceController extends AbstractController
             return $this->redirectToRoute('platform_invoice_index');
         }
 
+        if ($invoice->getSubmittedAt()) {
+            $this->addFlash('error', 'La facture n\'est plus modifiable car elle a été envoyé le '. $invoice->getSubmittedAt()->format('Y-m-d'));
+            return $this->redirectToRoute('platform_invoice_index');
+        }
+
         $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAll();
         $form = $this->createForm(InvoiceType::class, $invoice, ['status_choices' => $statusList]);
         $form->handleRequest($request);
@@ -115,6 +122,9 @@ class InvoiceController extends AbstractController
                     'form' => $form->createView(),
                 ]);
             }
+
+            $invoice->setUpdatedAt(new \DateTime());
+            $entityManager->flush();
 
             $this->addFlash('success', 'La facture a été mis à jour avec succès.');
             return $this->redirectToRoute('platform_invoice_index', [], Response::HTTP_SEE_OTHER);
@@ -136,8 +146,12 @@ class InvoiceController extends AbstractController
             return $this->redirectToRoute('platform_invoice_index');
         }
 
+        if ($invoice->getSubmittedAt()) {
+            $this->addFlash('error', 'La facture n\'est pas supprimable car elle a été envoyé le '. $invoice->getSubmittedAt()->format('Y-m-d'));
+            return $this->redirectToRoute('platform_invoice_index');
+        }
+
         $payments = $entityManager->getRepository(Payment::class)->findByInvoiceId($invoice->getId());
-        // TODO Lotfi : permettre au super admin + compte company de supprimer tt de meme
         if ($payments) {
             $this->addFlash('error', 'Suppression impossible ! Il y a eu un paiement sur la facture.');
             return $this->redirectToRoute('platform_invoice_index');
@@ -169,10 +183,33 @@ class InvoiceController extends AbstractController
             return $this->redirectToRoute('platform_invoice_index');
         }
 
-        $html = $this->renderView('back/invoice/export.html.twig', [
-            'invoice' => $invoice
-        ]);
-
-        return $invoiceService->exportPDF($invoice, $html);
+        return $invoiceService->exportPDF($invoice);
     }
+
+    #[Route('/{id}/send', name: 'platform_invoice_send', methods: ['GET'])]
+    public function send(Request $request, Invoice $invoice, MailService $mailService, EmailTypeRepository $emailTypeRepository, EntityManagerInterface $entityManager): Response
+    {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
+        if (!$invoice) {
+            $this->addFlash('error', 'La facture demandé n\'existe pas.');
+            return $this->redirectToRoute('platform_invoice_index');
+        }
+
+        $EmailType = $emailTypeRepository->findOneBy(['type' => 'send_invoice']);
+
+        if (!$mailService->sendInvoiceMail($invoice, $EmailType)) {
+            $this->addFlash('error', $mailService->getError());
+            return $this->redirectToRoute('platform_invoice_show', ['id' => $invoice->getId()]);
+        }
+
+        if (!$invoice->getSubmittedAt()) {
+            $invoice->setSubmittedAt(new \DateTime());
+            $entityManager->flush();
+        }
+
+        $this->addFlash('success', 'Le mail a été envoyé avec succès.');
+        return $this->redirectToRoute('platform_invoice_show', ['id' => $invoice->getId()]);
+    }
+
 }

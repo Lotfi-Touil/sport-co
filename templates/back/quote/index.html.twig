@@ -52,9 +52,6 @@
                             Date de soumission
                         </th>
                         <th scope="col" class="px-6 py-3 text-left">
-                            Date d'expiration
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left">
                             Actions
                         </th>
                     </tr>
@@ -70,18 +67,23 @@
                             <td class="px-6 py-4">{{ quote.createdAt ? quote.createdAt|date('d/m/Y H:i') : '-' }}</td>
                             <td class="px-6 py-4">{{ quote.updatedAt ? quote.updatedAt|date('d/m/Y H:i') : '-' }}</td>
                             <td class="px-6 py-4">{{ quote.submittedAt ? quote.submittedAt|date('d/m/Y H:i') : '-' }}</td>
-                            <td class="px-6 py-4">{{ quote.expiryDate ? quote.expiryDate|date('d/m/Y H:i') : '-' }}</td>
                             <td class="px-6 py-4 flex">
-                                <a href="{{ path('platform_quote_show', {'id': quote.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
-                                    Voir
-                                </a>
-                                <a href="{{ path('platform_quote_edit', {'id': quote.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
-                                    Modifier
-                                </a>
-                                <form method="post" action="{{ path('platform_quote_delete', {'id': quote.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce devis ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quote.id) }}">
-                                    <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
-                                </form>
+                                {% if can_access('platform_quote_show') %}
+                                    <a href="{{ path('platform_quote_show', {'id': quote.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                        Voir
+                                    </a>
+                                {% endif %}
+                                {% if can_access('platform_quote_edit') %}
+                                    <a href="{{ path('platform_quote_edit', {'id': quote.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
+                                        Modifier
+                                    </a>
+                                {% endif %}
+                                {% if can_access('platform_quote_delete') %}
+                                    <form method="post" action="{{ path('platform_quote_delete', {'id': quote.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce devis ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quote.id) }}">
+                                        <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
+                                    </form>
+                                {% endif %}
                             </td>
                         </tr>
                     {% else %}

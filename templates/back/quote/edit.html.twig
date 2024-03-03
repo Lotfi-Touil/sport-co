@@ -43,10 +43,22 @@
                             <div class="grid grid-cols-4 gap-12">
                                 <div class="text-sm font-light text-slate-500">
                                     <p class="text-sm font-normal text-slate-700">
-                                    Details
+                                    De
                                     </p>
-                                    <p>Unwrapped</p>
-                                    <p>Fake Street 123 San Javier CA 1234</p>
+                                    {% if quote.quoteUsers is not empty %}
+                                        {% set company = quote.quoteUsers[0].creator.company %}
+                                        <p>{{ company.name }}</p>
+                                        <p>{{ company.address }}</p>
+                                        <p>{{ company.email }}</p>
+                                        <p>{{ company.phone }}</p>
+                                    {% elseif app.user and is_granted("ROLE_ADMIN") == false %}
+                                        <p>{{ app.user.company.name }}</p>
+                                        <p>{{ app.user.company.address }}</p>
+                                        <p>{{ app.user.company.email }}</p>
+                                        <p>{{ app.user.company.phone }}</p>
+                                    {% else %}
+                                        <p>-</p>
+                                    {% endif %}
                                 </div>
                                 <div id="bloc-destinataire" class="text-sm font-light text-slate-500">
                                     <p class="text-sm font-normal text-slate-700">Destinataire</p>
@@ -80,11 +92,6 @@
                                         <p>-</p>
                                     {% endif %}
                                 </div>
-                                {# TODO #}
-                                {# <div class="text-sm font-light text-slate-500">
-                                    <p class="text-sm font-normal text-slate-700">Validité</p>
-                                    <p>0 Days</p>
-                                </div> #}
                             </div>
                         </div>
                     </div>

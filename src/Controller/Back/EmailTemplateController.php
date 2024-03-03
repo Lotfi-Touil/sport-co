@@ -9,20 +9,43 @@ use App\Repository\EmailTemplateRepository;
 use App\Repository\EmailTypeRepository;
 use App\Repository\QuoteRepository;
 use App\Service\MailService;
+use App\Service\PageAccessService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 #[Route('platform/email-template/template')]
 class EmailTemplateController extends AbstractController
 {
-    #[Route('/', name: 'platform_email_template_index', methods: ['GET'])]
-    public function index(EmailTemplateRepository $emailTemplateRepository): Response
+    private $pageAccessService;
+    private $security;
+
+    public function __construct(Security $security, PageAccessService $pageAccessService)
     {
+        $this->pageAccessService = $pageAccessService;
+        $this->security = $security;
+    }
+
+    #[Route('/', name: 'platform_email_template_index', methods: ['GET'])]
+    public function index(EmailTemplateRepository $emailTemplateRepository, AuthorizationCheckerInterface $authorizationChecker): Response
+    {
+        if ($authorizationChecker->isGranted("ROLE_ADMIN")) {
+            $emailTemplates = $emailTemplateRepository->findAll();
+        } else {
+            $user = $this->security->getUser();
+            $company = $user->getCompany();
+
+            if ($company) {
+                $emailTemplates = $emailTemplateRepository->findAllByCompanyId($company->getId());
+            }
+        }
+
         return $this->render('back/email_template/index.html.twig', [
-            'email_templates' => $emailTemplateRepository->findAll(),
+            'email_templates' => $emailTemplates,
         ]);
     }
 
