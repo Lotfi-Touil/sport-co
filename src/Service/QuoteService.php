@@ -12,20 +12,21 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 class QuoteService
 {
     private Security $security;
     private EntityManagerInterface $entityManager;
-    private Dompdf $dompdf;
+    private Environment $twig;
 
     private $error;
 
-    public function __construct(Security $security, EntityManagerInterface $entityManager, Dompdf $dompdf)
+    public function __construct(Environment $twig, Security $security, EntityManagerInterface $entityManager)
     {
         $this->security = $security;
         $this->entityManager = $entityManager;
-        $this->dompdf = $dompdf;
+        $this->twig = $twig;
     }
 
     private function addError(string $error): void
@@ -256,23 +257,43 @@ class QuoteService
         return true;
     }
 
-    public function exportPDF(Quote $quote, string $html): Response
-    {
-        $pdfOptions = new Options();
-        $pdfOptions->set('defaultFont', 'Arial');
-
-        $this->dompdf->setOptions($pdfOptions);
-        $this->dompdf->loadHtml($html);
-        $this->dompdf->setPaper('A4', 'portrait');
-        $this->dompdf->render();
+    public function exportPDF(Quote $quote): Response {
+        $dompdf = $this->preparePDF($quote);
 
         $filename = "devis-" . $quote->getId() . ".pdf";
-        $this->dompdf->stream($filename, [
+        $dompdf->stream($filename, [
             "Attachment" => true
         ]);
 
         return new Response('', 200, [
             'Content-Type' => 'application/pdf',
         ]);
+    }
+
+    public function generatePDF(Quote $quote): string {
+        $dompdf = $this->preparePDF($quote);
+
+        $output = $dompdf->output();
+        $filename = sys_get_temp_dir() . "/devis-" . $quote->getId() . ".pdf";
+        file_put_contents($filename, $output);
+
+        return $filename;
+    }
+
+    private function preparePDF(Quote $quote): \Dompdf\Dompdf
+    {
+        $html = $this->twig->render('back/quote/export.html.twig', [
+            'quote' => $quote
+        ]);
+
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+
+        $dompdf = new \Dompdf\Dompdf($pdfOptions);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return $dompdf;
     }
 }

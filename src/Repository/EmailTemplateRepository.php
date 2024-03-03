@@ -21,6 +21,17 @@ class EmailTemplateRepository extends ServiceEntityRepository
         parent::__construct($registry, EmailTemplate::class);
     }
 
+    public function findAllByCompanyId($companyId): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.company = :val')
+            ->setParameter('val', $companyId)
+            ->orderBy('e.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return EmailTemplate[] Returns an array of EmailTemplate objects
 //     */

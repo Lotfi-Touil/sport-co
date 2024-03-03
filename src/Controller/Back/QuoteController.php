@@ -5,8 +5,10 @@ namespace App\Controller\Back;
 use App\Entity\Quote;
 use App\Entity\QuoteStatus;
 use App\Form\QuoteType;
+use App\Repository\EmailTypeRepository;
 use App\Repository\QuoteRepository;
 use App\Repository\QuoteStatusRepository;
+use App\Service\MailService;
 use App\Service\PageAccessService;
 use App\Service\QuoteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -116,6 +118,9 @@ class QuoteController extends AbstractController
                 ]);
             }
 
+            $quote->setUpdatedAt(new \DateTime());
+            $entityManager->flush();
+
             $this->addFlash('success', 'Le devis a été mis à jour avec succès.');
             return $this->redirectToRoute('platform_quote_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -168,10 +173,31 @@ class QuoteController extends AbstractController
             return $this->redirectToRoute('platform_quote_index');
         }
 
-        $html = $this->renderView('back/quote/export.html.twig', [
-            'quote' => $quote
-        ]);
-
-        return $quoteService->exportPDF($quote, $html);
+        return $quoteService->exportPDF($quote);
     }
+
+    #[Route('/{id}/send', name: 'platform_quote_send', methods: ['GET'])]
+    public function send(Request $request, Quote $quote, MailService $mailService, EmailTypeRepository $emailTypeRepository, EntityManagerInterface $entityManager): Response
+    {
+        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+
+        if (!$quote) {
+            $this->addFlash('error', 'Le devis demandé n\'existe pas.');
+            return $this->redirectToRoute('platform_quote_index');
+        }
+
+        $EmailType = $emailTypeRepository->findOneBy(['type' => 'send_quote']);
+
+        if (!$mailService->sendQuoteMail($quote, $EmailType)) {
+            $this->addFlash('error', $mailService->getError());
+            return $this->redirectToRoute('platform_quote_show', ['id' => $quote->getId()]);
+        }
+
+        $quote->setSubmittedAt(new \DateTime());
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Le mail a été envoyé avec succès.');
+        return $this->redirectToRoute('platform_quote_show', ['id' => $quote->getId()]);
+    }
+
 }

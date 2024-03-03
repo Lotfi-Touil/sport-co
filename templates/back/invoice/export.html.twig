@@ -9,6 +9,61 @@
       <p>Date de délivrance: {{ (invoice.submittedAt ? invoice.submittedAt : 'now')|date('d/m/Y') }}</p>
   </div>
 
+  <h3 class="mb-20">Société</h3>
+  <table class="invoice-info">
+    <tbody>
+      <tr>
+        <th>Nom:</th>
+        <td>
+          {% if invoice.invoiceUsers|length > 0 %}
+            {{ invoice.invoiceUsers.first().creator.company.name }}
+          {% else %}
+            Pas de client associé
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Adresse:</th>
+        <td>
+          {% if invoice.invoiceUsers|length > 0 %}
+            {{ invoice.invoiceUsers.first().creator.company.address }}
+          {% else %}
+            Pas d'adresse associée
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Email:</th>
+        <td>
+          {% if invoice.invoiceUsers|length > 0 %}
+            {{ invoice.invoiceUsers.first().creator.company.email }}
+          {% else %}
+            Pas d'email associé
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Téléphone:</th>
+        <td>
+          {% if invoice.invoiceUsers|length > 0 %}
+            {{ invoice.invoiceUsers.first().creator.company.phone }}
+          {% else %}
+            Pas d'email associé
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Numéro de devis:</th>
+        <td>{{ invoice.id }}</td>
+      </tr>
+      <tr>
+        <th>Date de délivrance:</th>
+        <td>{{ invoice.submittedAt|default('now')|date('d/m/Y') }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="mb-20">Destinataire</h3>
   <table class="invoice-info">
     <tbody>
       <tr>
@@ -105,6 +160,7 @@
   body { font-family: 'Helvetica', 'Arial', sans-serif; background-color: #fff; color: #333; }
   .container { max-width: 800px; margin: 0 auto; padding: 20px; }
   .header { text-align: center; margin-bottom: 20px; }
+  .mb-20 {margin-bottom: 20px;}
   .header h2 { margin: 0; }
   .invoice-info, .items-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
   th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
