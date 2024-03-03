@@ -6,30 +6,46 @@
     {% include '_partials/back/_platform_nav.html.twig' %}
     <section class="p-4 mt-14 w-full">
         <div class="flex justify-between items-center mb-4">
-            <h1 class="text-2xl font-bold mb-5">Status (devis) #{{ quote_status.id }}</h1>
+            <h1 class="text-lg font-medium text-gray-800 dark:text-white">Status Devis #{{ quote_status.id }}</h1>
 
-            <div class="actions flex">
-                <a href="{{ path('platform_quote_status_index') }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
-                    Revenir à la liste
+            <div class="flex gap-4">
+                <a href="{{ path('platform_quote_status_index') }}" class="text-black dark:text-white">
+                    <svg width="42" height="42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12H5"></path>
+                        <path d="m12 19-7-7 7-7"></path>
+                    </svg>
                 </a>
-                <a href="{{ path('platform_quote_status_edit', {'id': quote_status.id}) }}" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
-                    Modifier
+                <a href="{{ path('platform_quote_status_edit', {'id': quote_status.id}) }}" class="text-black dark:text-white">
+                    <svg width="42" height="42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
                 </a>
-                {{ include('back/quote_status/_delete_form.html.twig') }}
+
+                <form method="post" action="{{ path('platform_quote_status_delete', {'id': quote_status.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce status de devis ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quote_status.id) }}">
+                    <button>
+                        <svg width="42" height="42" fill="none" stroke="#e83030" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                </form>
             </div>
         </div>
 
-        <div class="p-6">
+        <div class="bg-white shadow rounded-lg p-6 dark:bg-gray-800">
             <table class="w-full table-auto">
                 <tbody class="text-gray-700">
-                    <tr class="border-b">
-                        <th class="py-2 px-4 text-left font-semibold">Id</th>
-                        <td class="py-2 px-4">{{ quote_status.id }}</td>
-                    </tr>
-                    <tr class="border-b">
-                        <th class="py-2 px-4 text-left font-semibold">Titre</th>
-                        <td class="py-2 px-4">{{ quote_status.title }}</td>
-                    </tr>
+                <tr class="border-b">
+                    <th class="py-2 px-4 text-left font-semibold text-gray-800 dark:text-white">Id</th>
+                    <td class="py-2 px-4 text-gray-800 dark:text-white">{{ quote_status.id }}</td>
+                </tr>
+                <tr class="border-b">
+                    <th class="py-2 px-4 text-left font-semibold text-gray-800 dark:text-white">Name</th>
+                    <td class="py-2 px-4 text-gray-800 dark:text-white">{{ quote_status.title }}</td>
+                </tr>
+
                 </tbody>
             </table>
         </div>

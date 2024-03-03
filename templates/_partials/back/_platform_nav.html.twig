@@ -1,17 +1,10 @@
-{#{% include '_partials/back/_platform_navbar.html.twig' %}#}
+{% include '_partials/back/_platform_navbar.html.twig' %}
 {#{% include '_partials/back/_platform_sidebar.html.twig' %}#}
 
 {% set currentRoute = app.request.attributes.get('_route') %} {# NE PAS OUBLIER DE LAJOUTER POUR QUE LE HOVER SOIT SUR LA PAGE ACTUEL #}
 
-<div id="menuButton" class="lg:hidden">
-    <svg width="46" height="46" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M17 10H3"></path>
-        <path d="M21 6H3"></path>
-        <path d="M21 14H3"></path>
-        <path d="M17 18H3"></path>
-    </svg>
-</div>
-<aside id="sidebar" class=" absolute hidden lg:static lg:flex basis-1/5 flex flex-col  h-screen px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
+
+<aside id="sidebar" class=" absolute hidden lg:static lg:flex basis-1/5 flex flex-col z-2 h-screen px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
 
     <div class="flex justify-between lg:justify-center">
         <a href="#" class="h3 text-black font-bold dark:text-white">
