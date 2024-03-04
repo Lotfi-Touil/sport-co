@@ -62,7 +62,8 @@
                 Enregistrer
             </button>
 
-            {{ form_end(form) }}
+            {{ form_widget(form._token) }}
+            {{ form_end(form, {'render_rest': false}) }}
         </div>
     </section>
 {% endblock %}
