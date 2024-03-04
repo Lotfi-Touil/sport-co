@@ -114,8 +114,12 @@
                                         <h5 class="text-md font-bold">Paiement de: {{ payment.customerFirstName }} {{ payment.customerLastName }}</h5>
                                         <p class="text-sm">Montant: {{ payment.invoiceTotal|format_currency('EUR') }}</p>
                                     </div>
-                                    <div class="ml-4 flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-yellow-100 text-yellow-800">
-                                        <i class="fas fa-exclamation-triangle"></i>
+                                    <div class="ml-4 flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full
+                        {{ payment.paymentStatusName == 'Paid' ? 'bg-green-500 text-white' :
+                                    (payment.paymentStatusName == 'Pending' ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white') }}">
+                                        <i class="{{ payment.paymentStatusName == 'Paid' ? 'fas fa-check-circle' :
+                                        (payment.paymentStatusName == 'Pending' ? 'fas fa-exclamation-triangle' : 'fas fa-times-circle') }}">
+                                        </i>
                                     </div>
                                 </div>
                             {% endfor %}

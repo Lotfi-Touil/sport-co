@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller\Back;
 
+use App\Entity\PaymentStatus;
 use App\Repository\ReportRepository;
 use App\Service\PageAccessService;
 use App\Service\PDFExportService;
@@ -100,6 +101,21 @@ class ReportController extends AbstractController
         return $this->redirectToRoute('platform_report');
     }
 
+//    #[Route('/report/view/{reportId}', name: 'report_view')]
+//    public function viewReport(Request $request, int $reportId): Response
+//    {
+//        $this->pageAccessService->checkAccess($request->attributes->get('_route'));
+//
+//        $report = $this->reportRepository->find($reportId);
+//        if (!$report) {
+//            throw $this->createNotFoundException('Le rapport demandé n\'existe pas.');
+//        }
+//
+//        return $this->render('back/report/view.html.twig', [
+//            'report' => $report,
+//        ]);
+//    }
+
     #[Route('/report/view/{reportId}', name: 'report_view')]
     public function viewReport(Request $request, int $reportId): Response
     {
@@ -109,6 +125,19 @@ class ReportController extends AbstractController
         if (!$report) {
             throw $this->createNotFoundException('Le rapport demandé n\'existe pas.');
         }
+
+        $paymentDetails = json_decode($report->getPaymentDetails(), true);
+
+        foreach ($paymentDetails as &$detail) {
+            if (array_key_exists('paymentStatusId', $detail)) {
+                $paymentStatus = $this->entityManager->getRepository(PaymentStatus::class)->find($detail['paymentStatusId']);
+                $detail['paymentStatusName'] = $paymentStatus ? $paymentStatus->getName() : 'Inconnu';
+            } else {
+                $detail['paymentStatusName'] = 'Non spécifié';
+            }
+        }
+
+        $report->setPaymentDetails(json_encode($paymentDetails));
 
         return $this->render('back/report/view.html.twig', [
             'report' => $report,
@@ -132,6 +161,22 @@ class ReportController extends AbstractController
             throw $this->createNotFoundException('Le rapport demandé n\'existe pas.');
         }
 
+        $paymentDetails = json_decode($report->getPaymentDetails(), true);
+
+        foreach ($paymentDetails as &$payment) {
+            // Vérifier d'abord si 'paymentStatusId' existe et n'est pas null
+            if (isset($payment['paymentStatusId'])) {
+                $paymentStatus = $this->entityManager->getRepository(PaymentStatus::class)->find($payment['paymentStatusId']);
+                $payment['paymentStatusName'] = $paymentStatus ? $paymentStatus->getName() : 'Inconnu';
+            } else {
+                // Gérer le cas où 'paymentStatusId' n'existe pas ou est null
+                $payment['paymentStatusName'] = 'Non spécifié';
+            }
+        }
+        unset($payment); // Bonne pratique pour éviter les problèmes dans les boucles futures
+        $report->setPaymentDetails(json_encode($paymentDetails));
+
+
         $pdfContent = $this->pdfExportService->exportReportToPDF($report);
 
         $response = new Response($pdfContent);
@@ -140,4 +185,5 @@ class ReportController extends AbstractController
 
         return $response;
     }
+
 }
