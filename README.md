@@ -1,81 +1,50 @@
 # SportCo
+
 ## Symfony Docker (PHP8 / Caddy / Postgresql)
 
-A [Docker](https://www.docker.com/)-based installer and runtime for the [Symfony](https://symfony.com) web framework, with full [HTTP/2](https://symfony.com/doc/current/weblink.html), HTTP/3 and HTTPS support.
+Un installateur et environnement d'exécution basé sur [Docker](https://www.docker.com/) pour le framework web [Symfony](https://symfony.com), avec support complet pour [HTTP/2](https://symfony.com/doc/current/weblink.html), HTTP/3 et HTTPS.
 
-## Getting Started
+### Démarrage rapide
 
-1. If not already done, [install Docker Compose](https://docs.docker.com/compose/install/)
-2. Run `docker compose build --pull --no-cache` to build fresh images
-3. Run `docker compose up` (the logs will be displayed in the current shell) or Run `docker compose up -d` to run in background
-4. Open `https://localhost` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
-5. Run `docker compose down --remove-orphans` to stop the Docker containers.
-6. Run `docker compose logs -f` to display current logs, `docker compose logs -f [CONTAINER_NAME]` to display specific container's current logs
+1. Si ce n'est pas déjà fait, [installez Docker Compose](https://docs.docker.com/compose/install/).
+2. Exécutez `docker compose build --pull --no-cache` pour construire des images fraîches.
+3. Exécutez `docker compose up` (les logs seront affichés dans le terminal actuel) ou `docker compose up -d` pour exécuter en arrière-plan.
+4. Ouvrez `https://localhost` dans votre navigateur web préféré et [acceptez le certificat TLS auto-généré](https://stackoverflow.com/a/15076602/1352334).
+5. Exécutez `docker compose down --remove-orphans` pour arrêter les conteneurs Docker.
+6. Exécutez `docker compose logs -f` pour afficher les logs actuels, `docker compose logs -f [CONTAINER_NAME]` pour afficher les logs d'un conteneur spécifique.
 
-## Commandes utiles
-Lister l'ensemble des commandes existances `docker compose exec php bin/console`
+### Commandes utiles
 
-#### Création de fichier vierge
-Controller `docker compose exec php bin/console make:controller`
+- **Liste des commandes:** `docker compose exec php bin/console`
+- **Création de fichier vierge:** Controller `docker compose exec php bin/console make:controller`, etc.
+- **Debug:** Supprimer le cache `docker compose exec php bin/console cache:clear`, voir les routes actives `docker compose exec php bin/console debug:router`, etc.
+- **Gestion des routes:** [Documentation](https://symfony.com/doc/current/routing.html)
+- **Autowiring & ParamConverter:** [Documentation](https://symfony.com/doc/current/service_container/autowiring.html)
+- **Gestion de base de données:** Commandes pour la création d'entités, la mise à jour de la base de données, etc.
 
-FormType `docker compose exec php bin/console make:form`
+### Contributeurs et Fonctionnalités
 
-CRUD `docker compose exec php bin/console make:crud`
+Ce projet est le fruit du travail collaboratif de plusieurs développeurs talentueux, chacun apportant sa pierre à l'édifice :
 
-#### Debug
-Supprimer le cache du navigateur
+- **Annaël Moussa** - [@annaelmoussa](https://github.com/annaelmoussa)
+    - Suivi des Paiements et Gestion des Statuts de Paiement
+    - Envoi par mail de liens de paiements
+    - Tableau de bord administrateur
+    - Génération de Rapports Financiers
+- **Lotfi Touil** - [@Lotfi-Touil](https://github.com/Lotfi-Touil)
+    - Création, Modification et Suppression de Devis
+    - Création, Modification et Suppression de Factures
+    - Envoi par mail de Devis et de Factures au client
+    - Gestion des Clients
+    - Gestion des Utilisateurs, des Rôles et des Droits d'Accès
+- **Jason Afonso** - [@JasonAfs](https://github.com/JasonAfs)
+- **Raouf Abdoumsa** - [@](https://github.com/)
+      
 
-`docker compose exec php bin/console cache:clear`
+### Lien vers le projet en production
 
-`docker compose exec php bin/console c:c`
+[Accéder à SportCo en production](https://littleyarns.org/)
 
-Voir les routes actives
+### Lien GitHub
 
-`docker compose exec php bin/console debug:router`
-
-## Gestion des routes
-[https://symfony.com/doc/current/routing.html](https://symfony.com/doc/current/routing.html)
-
-## Autowiring & ParamConverter
-Autowiring [https://symfony.com/doc/current/service_container/autowiring.html](https://symfony.com/doc/current/service_container/autowiring.html)
-
-ParamConverter [https://symfony.com/bundles/SensioFrameworkExtraBundle/current/annotations/converters.html](https://symfony.com/bundles/SensioFrameworkExtraBundle/current/annotations/converters.html)
-
-## Gestion de base de données
-
-#### Fix error duplicate table (en rapport avec le cours uniquement; quand vous faites un pull du git du cours)
-Supprimer l'ensemble de vos migrations et faire les commandes suivantes : 
-
-`docker compose exec php bin/console d:d:d --force`
-`docker compose exec php bin/console d:d:c`
-`docker compose exec php bin/console make:migr`
-`docker compose exec php bin/console d:m:m`
-
-#### Commandes de création des fichiers entity/repository et d'ajout de champs
-`docker compose exec php bin/console make:entity`
-
-Documentation sur les relations entre les entités [https://symfony.com/doc/current/doctrine/associations.html](https://symfony.com/doc/current/doctrine/associations.html)
-
-#### Mise à jour de la base de données via migration
-Generation d'une migration
-
-`docker compose exec php bin/console make:migration`
-
-Jouer les migrations
-
-`docker compose exec php bin/console doctrine:migration:migrate`
-
-`docker compose exec php bin/console d:m:m`
-
-#### Mise à jour de la base de données via update de schema sans migration
-Voir les requètes interprétées (sans mise à jour de la DB)
-
-`docker compose exec php bin/console doctrine:schema:update --dump-sql`
-
-`docker compose exec php bin/console d:s:u --dump-sql`
-
-Executer les requètes en DB
-
-`docker compose exec php bin/console doctrine:schema:update --force`
-
-`docker compose exec php bin/console d:s:u --force`
+[Repository GitHub de SportCo](https://github.com/Lotfi-Touil/sport-co)

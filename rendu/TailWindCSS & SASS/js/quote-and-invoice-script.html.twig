@@ -1,0 +1,238 @@
+<script>
+$(document).ready(function() {
+
+    // CUSTOMER PART
+    $('#user-search').on('input', function() {
+        var searchTerm = $(this).val();
+
+        if (searchTerm.length < 2) {
+            $('#user-results').hide();
+            return;
+        }
+
+        $.ajax({
+            url: '{{ path('customer_search') }}',
+            type: 'GET',
+            data: {'term': searchTerm},
+            success: function(data) {
+                $('#user-results').html(data).show();
+            }
+        });
+    });
+
+    $(this).on('click', '#remove-customer', function() {
+        $(this).hide();
+        $('#warning-customer-delete').hide();
+        $('#user-dest-id').val('')
+        $('.zone-info-dest p').text('-');
+    });
+
+    $(this).on('click', '#user-results .add-customer', function() {
+        var userId = $(this).data('id');
+        var email = $(this).data('email');
+        var name = $(this).data('name');
+        var address = $(this).data('address');
+
+        $('#bloc-destinataire .zone-info-dest').html(`
+            <input id="user-dest-id" type="hidden" value="${userId}" class="hidden"/>
+            <p class="user-dest-intitule disabled">${name}</p>
+            <p class="user-dest-email disabled">${email}</p>
+            <p class="user-dest-address-street disabled">${address}</p>
+        `);
+        $('#remove-customer').show();
+        $('#warning-customer-delete').show();
+    });
+
+    // PRODUCT PART
+    $('#product-search').on('input', function() {
+        var searchTerm = $(this).val();
+
+        if (searchTerm.length < 2) {
+            $('#product-results').hide();
+            return;
+        }
+
+        $.ajax({
+            url: '{{ path('product_search') }}',
+            data: { term: searchTerm },
+            success: function(data) {
+                $('#product-results').html(data).show();
+            }
+        });
+    });
+
+    $(this).on('click', function(event) {
+        if (!$(event.target).closest('#product-search, #product-results, #user-search, #user-results').length) {
+            $('#product-results').hide();
+            $('#product-search').val('');
+            $('#user-results').hide();
+            $('#user-search').val('');
+        }
+    });
+
+    $(this).on('click', '.add-product', function() {
+        let productId = $(this).data('product-id');
+        let productName = $(this).data('product-name');
+        let priceTTC = parseFloat($(this).data('product-price'));
+        let taxRate = parseFloat($(this).data('product-tax-rate'));
+
+        // Calcul du prix HT à partir du prix TTC et du taux de taxe
+        let priceHT = getPriceHT(priceTTC, taxRate)
+
+        // Vérifier si le produit est déjà ajouté
+        let existingProduct = $('#added-products').find(`input[data-product-id=${productId}]`);
+        if (existingProduct.length > 0) {
+            let quantity = parseInt(existingProduct.val());
+            existingProduct.val(quantity + 1);
+            $(`.quantity-display[data-product-id=${productId}]`).html(quantity + 1);
+            updateTotalPricePerProduct(existingProduct);
+        } else {
+            // Ajouter un nouveau produit
+            $.ajax({
+                url: '{{ path('product_row_view') }}',
+                data: { id: productId },
+                success: function(data) {
+                    $('#added-products').append(data);
+                }
+            });
+        }
+        $('#no-products').remove();
+        updateTotals();
+    });
+
+    $(this).on('click', '.remove-product', function() {
+        let productId = $(this).data('product-id');
+        $(`.product-info[data-product-id=${productId}]`).remove();
+        if ($('#added-products').children().length === 0) {
+            $('#added-products').html('<tr class="py-5" id="no-products"><td class="py-2" colspan="7">Le devis ne contient aucun article.</td></tr>');
+        }
+        updateTotals();
+    });
+
+    $(this).on('submit', '#form-new-quote, #form-new-invoice', function(e) {
+        e.preventDefault();
+
+        let customerData = collectCustomerData();
+        let productsData = collectProductsData();
+
+        updateCustomerField(customerData);
+        updateProductsField(productsData);
+
+        this.submit(); // Soumettre le formulaire
+    });
+
+    function collectCustomerData() {
+        let customerId = $('#bloc-destinataire .zone-info-dest #user-dest-id').val();
+        let customerEmail = $('#bloc-destinataire .zone-info-dest .user-dest-email').text().trim();
+
+        let id = customerId !== undefined ? customerId : '';
+
+        return {
+            id: id ?? '',
+            email: customerEmail
+        };
+    }
+
+    function collectProductsData() {
+        let productsData = [];
+        $('#added-products .product-info').each(function() {
+            let productId = $(this).data('product-id');
+            let quantity = $(this).find('.product-item').val();
+            let price = $(this).find('.product-item').data('product-price');
+            let taxRate = $(this).find('.product-item').data('product-tax-rate');
+
+            productsData.push({
+                product_id: productId,
+                quantity: quantity,
+                price: price,
+                tax_rate: taxRate,
+            });
+        });
+        return productsData;
+    }
+
+    function updateCustomerField(customerData) {
+        let customerJsonData = JSON.stringify(customerData);
+        $('#form_customer_json').val(customerJsonData);
+    }
+
+    function updateProductsField(productsData) {
+        let jsonData = JSON.stringify(productsData);
+        $('#form_products_json').val(jsonData);
+    }
+
+    $(this).on('click', '.increment-quantity', function() {
+        let quantityDisplay = $(this).siblings('.quantity-display');
+        let inputElement = $(this).closest('td').siblings('.product-item');
+        let currentQuantity = parseInt(inputElement.val());
+        quantityDisplay.text(currentQuantity + 1);
+        inputElement.val(currentQuantity + 1);
+        updateTotalPricePerProduct(inputElement);
+    });
+
+    $(this).on('click', '.decrement-quantity', function() {
+        let inputElement = $(this).closest('td').siblings('.product-item');
+        let quantityDisplay = $(this).siblings('.quantity-display');
+        let currentQuantity = parseInt(inputElement.val());
+        if (currentQuantity > 1) {
+            quantityDisplay.text(currentQuantity - 1);
+            inputElement.val(currentQuantity - 1);
+            updateTotalPricePerProduct(inputElement);
+        }
+    });
+
+    function getPriceTTC(price_ht, tax) {
+        return price_ht * (1 + tax / 100);
+    }
+
+    function getPriceHT(price_ttc, tax) {
+        return price_ttc - (price_ttc * tax / 100);
+        return price_ttc * (1 - tax / 100);
+    }
+
+    function getTotalPrice(price, quantity) {
+        return price * quantity;
+    }
+
+    function getTaxAmountByProduct(price_ttc, tax, quantity=1) {
+        let priceHT = getPriceHT(price_ttc, tax);
+        let taxAmount = price_ttc - priceHT;
+        return taxAmount * quantity;
+    }
+
+    function updateTotals() {
+        var subtotalHT = 0; // Sous-total HT
+        var totalTaxes = 0; // Total des taxes
+
+        $('#added-products tr.product-info').each(function () {
+            var priceTTC = parseFloat($(this).find('.product-item').data('product-price')); // Prix TTC
+            var taxRate = parseFloat($(this).find('.product-item').data('product-tax-rate')); // Taux de taxe
+            var quantity = parseInt($(this).find('.product-item').val()); // Quantité
+            if (!isNaN(priceTTC) && !isNaN(taxRate) && !isNaN(quantity)) {
+                var priceHT = getPriceHT(priceTTC, taxRate);
+                var totalPriceHT = getTotalPrice(priceHT, quantity);
+                var taxAmount = getTaxAmountByProduct(priceTTC, taxRate, quantity)
+
+                subtotalHT += totalPriceHT;
+                totalTaxes += taxAmount;
+            }
+        });
+        // Mise à jour des totaux sur la page
+        $('#subtotal').text(subtotalHT.toFixed(2) + ' €'); // Afficher le sous-total HT
+        $('#total-taxes').text(totalTaxes.toFixed(2) + ' €'); // Afficher le total des taxes
+        $('#total-amount').text((subtotalHT + totalTaxes).toFixed(2) + ' €'); // Afficher le total TTC
+    }
+
+    function updateTotalPricePerProduct(inputElement) {
+        let productId = parseFloat(inputElement.data('product-id'));
+        let quantity = parseInt(inputElement.val());
+        let price = parseFloat(inputElement.data('product-price'));
+        let totalPriceElement = $(`.product-info[data-product-id=${productId}]`).find('.total-product-price');
+
+        totalPriceElement.text(`${(price * quantity).toFixed(2)} €`);
+        updateTotals();
+    }
+
+    updateTotals(); // Appelez la fonction initialement pour calculer les totaux à l'ouverture de la page
+});
+</script>
