@@ -38,9 +38,7 @@ class InvoiceStatusController extends AbstractController
             $invoice_statuses = $invoiceStatusRepository->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $invoice_statuses = $invoiceStatusRepository->findAllByCompanyId($company->getId(), true);
-            }
+            $invoice_statuses = $invoiceStatusRepository->findAllByCompanyId($company->getId(), true);
         }
 
         return $this->render('back/invoice_status/index.html.twig', [

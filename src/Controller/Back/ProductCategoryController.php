@@ -38,9 +38,7 @@ class ProductCategoryController extends AbstractController
             $productCategories = $productCategoryRepository->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $productCategories = $productCategoryRepository->findAllByCompanyId($company->getId());
-            }
+            $productCategories = $productCategoryRepository->findAllByCompanyId($company->getId());
         }
 
         return $this->render('back/product_category/index.html.twig', [

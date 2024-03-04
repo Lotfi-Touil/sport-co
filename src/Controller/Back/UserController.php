@@ -39,9 +39,7 @@ class UserController extends AbstractController
             $users = $userRepository->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $users = $userRepository->findAllByCompanyId($company->getId());
-            }
+            $users = $userRepository->findAllByCompanyId($company->getId());
         }
 
         return $this->render('back/user/index.html.twig', [

@@ -32,6 +32,17 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findBySearchTerm($searchTerm)
+    {
+        $searchTerm = strtolower($searchTerm);
+
+        return $this->createQueryBuilder('p')
+            ->where('LOWER(p.name) LIKE :term')
+            ->setParameter('term', '%'.$searchTerm.'%')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findByTermAndCompany($term, $company)
     {
         $term = strtolower($term);

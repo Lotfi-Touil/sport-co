@@ -43,10 +43,7 @@ class EmailTemplateController extends AbstractController
         } else {
             $user = $this->security->getUser();
             $company = $user->getCompany();
-
-            if ($company) {
-                $emailTemplates = $emailTemplateRepository->findAllByCompanyId($company->getId());
-            }
+            $emailTemplates = $emailTemplateRepository->findAllByCompanyId($company->getId());
         }
 
         return $this->render('back/email_template/index.html.twig', [

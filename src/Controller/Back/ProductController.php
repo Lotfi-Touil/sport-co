@@ -42,9 +42,7 @@ class ProductController extends AbstractController
             $products = $productRepository->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $products = $productRepository->findAllByCompanyId($company->getId());
-            }
+            $products = $productRepository->findAllByCompanyId($company->getId());
         }
 
         return $this->render('back/product/index.html.twig', [
@@ -153,8 +151,12 @@ class ProductController extends AbstractController
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
         $term = $request->query->get('term');
-        $company = $security->getUser()->getCompany();
-        $products = $productRepository->findByTermAndCompany($term, $company);
+        if ($this->authorizationChecker->isGranted("ROLE_ADMIN")) {
+            $products = $productRepository->findByTerm($term);
+        } else {
+            $company = $security->getUser()->getCompany();
+            $products = $productRepository->findByTermAndCompany($term, $company);
+        }
 
         return $this->render('back/product/_search_results.html.twig', [
             'products' => $products,

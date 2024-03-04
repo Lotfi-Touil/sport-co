@@ -38,9 +38,7 @@ class QuoteStatusController extends AbstractController
             $quote_statuses = $quoteStatusRepository->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $quote_statuses = $quoteStatusRepository->findAllByCompanyId($company->getId());
-            }
+            $quote_statuses = $quoteStatusRepository->findAllByCompanyId($company->getId());
         }
 
         return $this->render('back/quote_status/index.html.twig', [

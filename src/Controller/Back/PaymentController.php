@@ -379,10 +379,8 @@ class PaymentController extends AbstractController
             $allInvoices = $invoiceRepository->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $payments = $paymentRepository->findAllByCompanyId($company->getId());
-                $allInvoices = $invoiceRepository->findAllByCompanyId($company->getId());
-            }
+            $payments = $paymentRepository->findAllByCompanyId($company->getId());
+            $allInvoices = $invoiceRepository->findAllByCompanyId($company->getId());
         }
 
         $invoicesWithoutPayments = array_filter($allInvoices, function ($invoice) {

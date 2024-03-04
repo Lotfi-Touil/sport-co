@@ -44,10 +44,8 @@ class InvoiceController extends AbstractController
             $invoice_status = $invoiceStatusRepository->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $invoices = $invoiceRepository->findAllByCompanyId($company->getId());
-                $invoice_status = $invoiceStatusRepository->findAllByCompanyId($company->getId(), true);
-            }
+            $invoices = $invoiceRepository->findAllByCompanyId($company->getId());
+            $invoice_status = $invoiceStatusRepository->findAllByCompanyId($company->getId(), true);
         }
 
         return $this->render('back/invoice/index.html.twig', [
@@ -65,9 +63,7 @@ class InvoiceController extends AbstractController
             $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAllByCompanyId($company->getId(), true);
-            }
+            $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAllByCompanyId($company->getId(), true);
         }
 
         $invoice = new Invoice();
@@ -127,15 +123,11 @@ class InvoiceController extends AbstractController
             return $this->redirectToRoute('platform_invoice_index');
         }
 
-        // TODO Lotfi : empecher d'edit les invoice des autres companys et donc voir le TODO du InvoiceService
-
         if ($authorizationChecker->isGranted("ROLE_ADMIN")) {
             $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAllByCompanyId($company->getId(), true);
-            }
+            $statusList = $entityManager->getRepository(InvoiceStatus::class)->findAllByCompanyId($company->getId(), true);
         }
 
         $form = $this->createForm(InvoiceType::class, $invoice, ['status_choices' => $statusList]);

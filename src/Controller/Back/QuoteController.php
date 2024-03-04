@@ -43,10 +43,8 @@ class QuoteController extends AbstractController
             $quote_status = $quoteStatusRepository->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $quotes = $quoteRepository->findAllByCompanyId($company->getId());
-                $quote_status = $quoteStatusRepository->findAllByCompanyId($company->getId());
-            }
+            $quotes = $quoteRepository->findAllByCompanyId($company->getId());
+            $quote_status = $quoteStatusRepository->findAllByCompanyId($company->getId());
         }
 
         return $this->render('back/quote/index.html.twig', [
@@ -64,9 +62,7 @@ class QuoteController extends AbstractController
             $statusList = $entityManager->getRepository(QuoteStatus::class)->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $statusList = $entityManager->getRepository(QuoteStatus::class)->findAllByCompanyId($company->getId());
-            }
+            $statusList = $entityManager->getRepository(QuoteStatus::class)->findAllByCompanyId($company->getId());
         }
 
         $quote = new Quote();

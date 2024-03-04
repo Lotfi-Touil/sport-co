@@ -42,9 +42,7 @@ class CustomerController extends AbstractController
             $customers = $customerRepository->findAll();
         } else {
             $company = $this->security->getUser()->getCompany();
-            if ($company) {
-                $customers = $customerRepository->findAllByCompanyId($company->getId());
-            }
+            $customers = $customerRepository->findAllByCompanyId($company->getId());
         }
 
         return $this->render('/back/customer/index.html.twig', [
@@ -158,8 +156,12 @@ class CustomerController extends AbstractController
         $this->pageAccessService->checkAccess($request->attributes->get('_route'));
 
         $term = $request->query->get('term');
-        $company = $security->getUser()->getCompany();
-        $customers = $customerRepository->findByTermAndCompany($term, $company);
+        if ($this->authorizationChecker->isGranted("ROLE_ADMIN")) {
+            $customers = $customerRepository->findByTerm($term);
+        } else {
+            $company = $security->getUser()->getCompany();
+            $customers = $customerRepository->findByTermAndCompany($term, $company);
+        }
 
         return $this->render('back/customer/_search_results.html.twig', [
             'customers' => $customers,
