@@ -1,73 +1,60 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des produits{% endblock %}
+{% block title %}Modifier utilisateur{% endblock %}
 
 {% block body %}
     {% include '_partials/back/_platform_nav.html.twig' %}
 
     <section class="p-4 mt-14 w-full">
         <div class="flex justify-between items-center mb-4">
-            <h1 class="text-lg font-bold">Liste des produits</h1>
-            <a href="{{ path('platform_product_new') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Créer un produit
-            </a>
-        </div>
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left">
-                            #
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left">
-                            Nom
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left">
-                            Description
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left">
-                            Prix
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left">
-                            Taxes
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                {# <tbody>
-                    {% for product in products %}
-                        <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                            <td class="px-6 py-4">{{ product.id }}</td>
-                            <td class="px-6 py-4">{{ product.name }}</td>
-                            <td class="px-6 py-4">{{ product.description }}</td>
-                            <td class="px-6 py-4">{{ product.price }}</td>
-                            <td class="px-6 py-4">{{ product.taxRate }}</td>
-                            <td class="px-6 py-4 flex">
-                                <a href="{{ path('platform_product_show', {'id': product.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
-                                    Voir
-                                </a>
-                                <a href="{{ path('platform_product_edit', {'id': product.id}) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2">
-                                    Modifier
-                                </a>
-                                <form method="post" action="{{ path('platform_product_delete', {'id': product.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
-                                    <button class="font-medium text-red-600 dark:text-red-500 hover:underline" type="submit">Supprimer</button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr class="bg-gray-100 border-b dark:bg-gray-800">
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-600 dark:text-gray-400 text-lg">
-                                Aucun produit pour le moment.
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody> #}
-            </table>
+            <h1 class="text-2xl font-bold mb-5">Modifier le profil</h1>
         </div>
 
+        <div class="p-6">
+            {{ form_start(form, {'attr': {'class': 'w-full'}}) }}
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Prénom</label>
+                {{ form_widget(form.firstName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.firstName) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
+                {{ form_widget(form.lastName, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.lastName) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                {{ form_widget(form.email, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Téléphone</label>
+                {{ form_widget(form.phone, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.phone) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Adresse</label>
+                {{ form_widget(form.address, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.address) }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Changer de mot de passe </label>
+                {{ form_widget(form.newPassword.first, {'attr': {'class': 'border-gray-300 shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
+                {{ form_errors(form.newPassword.first) }}
+            </div>
+
+            <button type="submit" class="text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                Enregistrer
+            </button>
+
+            {{ form_widget(form._token) }}
+            {{ form_end(form, {'render_rest': false}) }}
+        </div>
     </section>
-
 {% endblock %}
